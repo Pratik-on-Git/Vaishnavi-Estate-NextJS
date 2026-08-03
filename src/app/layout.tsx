@@ -1,18 +1,10 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import { Navbar } from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { CartProvider } from "@/components/cart/cart-context";
 import { cookies } from "next/headers";
 import { getCart } from "@/lib/shopify";
-
-const inter = localFont({
-  src: "../fonts/InterVariable.woff2",
-  variable: "--font-inter",
-  weight: "100 900",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -34,7 +26,19 @@ export default async function RootLayout({
   const cart = getCart(cartId);
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body>
         <CartProvider cartPromise={cart}>
           <Navbar />
           {children}
