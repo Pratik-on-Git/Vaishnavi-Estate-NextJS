@@ -7,10 +7,10 @@ import { CartProvider } from "@/components/cart/cart-context";
 import { cookies } from "next/headers";
 import { getCart } from "@/lib/shopify";
 
-const interBold = localFont({
-  src: "../fonts/Inter-Bold.ttf",
-  variable: "--font-inter-bold",
-  weight: "700",
+const inter = localFont({
+  src: "../fonts/InterVariable.woff2",
+  variable: "--font-inter",
+  weight: "100 900",
   display: "swap",
 });
 
@@ -34,7 +34,7 @@ export default async function RootLayout({
   const cart = getCart(cartId);
   return (
     <html lang="en">
-      <body className={`${interBold.variable} font-sans`}>
+      <body className={`${inter.variable} font-sans`}>
         <CartProvider cartPromise={cart}>
           <Navbar />
           {children}
