@@ -1,5 +1,3 @@
-export const runtime = "edge";
-
 import { getCollections, getPages, getProducts } from "@/lib/shopify";
 import { MetadataRoute } from "next";
 

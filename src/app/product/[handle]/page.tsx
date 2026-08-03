@@ -1,5 +1,3 @@
-export const runtime = "edge";
-
 import { GridTileImage } from "@/components/grid/tile";
 import Gallery from "@/components/product/gallery";
 import { ProductProvider } from "@/components/product/product-context";
