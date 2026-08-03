@@ -37,3 +37,10 @@ Rotate any private token that has been shared outside your secret manager.
 - `/api/auth/callback` — validates state and exchanges the authorization code
 - `/api/auth/refresh` — refreshes expired access tokens
 - `/api/auth/logout` — clears the local session and ends the Shopify session
+
+## Current production URLs
+
+- Site URL: `https://vaishnavi-estate-next-js.vercel.app`
+- Callback URL: `https://vaishnavi-estate-next-js.vercel.app/api/auth/callback`
+- JavaScript origin: `https://vaishnavi-estate-next-js.vercel.app`
+- Logout URL: `https://vaishnavi-estate-next-js.vercel.app/`
