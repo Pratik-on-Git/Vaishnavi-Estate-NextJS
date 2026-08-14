@@ -54,7 +54,8 @@ function Hero() {
         className="absolute inset-0 bg-gradient-to-b from-espresso/70 via-espresso/25 to-espresso/85"
       />
 
-      <div className="relative flex min-h-[calc(100svh-6.5rem)] flex-col justify-between pb-10 pt-16 md:pb-14 md:pt-20">
+      {/* Fill the viewport below the header stack (2.25rem strip + nav). */}
+      <div className="relative flex min-h-[calc(100svh-6.25rem)] flex-col justify-between pb-10 pt-16 md:min-h-[calc(100svh-7.25rem)] md:pb-14 md:pt-20">
         <div className="shell">
           <p className="animate-riseIn font-display text-lg italic text-clay">
             {site.origin} · Est. {site.since}

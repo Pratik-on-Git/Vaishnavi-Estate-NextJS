@@ -29,7 +29,8 @@ export default function SearchLayout({
         </div>
       </div>
 
-      <div className="sticky top-[6.25rem] z-40 border-b border-ink/15 bg-paper/95 backdrop-blur-md">
+      {/* Offsets match the header stack: 2.25rem strip + 4rem nav (5rem at md). */}
+      <div className="sticky top-[6.25rem] z-40 border-b border-ink/15 bg-paper/95 backdrop-blur-md md:top-[7.25rem]">
         <div className="shell flex flex-col gap-4 py-4 lg:flex-row lg:items-center lg:justify-between">
           <Suspense fallback={<div className="h-6 w-64 animate-pulse bg-ink/10" />}>
             <Collections />
