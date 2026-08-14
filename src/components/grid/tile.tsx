@@ -2,14 +2,20 @@ import clsx from "clsx";
 import Image from "next/image";
 import Label from "../label";
 
+/**
+ * Image tile used by the product gallery and its thumbnail rail. Square
+ * corners, hairline border, oxblood active state — no rounded chrome.
+ */
 export function GridTileImage({
   isInteractive = true,
   active,
   label,
+  className,
   ...props
 }: {
   isInteractive?: boolean;
   active?: boolean;
+  className?: string;
   label?: {
     title: string;
     amount: string;
@@ -20,21 +26,22 @@ export function GridTileImage({
   return (
     <div
       className={clsx(
-        "group flex h-full w-full items-center justify-center overflow-hidden border bg-[rgb(235,235,235)] hover:border-blue-600 dark:bg-black",
+        "group flex h-full w-full items-center justify-center overflow-hidden bg-paper-100",
         {
           relative: label,
-          "border-2 border-blue-600": active,
-          "border-neutral-200 dark:border-neutral-800": !active,
-        }
+          "border border-oxblood": active,
+          "border border-ink/12": !active,
+        },
+        className
       )}
     >
       {props.src ? (
         <Image
-          className={clsx("relative h-full w-full object-contain", {
-            "transition duration-300 ease-in-out group-hover:scale-105":
+          {...props}
+          className={clsx("relative h-full w-full object-cover", {
+            "transition-transform duration-700 ease-editorial group-hover:scale-[1.04]":
               isInteractive,
           })}
-          {...props}
           alt={props.alt}
         />
       ) : null}

@@ -1,10 +1,13 @@
-import { GridTileImage } from "@/components/grid/tile";
 import Gallery from "@/components/product/gallery";
 import { ProductProvider } from "@/components/product/product-context";
 import { ProductDescription } from "@/components/product/product-description";
+import ProductCard from "@/components/product-card";
+import Marquee from "@/components/ui/marquee";
+import { Eyebrow, Headline } from "@/components/ui/section";
 import { HIDDEN_PRODUCT_TAG } from "@/lib/constants";
 import { getProduct, getProductRecommendations } from "@/lib/shopify";
 import { Image } from "@/lib/shopify/types";
+import { site, tickerPhrases } from "@/lib/site";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -29,22 +32,10 @@ export async function generateMetadata({
     robots: {
       index: indexable,
       follow: indexable,
-      googleBot: {
-        index: indexable,
-        follow: indexable,
-      },
+      googleBot: { index: indexable, follow: indexable },
     },
     openGraph: url
-      ? {
-          images: [
-            {
-              url,
-              width,
-              height,
-              alt,
-            },
-          ],
-        }
+      ? { images: [{ url, width, height, alt }] }
       : null,
   };
 }
@@ -57,70 +48,105 @@ export default async function ProductPage({
   const { handle } = await params;
   const product = await getProduct(handle);
   if (!product) return notFound();
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.title,
+    description: product.description,
+    image: product.featuredImage?.url,
+    brand: { "@type": "Brand", name: site.name },
+    offers: {
+      "@type": "AggregateOffer",
+      availability: product.availableForSale
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      priceCurrency: product.priceRange.minVariantPrice.currencyCode,
+      lowPrice: product.priceRange.minVariantPrice.amount,
+      highPrice: product.priceRange.maxVariantPrice.amount,
+    },
+  };
+
   return (
     <ProductProvider>
-      <div className="mx-auto max-w-screen-2xl px-4">
-        <div className="flex flex-col rounded-lg border border-neutral-200 bg-white p-8 md:p-12 lg:flex-row lg:gap-8 dark:border-neutral-800 dark:bg-black">
-          <div className="h-full w-full basis-full lg:basis-4/6">
-            <Suspense
-              fallback={
-                <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden" />
-              }
-            >
-              <Gallery
-                images={product.images.slice(0, 5).map((image: Image) => ({
-                  src: image.url,
-                  altText: image.altText,
-                }))}
-              />
-            </Suspense>
-          </div>
-          <div className="basis-full lg:basis-2/6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+
+      {/* Breadcrumb rail */}
+      <div className="border-b border-ink/15">
+        <div className="shell flex items-center gap-3 py-4">
+          <Link href="/" className="eyebrow hover:text-oxblood">
+            Home
+          </Link>
+          <span aria-hidden className="text-ink-faint">
+            /
+          </span>
+          <Link href="/search" className="eyebrow hover:text-oxblood">
+            Coffee
+          </Link>
+          <span aria-hidden className="text-ink-faint">
+            /
+          </span>
+          <span className="eyebrow text-ink">{product.title}</span>
+        </div>
+      </div>
+
+      <div className="shell grid gap-12 py-12 md:grid-cols-12 md:gap-12 md:py-16">
+        <div className="md:col-span-7">
+          <Suspense
+            fallback={
+              <div className="aspect-square w-full animate-pulse bg-paper-100" />
+            }
+          >
+            <Gallery
+              images={product.images.slice(0, 6).map((image: Image) => ({
+                src: image.url,
+                altText: image.altText,
+              }))}
+            />
+          </Suspense>
+        </div>
+
+        <div className="md:col-span-5">
+          {/* Sticky so the buy panel stays reachable past a tall gallery. */}
+          <div className="md:sticky md:top-32">
             <Suspense fallback={null}>
               <ProductDescription product={product} />
             </Suspense>
           </div>
         </div>
-        <RelatedPRoducts id={product.id} />
       </div>
+
+      <Marquee phrases={tickerPhrases} tone="espresso" />
+
+      <Suspense fallback={null}>
+        <RelatedProducts id={product.id} />
+      </Suspense>
     </ProductProvider>
   );
 }
 
-async function RelatedPRoducts({ id }: { id: string }) {
+async function RelatedProducts({ id }: { id: string }) {
   const relatedProducts = await getProductRecommendations(id);
-
-  if (!relatedProducts) return null;
+  if (!relatedProducts?.length) return null;
 
   return (
-    <div className="py-8">
-      <h2 className="mb-4 text-2xl font-bold">Related Products</h2>
-      <ul className="flex w-full gap-4 overflow-x-auto pt-1">
-        {relatedProducts.map((product) => (
-          <li
-            key={product.handle}
-            className="aspect-square w-full flex-none min-[475px]:w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5"
-          >
-            <Link
-              className="relative h-full w-full"
-              href={`/product/${product.handle}`}
-              prefetch={true}
-            >
-              <GridTileImage
-                alt={product.title}
-                label={{
-                  title: product.title,
-                  amount: product.priceRange.maxVariantPrice.amount,
-                  currencyCode: product.priceRange.maxVariantPrice.currencyCode,
-                }}
-                src={product.featuredImage?.url}
-                fill
-                sizes="(min-width: 1024px) 20vw, (min-width: 768px) 25vw, (min-width: 640px) 33vw, (min-width: 475px) 50vw, 100vw"
-              />
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <section className="py-20 md:py-24">
+      <div className="shell">
+        <Eyebrow>Also from the estate</Eyebrow>
+        <Headline className="mt-5" accent="you may also like">
+          Others
+        </Headline>
+        <ul className="mt-12 grid grid-cols-1 gap-px bg-ink/12 sm:grid-cols-2 lg:grid-cols-4">
+          {relatedProducts.slice(0, 4).map((product) => (
+            <li key={product.handle}>
+              <ProductCard product={product} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }

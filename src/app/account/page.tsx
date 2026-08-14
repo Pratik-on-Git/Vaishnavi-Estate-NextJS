@@ -1,4 +1,5 @@
 import Price from "@/components/price";
+import { Eyebrow, Headline } from "@/components/ui/section";
 import {
   fetchCustomerAccount,
   getCustomerSession,
@@ -8,7 +9,7 @@ import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "My account",
-  description: "View your Shopify customer profile, addresses, and orders.",
+  description: "View your profile, addresses, and order history.",
 };
 
 export default async function AccountPage({
@@ -21,27 +22,30 @@ export default async function AccountPage({
 
   if (!session.isAuthenticated) {
     return (
-      <main className="mx-auto flex min-h-[60vh] max-w-xl items-center px-6 py-16">
-        <div className="w-full rounded-2xl border border-neutral-200 p-8 text-center dark:border-neutral-800">
-          <h1 className="text-3xl font-semibold">Your account</h1>
-          <p className="mt-3 text-neutral-600 dark:text-neutral-400">
-            Sign in securely with Shopify to see your profile, saved addresses,
+      <div className="shell flex min-h-[60vh] items-center py-20">
+        <div className="mx-auto w-full max-w-lg border border-ink/15 p-10 text-center">
+          <Eyebrow>Account</Eyebrow>
+          <Headline as="h1" size="sm" className="mt-5">
+            Sign in to your account
+          </Headline>
+          <p className="mt-5 text-sm leading-relaxed text-ink-muted">
+            Sign in securely with Shopify to see your profile, saved addresses
             and order history. New customers can create an account on the same
             screen.
           </p>
           {error ? (
-            <p role="alert" className="mt-4 text-sm text-red-600">
+            <p role="alert" className="mt-5 font-mono text-spec uppercase tracking-micro text-oxblood">
               We couldn&apos;t complete sign-in. Please try again.
             </p>
           ) : null}
           <Link
             href="/api/auth/login?returnTo=/account"
-            className="mt-8 inline-flex rounded-full bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700"
+            className="btn-primary mt-8"
           >
             Sign in or create account
           </Link>
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -50,79 +54,102 @@ export default async function AccountPage({
   if (!customer) redirect("/api/auth/refresh?returnTo=/account");
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-6 py-12">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <div className="shell py-16 md:py-20">
+      <div className="flex flex-wrap items-end justify-between gap-6 border-b border-ink/15 pb-10">
         <div>
-          <p className="text-sm text-neutral-500">Welcome back</p>
-          <h1 className="text-3xl font-semibold">{customer.displayName}</h1>
-          <p className="mt-1 text-neutral-600 dark:text-neutral-400">
+          <Eyebrow>Welcome back</Eyebrow>
+          <h1 className="mt-4 font-display text-display-sm">
+            {customer.displayName}
+          </h1>
+          <p className="mt-2 text-sm text-ink-muted">
             {customer.emailAddress?.emailAddress}
           </p>
         </div>
-        <Link
-          href="/api/auth/logout"
-          className="rounded-full border border-neutral-300 px-5 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900"
-        >
+        <Link href="/api/auth/logout" className="btn-ghost">
           Sign out
         </Link>
       </div>
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_2fr]">
-        <section className="rounded-2xl border border-neutral-200 p-6 dark:border-neutral-800">
-          <h2 className="text-xl font-semibold">Profile</h2>
-          <dl className="mt-5 space-y-4 text-sm">
-            <div>
-              <dt className="text-neutral-500">Name</dt>
-              <dd>{customer.displayName}</dd>
-            </div>
-            <div>
-              <dt className="text-neutral-500">Email</dt>
-              <dd>{customer.emailAddress?.emailAddress || "Not provided"}</dd>
-            </div>
-            <div>
-              <dt className="text-neutral-500">Phone</dt>
-              <dd>{customer.phoneNumber?.phoneNumber || "Not provided"}</dd>
-            </div>
+      <div className="mt-12 grid gap-12 lg:grid-cols-12 lg:gap-10">
+        <section className="lg:col-span-4">
+          <Eyebrow index="01">Profile</Eyebrow>
+          <dl className="mt-6 space-y-5 border-t border-ink/15 pt-6">
+            {[
+              { term: "Name", value: customer.displayName },
+              {
+                term: "Email",
+                value: customer.emailAddress?.emailAddress || "Not provided",
+              },
+              {
+                term: "Phone",
+                value: customer.phoneNumber?.phoneNumber || "Not provided",
+              },
+            ].map((row) => (
+              <div key={row.term}>
+                <dt className="eyebrow">{row.term}</dt>
+                <dd className="mt-1.5 font-display text-lg">{row.value}</dd>
+              </div>
+            ))}
           </dl>
 
-          <h2 className="mt-8 text-xl font-semibold">Saved addresses</h2>
+          <Eyebrow index="02" className="mt-12">
+            Saved addresses
+          </Eyebrow>
           {customer.addresses.nodes.length ? (
-            <ul className="mt-4 space-y-4">
+            <ul className="mt-6 space-y-px border-t border-ink/15">
               {customer.addresses.nodes.map((address) => (
-                <li key={address.id} className="rounded-xl bg-neutral-50 p-4 text-sm dark:bg-neutral-900">
+                <li
+                  key={address.id}
+                  className="border-b border-ink/12 py-4 text-sm leading-relaxed text-ink-muted"
+                >
                   {address.formatted.map((line) => (
-                    <span key={line} className="block">{line}</span>
+                    <span key={line} className="block">
+                      {line}
+                    </span>
                   ))}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-sm text-neutral-500">No saved addresses yet.</p>
+            <p className="mt-6 border-t border-ink/15 pt-6 text-sm text-ink-muted">
+              No saved addresses yet.
+            </p>
           )}
         </section>
 
-        <section className="rounded-2xl border border-neutral-200 p-6 dark:border-neutral-800">
-          <h2 className="text-xl font-semibold">Order history</h2>
+        <section className="lg:col-span-7 lg:col-start-6">
+          <Eyebrow index="03">Order history</Eyebrow>
           {customer.orders.nodes.length ? (
-            <ul className="mt-5 divide-y divide-neutral-200 dark:divide-neutral-800">
+            <ul className="mt-6 border-t border-ink/15">
               {customer.orders.nodes.map((order) => (
-                <li key={order.id} className="flex flex-wrap items-center justify-between gap-4 py-5">
+                <li
+                  key={order.id}
+                  className="flex flex-wrap items-start justify-between gap-6 border-b border-ink/12 py-6"
+                >
                   <div>
-                    <p className="font-medium">{order.name}</p>
-                    <p className="mt-1 text-sm text-neutral-500">
-                      {new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(new Date(order.processedAt))}
+                    <p className="font-display text-xl">{order.name}</p>
+                    <p className="mt-1.5 text-sm text-ink-muted">
+                      {new Intl.DateTimeFormat("en", {
+                        dateStyle: "medium",
+                      }).format(new Date(order.processedAt))}
                     </p>
-                    <p className="mt-1 text-xs uppercase tracking-wide text-neutral-500">
-                      {[order.financialStatus, order.fulfillmentStatus].filter(Boolean).join(" · ")}
+                    <p className="eyebrow mt-2">
+                      {[order.financialStatus, order.fulfillmentStatus]
+                        .filter(Boolean)
+                        .join(" · ")}
                     </p>
                   </div>
                   <div className="text-right">
                     <Price
+                      className="font-display text-xl text-oxblood"
                       amount={order.totalPrice.amount}
                       currencyCode={order.totalPrice.currencyCode}
                     />
                     {order.statusPageUrl ? (
-                      <a href={order.statusPageUrl} className="mt-2 block text-sm text-blue-600 hover:underline">
+                      <a
+                        href={order.statusPageUrl}
+                        className="link-rule mt-3 inline-block"
+                      >
                         View order
                       </a>
                     ) : null}
@@ -131,15 +158,18 @@ export default async function AccountPage({
               ))}
             </ul>
           ) : (
-            <div className="py-16 text-center">
-              <p className="text-neutral-500">You haven&apos;t placed an order yet.</p>
-              <Link href="/search" className="mt-4 inline-block text-blue-600 hover:underline">
+            <div className="mt-6 border border-ink/15 px-8 py-16 text-center">
+              <p className="font-display text-2xl">No orders yet</p>
+              <p className="mt-3 text-sm text-ink-muted">
+                Your first bag from the estate is waiting.
+              </p>
+              <Link href="/search" className="btn-ghost mt-8">
                 Start shopping
               </Link>
             </div>
           )}
         </section>
       </div>
-    </main>
+    </div>
   );
 }

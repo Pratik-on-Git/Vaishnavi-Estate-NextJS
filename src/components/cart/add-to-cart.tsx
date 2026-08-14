@@ -5,7 +5,6 @@ import { useProduct } from "../product/product-context";
 import { useCart } from "./cart-context";
 import { useActionState } from "react";
 import clsx from "clsx";
-import { PlusIcon } from "@heroicons/react/24/outline";
 import { addItem } from "./actions";
 
 function SubmitButton({
@@ -15,14 +14,12 @@ function SubmitButton({
   availableForSale: boolean;
   selectedVariantId: string | undefined;
 }) {
-  const buttonClasses =
-    "relative flex w-full items-center justify-center rounded-full bg-blue-600 p-4 tracking-wide text-white";
-  const disabledClasses = "cursor-not-allowed opacity-60 hover:opacity-60";
+  const base = "btn-primary w-full";
 
   if (!availableForSale) {
     return (
-      <button disabled className={clsx(buttonClasses, disabledClasses)}>
-        Out of Stock
+      <button disabled className={clsx(base)}>
+        Sold out
       </button>
     );
   }
@@ -32,27 +29,16 @@ function SubmitButton({
       <button
         aria-label="Please select an option"
         disabled
-        className={clsx(buttonClasses, disabledClasses)}
+        className={clsx(base)}
       >
-        <div className="absolute left-0 ml-4">
-          <PlusIcon className="h-5" />
-        </div>
-        Add to Cart
+        Select an option
       </button>
     );
   }
 
   return (
-    <button
-      aria-label="Add to cart"
-      className={clsx(buttonClasses, {
-        "hover:opacity-90": true,
-      })}
-    >
-      <div className="absolute left-0 ml-4">
-        <PlusIcon className="h-5" />
-      </div>
-      Add To Cart
+    <button aria-label="Add to cart" className={base}>
+      Add to cart
     </button>
   );
 }

@@ -1,7 +1,31 @@
 import Grid from "@/components/grid";
 import ProductGridItems from "@/components/layout/product-grid-items";
 import { defaultSort, sorting } from "@/lib/constants";
-import { getCollectionProducts } from "@/lib/shopify";
+import { getCollections, getCollectionProducts } from "@/lib/shopify";
+import { Metadata } from "next";
+import Link from "next/link";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ collection: string }>;
+}): Promise<Metadata> {
+  const { collection: handle } = await params;
+  // The storefront client exposes the collection list rather than a
+  // single-collection lookup, so match on the handle within its path.
+  const collections = await getCollections();
+  const collection = collections.find((item) => item.path === `/search/${handle}`);
+
+  if (!collection) return { title: "Collection" };
+
+  return {
+    title: collection.seo?.title || collection.title,
+    description:
+      collection.seo?.description ||
+      collection.description ||
+      `${collection.title} from Vaishnavi Estate.`,
+  };
+}
 
 export default async function CategoryPage({
   params,
@@ -25,9 +49,18 @@ export default async function CategoryPage({
   return (
     <section>
       {products.length === 0 ? (
-        <p className="py-3 text-lg">{`No products found in this collection`}</p>
+        <div className="border border-ink/15 px-8 py-20 text-center">
+          <p className="font-display text-3xl">This collection is empty</p>
+          <p className="mx-auto mt-4 max-w-prose2 text-sm leading-relaxed text-ink-muted">
+            Nothing from this lot is in stock right now. The rest of the harvest
+            is still on the shelf.
+          </p>
+          <Link href="/search" className="btn-ghost mt-8">
+            View all coffee
+          </Link>
+        </div>
       ) : (
-        <Grid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <Grid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <ProductGridItems products={products} />
         </Grid>
       )}

@@ -5,38 +5,41 @@ import FilterItemDropDown from "./dropdown";
 export type PathFilterItem = { title: string; path: string };
 export type ListItem = SortFilterItem | PathFilterItem;
 
-function FilterItemList({ list }: { list: ListItem[] }) {
-  return (
-    <>
-      {list.map((item: ListItem, i) => (
-        <FilterItem key={i} item={item} />
-      ))}
-    </>
-  );
-}
-
+/**
+ * Horizontal filter rail. Collections read as an inline row of links on wide
+ * screens and collapse to a dropdown below `lg`, where a row of eight
+ * collection names would wrap into an unreadable block.
+ */
 export default function FilterList({
   list,
   title,
+  layout = "inline",
 }: {
   list: ListItem[];
   title?: string;
+  layout?: "inline" | "compact";
 }) {
   return (
-    <>
-      <nav>
-        {title ? (
-          <h3 className="hidden text-xs text-neutral-500 md:block dark:text-neutral-400">
-            {title}
-          </h3>
-        ) : null}
-        <ul className="hidden md:block">
-          <FilterItemList list={list} />
-        </ul>
-        <ul className="md:hidden">
-          <FilterItemDropDown list={list} />
-        </ul>
-      </nav>
-    </>
+    <nav className="flex items-center gap-4">
+      {title ? (
+        <span className="eyebrow hidden shrink-0 lg:inline">{title}</span>
+      ) : null}
+
+      <ul
+        className={
+          layout === "inline"
+            ? "hidden flex-wrap items-center gap-x-6 gap-y-2 lg:flex"
+            : "hidden items-center gap-x-6 lg:flex"
+        }
+      >
+        {list.map((item: ListItem, i) => (
+          <FilterItem key={i} item={item} />
+        ))}
+      </ul>
+
+      <div className="w-full lg:hidden">
+        <FilterItemDropDown list={list} label={title} />
+      </div>
+    </nav>
   );
 }

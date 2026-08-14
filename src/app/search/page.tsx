@@ -2,10 +2,11 @@ import Grid from "@/components/grid";
 import ProductGridItems from "@/components/layout/product-grid-items";
 import { defaultSort, sorting } from "@/lib/constants";
 import { getProducts } from "@/lib/shopify";
+import Link from "next/link";
 
 export const metadata = {
-  title: "Search",
-  description: "Search for products in the store.",
+  title: "Shop coffee",
+  description: "Search single-origin Coorg Robusta from Vaishnavi Estate.",
 };
 
 export default async function SearchPage({
@@ -25,22 +26,36 @@ export default async function SearchPage({
   const { sortKey, reverse } =
     sorting.find((item) => item.slug === sort) || defaultSort;
   const products = await getProducts({ sortKey, reverse, query: searchValue });
-  const resultsText = products.length > 1 ? "results" : "result";
+  const resultsText = products.length === 1 ? "result" : "results";
+
   return (
-    <>
+    <section>
       {searchValue ? (
-        <p className="mb-4">
+        <p className="eyebrow mb-10">
           {products.length === 0
-            ? "There are no products that match"
-            : `Showing ${products.length} ${resultsText} for `}
-          <span>&quot;{searchValue}&quot;</span>
+            ? "No coffee matches"
+            : `${products.length} ${resultsText} for`}{" "}
+          <span className="text-ink">&ldquo;{searchValue}&rdquo;</span>
         </p>
       ) : null}
+
       {products.length > 0 ? (
-        <Grid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <Grid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <ProductGridItems products={products} />
         </Grid>
-      ) : null}
-    </>
+      ) : (
+        <div className="border border-ink/15 px-8 py-20 text-center">
+          <p className="font-display text-3xl">Nothing on this shelf yet</p>
+          <p className="mx-auto mt-4 max-w-prose2 text-sm leading-relaxed text-ink-muted">
+            {searchValue
+              ? "Try a broader term — a roast level, a brew method, or simply “Robusta”."
+              : "The current harvest is being listed. Check back shortly."}
+          </p>
+          <Link href="/search" className="btn-ghost mt-8">
+            View all coffee
+          </Link>
+        </div>
+      )}
+    </section>
   );
 }

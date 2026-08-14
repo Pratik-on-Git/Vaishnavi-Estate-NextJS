@@ -7,29 +7,32 @@ import { createUrl } from "@/lib/utils";
 import type { SortFilterItem } from "@/lib/constants";
 import clsx from "clsx";
 
+const itemClass = (active: boolean) =>
+  clsx(
+    "whitespace-nowrap font-mono text-spec uppercase tracking-micro transition-colors",
+    active
+      ? "text-oxblood underline decoration-1 underline-offset-4"
+      : "text-ink-muted hover:text-ink"
+  );
+
 function PathFilterItem({ item }: { item: PathFilterItem }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const active = pathname === item.path;
   const newParams = new URLSearchParams(searchParams.toString());
-  const DynamicTag = active ? "p" : Link;
 
   newParams.delete("q");
   newParams.delete("collection");
 
   return (
-    <li className="mt-2 flex text-black dark:text-white" key={item.title}>
-      <DynamicTag
+    <li key={item.title}>
+      <Link
         href={createUrl(item.path, newParams)}
-        className={clsx(
-          "w-full text-sm underline-offset-4 hover:underline dark:hover:text-neutral-100",
-          {
-            "underline underline-offset-4": active,
-          }
-        )}
+        aria-current={active ? "page" : undefined}
+        className={itemClass(active)}
       >
         {item.title}
-      </DynamicTag>
+      </Link>
     </li>
   );
 }
@@ -47,22 +50,17 @@ function SortFilterItem({ item }: { item: SortFilterItem }) {
       ...(item.slug && item.slug.length && { sort: item.slug }),
     })
   );
-  const DynamicTag = active ? "p" : Link;
 
   return (
-    <li
-      className="mt-2 flex text-sm text-black dark:text-white"
-      key={item.title}
-    >
-      <DynamicTag
+    <li key={item.title}>
+      <Link
         prefetch={!active ? false : undefined}
         href={href}
-        className={clsx("w-full hover:underline hover:underline-offset-4", {
-          "underline underline-offset-4": active,
-        })}
+        aria-current={active ? "true" : undefined}
+        className={itemClass(active)}
       >
         {item.title}
-      </DynamicTag>
+      </Link>
     </li>
   );
 }

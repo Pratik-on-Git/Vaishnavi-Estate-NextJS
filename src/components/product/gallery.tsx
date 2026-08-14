@@ -2,9 +2,14 @@
 
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import { GridTileImage } from "../grid/tile";
+import clsx from "clsx";
 import { useProduct, useUpdateURL } from "./product-context";
 
+/**
+ * Product gallery: one large square frame with square-cornered arrow controls
+ * and a hairline thumbnail rail beneath. Images are cover-cropped so a mixed
+ * set of packshots and lifestyle shots still reads as one consistent grid.
+ */
 export default function Gallery({
   images,
 }: {
@@ -18,71 +23,86 @@ export default function Gallery({
   const previousImageIndex =
     imageIndex === 0 ? images.length - 1 : imageIndex - 1;
 
-  const buttonClassName =
-    "h-full px-6 transition-all ease-in-out hover:scale-110 hover:text-black dark:hover:text-white flex items-center justify-center";
+  const arrowClass =
+    "flex h-12 w-12 items-center justify-center text-ink transition-colors hover:bg-ink hover:text-paper";
 
   return (
     <form>
-      <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden">
-        {images[imageIndex] && (
+      <div className="relative aspect-square w-full overflow-hidden border border-ink/12 bg-paper-100">
+        {images[imageIndex] ? (
           <Image
-            className="h-full w-full object-contain"
+            className="h-full w-full object-cover"
             fill
-            sizes="(min-width: 1024px) 66vw, 100vw"
+            sizes="(min-width: 768px) 58vw, 100vw"
             src={images[imageIndex]?.src as string}
             alt={images[imageIndex]?.altText as string}
-            priority={true}
+            priority
           />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <span className="eyebrow">No image</span>
+          </div>
         )}
 
         {images.length > 1 ? (
-          <div className="absolute bottom-[15%] flex w-full justify-center">
-            <div className="mx-auto flex h-11 items-center rounded-full border border-white bg-neutral-50/80 text-neutral-500 backdrop-blur dark:border-black dark:bg-neutral-900/80">
-              <button
-                formAction={() => {
-                  const newState = updateImage(previousImageIndex.toString());
-                  updateURL(newState);
-                }}
-                aria-label="Previous product image"
-                className={buttonClassName}
-              >
-                <ArrowLeftIcon className="h-5" />
-              </button>
-              <div className="mx-1 h-6 w-px bg-neutral-500"></div>
-              <button
-                formAction={() => {
-                  const newState = updateImage(nextImageIndex.toString());
-                  updateURL(newState);
-                }}
-                aria-label="Next product image"
-                className={buttonClassName}
-              >
-                <ArrowRightIcon className="h-5" />
-              </button>
-            </div>
+          <div className="absolute bottom-0 right-0 flex divide-x divide-ink/15 border-l border-t border-ink/15 bg-paper">
+            <button
+              formAction={() => {
+                const newState = updateImage(previousImageIndex.toString());
+                updateURL(newState);
+              }}
+              aria-label="Previous product image"
+              className={arrowClass}
+            >
+              <ArrowLeftIcon className="h-4 w-4" />
+            </button>
+            <button
+              formAction={() => {
+                const newState = updateImage(nextImageIndex.toString());
+                updateURL(newState);
+              }}
+              aria-label="Next product image"
+              className={arrowClass}
+            >
+              <ArrowRightIcon className="h-4 w-4" />
+            </button>
           </div>
         ) : null}
+
+        {images.length > 1 ? (
+          <p className="absolute bottom-4 left-4 font-mono text-spec tracking-micro text-ink">
+            {String(imageIndex + 1).padStart(2, "0")} /{" "}
+            {String(images.length).padStart(2, "0")}
+          </p>
+        ) : null}
       </div>
+
       {images.length > 1 ? (
-        <ul className="my-12 flex items-center justify-center gap-2 overflow-auto py-1 lg:mb-0">
+        <ul className="mt-4 grid grid-cols-6 gap-2">
           {images.map((image, index) => {
             const isActive = index === imageIndex;
             return (
-              <li key={image.src} className="h-20 w-20">
+              <li key={image.src}>
                 <button
                   formAction={() => {
                     const newState = updateImage(index.toString());
                     updateURL(newState);
                   }}
-                  aria-label="Select product image"
-                  className="h-full w-full"
+                  aria-label={`Show image ${index + 1}`}
+                  aria-current={isActive}
+                  className={clsx(
+                    "relative block aspect-square w-full overflow-hidden border transition-colors",
+                    isActive
+                      ? "border-oxblood"
+                      : "border-ink/12 hover:border-ink/40"
+                  )}
                 >
-                  <GridTileImage
-                    alt={image.altText}
+                  <Image
                     src={image.src}
-                    active={isActive}
-                    width={80}
-                    height={80}
+                    alt={image.altText}
+                    fill
+                    sizes="12vw"
+                    className="object-cover"
                   />
                 </button>
               </li>

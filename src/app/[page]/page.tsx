@@ -1,4 +1,5 @@
 import Prose from "@/components/prose";
+import { Eyebrow } from "@/components/ui/section";
 import { getPage } from "@/lib/shopify";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -6,9 +7,10 @@ import { notFound } from "next/navigation";
 export async function generateMetadata({
   params,
 }: {
-  params: { page: string };
+  params: Promise<{ page: string }>;
 }): Promise<Metadata> {
-  const page = await getPage(params.page);
+  const { page: handle } = await params;
+  const page = await getPage(handle);
 
   if (!page) return notFound();
 
@@ -23,25 +25,29 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({ params }: { params: { page: string } }) {
-  const page = await getPage(params.page);
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ page: string }>;
+}) {
+  const { page: handle } = await params;
+  const page = await getPage(handle);
 
   if (!page) return notFound();
 
   return (
-    <>
-      <h1 className="mb-8 text-5xl font-bold">{page.title}</h1>
-      <Prose className="mb-8" html={page.body as string} />
-      <p className="text-sm italic">
-        {`This document was last updated on ${new Intl.DateTimeFormat(
-          undefined,
-          {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          },
-        ).format(new Date(page.updatedAt))}.`}
+    <article className="mx-auto max-w-3xl">
+      <Eyebrow>Vaishnavi Estate</Eyebrow>
+      <h1 className="mt-5 font-display text-display-sm">{page.title}</h1>
+      <hr className="my-10 border-ink/15" />
+      <Prose html={page.body as string} />
+      <p className="eyebrow mt-14 border-t border-ink/15 pt-6">
+        {`Last updated ${new Intl.DateTimeFormat(undefined, {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }).format(new Date(page.updatedAt))}`}
       </p>
-    </>
+    </article>
   );
 }

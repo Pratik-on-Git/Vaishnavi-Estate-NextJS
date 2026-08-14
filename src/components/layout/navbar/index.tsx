@@ -2,66 +2,84 @@ import { getMenu } from "@/lib/shopify";
 import { Menu } from "@/lib/shopify/types";
 import Link from "next/link";
 import MobileMenu from "./mobile-menu";
-import Search from "./search";
+import SearchTrigger from "./search";
 import LogoSquare from "@/components/logo-square";
 import CartModal from "@/components/cart/modal";
 import { getCustomerSession } from "@/lib/customer-account";
-import { UserCircleIcon } from "@heroicons/react/24/outline";
+import { primaryNav, site } from "@/lib/site";
 
 export async function Navbar() {
-  const menu = await getMenu("vaishnavi-estate-nextjs-menu");
+  const shopifyMenu = await getMenu("vaishnavi-estate-nextjs-menu");
   const customerSession = await getCustomerSession();
-  return (
-    <nav className="flex items-center justify-between p-4 lg:px-6 sticky top-0 backdrop-blur-sm z-[999]">
-      <div className="block flex-none md:hidden">
-        <MobileMenu menu={menu} />
-      </div>
-      <div className="flex w-full items-center">
-        <div className="flex w-full md:w-1/3">
-          <Link
-            href={"/"}
-            prefetch={true}
-            className="mr-2 flex w-full items-center justify-center md:w-auto lg:mr-6"
-          >
-            <LogoSquare />
-            {/* <div className="ml-2 flex-none text-sm font-medium uppercase md:hidden lg:block">
-              {process.env.SITE_NAME}
-            </div> */}
-          </Link>
 
-          {menu.length > 0 ? (
-            <ul className="hidden gap-6 text-sm md:flex md:items-center">
-              {menu.map((item: Menu) => (
-                <li key={item.title}>
-                  <Link
-                    href={item.path}
-                    prefetch={true}
-                    className="text-gray-700 underline-offset-4 hover:text-black hover:underline dark:text-neutral-400 dark:hover:text-neutral-300"
-                  >
-                    {item.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-        <div className="hidden justify-center md:flex md:w-1/3">
-          <Search />
-        </div>
-        <div className="flex items-center justify-end gap-4 md:w-1/3">
-          <Link
-            href={customerSession.isAuthenticated ? "/account" : "/api/auth/login?returnTo=/account"}
-            aria-label={customerSession.isAuthenticated ? "View account" : "Sign in"}
-            className="relative"
-          >
-            <UserCircleIcon className="h-6 w-6" />
-            {customerSession.isAuthenticated ? (
-              <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-green-500" />
-            ) : null}
-          </Link>
-          <CartModal />
+  // Shopify owns the menu when it is configured; the site config is the
+  // fallback so the nav is never empty on a fresh store.
+  const menu: Menu[] = shopifyMenu.length ? shopifyMenu : primaryNav;
+
+  return (
+    <header className="sticky top-0 z-[999]">
+      {/* Announcement strip — the estate's standing promises. */}
+      <div className="bg-oxblood text-paper">
+        <div className="shell flex h-9 items-center justify-center gap-6 overflow-hidden">
+          <p className="eyebrow-inverse whitespace-nowrap">
+            Free shipping across India
+          </p>
+          <span aria-hidden className="text-[0.4rem] opacity-50">
+            &#9679;
+          </span>
+          <p className="eyebrow-inverse hidden whitespace-nowrap sm:block">
+            Roasted daily · Ground on order
+          </p>
+          <span aria-hidden className="hidden text-[0.4rem] opacity-50 md:block">
+            &#9679;
+          </span>
+          <p className="eyebrow-inverse hidden whitespace-nowrap md:block">
+            {site.tagline}
+          </p>
         </div>
       </div>
-    </nav>
+
+      <nav className="border-b border-ink/15 bg-paper/90 backdrop-blur-md">
+        <div className="shell flex h-16 items-center justify-between gap-4 md:h-20">
+          <div className="flex items-center gap-8">
+            <div className="md:hidden">
+              <MobileMenu menu={menu} />
+            </div>
+            <Link href="/" prefetch aria-label={`${site.name} home`}>
+              <LogoSquare />
+            </Link>
+          </div>
+
+          <ul className="hidden items-center gap-9 md:flex">
+            {menu.map((item: Menu) => (
+              <li key={item.title}>
+                <Link
+                  href={item.path}
+                  prefetch
+                  className="font-mono text-spec uppercase tracking-micro text-ink-muted transition-colors hover:text-oxblood"
+                >
+                  {item.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex items-center gap-5">
+            <SearchTrigger />
+            <Link
+              href={
+                customerSession.isAuthenticated
+                  ? "/account"
+                  : "/api/auth/login?returnTo=/account"
+              }
+              className="hidden font-mono text-spec uppercase tracking-micro text-ink-muted transition-colors hover:text-oxblood sm:block"
+            >
+              {customerSession.isAuthenticated ? "Account" : "Sign in"}
+            </Link>
+            <CartModal />
+          </div>
+        </div>
+      </nav>
+    </header>
   );
 }

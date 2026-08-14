@@ -1,11 +1,19 @@
 "use client";
+
 import { usePathname, useSearchParams } from "next/navigation";
 import { ListItem } from ".";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { FilterItem } from "./item";
+import clsx from "clsx";
 
-export default function FilterItemDropDown({ list }: { list: ListItem[] }) {
+export default function FilterItemDropDown({
+  list,
+  label,
+}: {
+  list: ListItem[];
+  label?: string;
+}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [active, setActive] = useState("");
@@ -38,23 +46,34 @@ export default function FilterItemDropDown({ list }: { list: ListItem[] }) {
 
   return (
     <div className="relative" ref={ref}>
-      <div
+      <button
+        type="button"
+        aria-expanded={openSelect}
         onClick={() => setOpenSelect(!openSelect)}
-        className="flex w-full items-center justify-between rounded border border-black/30 px-4 py-2 text-sm dark:border-white/30"
+        className="flex w-full items-center justify-between gap-3 border border-ink/20 px-4 py-2.5 font-mono text-spec uppercase tracking-micro text-ink"
       >
-        {active}
-        <ChevronDownIcon className="h-4" />
-      </div>
-      {openSelect && (
-        <div
+        <span className="truncate">
+          {label ? `${label}: ` : ""}
+          {active || "All"}
+        </span>
+        <ChevronDownIcon
+          aria-hidden
+          className={clsx(
+            "h-4 w-4 shrink-0 transition-transform duration-200",
+            openSelect && "rotate-180"
+          )}
+        />
+      </button>
+      {openSelect ? (
+        <ul
           onClick={() => setOpenSelect(false)}
-          className="absolute z-40 w-full rounded-b-md bg-white p-4 shadow-md dark:bg-black"
+          className="absolute z-40 mt-px flex w-full flex-col gap-3 border border-ink/20 bg-paper p-4"
         >
           {list.map((item: ListItem, i) => (
             <FilterItem item={item} key={i} />
           ))}
-        </div>
-      )}
+        </ul>
+      ) : null}
     </div>
   );
 }

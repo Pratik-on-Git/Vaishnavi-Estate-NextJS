@@ -1,6 +1,11 @@
 import clsx from "clsx";
 import Price from "./price";
 
+/**
+ * Caption bar laid over an image tile. A flat espresso band rather than a
+ * floating pill — it reads as a printed caption strip, matching the
+ * micro-label treatment used across the hero and section grids.
+ */
 export default function Label({
   title,
   amount,
@@ -14,22 +19,18 @@ export default function Label({
 }) {
   return (
     <div
-      className={clsx(
-        "absolute bottom-0 left-0 flex w-full px-4 pb-4 srccontainer/label",
-        {
-          "lg:px-20 lg:pb-[35%]": position === "center",
-        }
-      )}
+      className={clsx("absolute inset-x-0 bottom-0 flex", {
+        "lg:bottom-[35%]": position === "center",
+      })}
     >
-      <div className="flex items-center rounded-full border bg-white/70 p-1 text-xs font-semibold text-black backdrop-blur-md dark:border-neutral-800 dark:bg-black/70 dark:text-white">
-        <h3 className="mr-4 line-clamp-2 flex-grow pl-2 leading-none tracking-tight">
+      <div className="flex w-full items-center justify-between gap-4 bg-espresso/90 px-4 py-3 text-paper backdrop-blur-sm">
+        <h3 className="line-clamp-2 font-display text-base leading-tight">
           {title}
         </h3>
         <Price
-          className="flex-none rounded-full bg-blue-600 p-2 text-white"
+          className="shrink-0 font-mono text-spec tracking-micro text-clay"
           amount={amount}
           currencyCode={currencyCode}
-          currencyCodeClassName="hidden src[275px]/label:inline"
         />
       </div>
     </div>

@@ -2,19 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body,
-button,
-input,
-textarea,
-select {
-  font-family: "Inter", sans-serif;
-  font-optical-sizing: auto;
+/* ---------------------------------------------------------------------------
+   Vaishnavi Estate — design tokens
+   Warm paper ground, oxblood primary, roasted-brown depth. Single light
+   theme: the brand is a paper-and-ink editorial system, so we opt out of
+   the OS dark scheme rather than invert a palette that depends on warmth.
+--------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light;
+
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-sans: "Inter Tight", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --paper: #fbf4e6;
+  --paper-100: #f6ebd6;
+  --ink: #1c1210;
+  --ink-muted: #6b5b4e;
+  --oxblood: #7b1526;
+  --espresso: #1c1210;
+  --clay: #c08a4e;
+
+  --rule: rgba(28, 18, 16, 0.14);
+  --rule-inverse: rgba(251, 244, 230, 0.22);
+
+  /* Consistent page gutter across every section. */
+  --gutter: 1.25rem;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (min-width: 768px) {
+  :root {
+    --gutter: 2.5rem;
+  }
+}
+
+@layer base {
   html {
-    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-optical-sizing: auto;
+  }
+
+  /* Serif headings carry the editorial voice; the grotesk is for UI. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+  }
+
+  ::selection {
+    background: var(--oxblood);
+    color: var(--paper);
+  }
+
+  a,
+  input,
+  button,
+  textarea,
+  select {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxblood focus-visible:ring-offset-2 focus-visible:ring-offset-paper;
+  }
+
+  /* Sits on dark imagery — flip the offset so the ring stays visible. */
+  .on-dark a,
+  .on-dark button {
+    @apply focus-visible:ring-paper focus-visible:ring-offset-espresso;
   }
 }
 
@@ -24,8 +84,83 @@ select {
   }
 }
 
-a,
-input,
-button {
-  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-neutral-600 dark:focus-visible:ring-offset-neutral-900;
+@layer components {
+  /* Page shell — every section aligns to this gutter. */
+  .shell {
+    @apply mx-auto w-full max-w-shell;
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+
+  /* Uppercase micro-label. The spec text under the hero, section numbers,
+     product metadata — all the small structural type in the references. */
+  .eyebrow {
+    @apply font-mono text-micro uppercase tracking-micro text-ink-muted;
+  }
+
+  .eyebrow-inverse {
+    @apply font-mono text-micro uppercase tracking-micro text-paper/70;
+  }
+
+  /* Buttons: square, rule-bordered, no shadow — print sensibility. */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-mono text-spec uppercase tracking-micro transition-colors duration-300 ease-editorial disabled:cursor-not-allowed disabled:opacity-50;
+    padding: 0.95rem 1.75rem;
+  }
+
+  .btn-primary {
+    @apply btn bg-oxblood text-paper hover:bg-oxblood-800;
+  }
+
+  .btn-ghost {
+    @apply btn border border-ink/20 text-ink hover:border-ink hover:bg-ink hover:text-paper;
+  }
+
+  .btn-inverse {
+    @apply btn bg-paper text-espresso hover:bg-clay hover:text-espresso;
+  }
+
+  /* Underlined text link — the "посмотреть меню" treatment in ref 1. */
+  .link-rule {
+    @apply font-mono text-spec uppercase tracking-micro underline decoration-1 underline-offset-4 transition-opacity hover:opacity-60;
+  }
+
+  /* Hairline divider matching the reference grids. */
+  .rule {
+    @apply border-t border-ink/15;
+  }
+
+  /* Full-bleed marquee track. Children are duplicated in the component,
+     so translating -50% loops seamlessly. */
+  .marquee-track {
+    @apply flex w-max animate-marquee items-center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+  }
+}
+
+@layer utilities {
+  /* Optical tightening for the oversized wordmark hero. */
+  .text-wordmark {
+    @apply font-sans font-semibold uppercase;
+    font-stretch: condensed;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -1,81 +1,119 @@
 "use client";
 
 import { Menu } from "@/lib/shopify/types";
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Fragment, useState } from "react";
-import Search from "./search";
+import { SearchBar } from "./search";
+import { brewFormats, site, socialLinks } from "@/lib/site";
+import LogoSquare from "@/components/logo-square";
 
 export default function MobileMenu({ menu }: { menu: Menu[] }) {
   const [isOpen, setIsOpen] = useState(false);
-  const openMobileMenu = () => setIsOpen(true);
-  const closeMobileMenu = () => setIsOpen(false);
+  const close = () => setIsOpen(false);
+
   return (
     <>
       <button
-        onClick={openMobileMenu}
-        aria-label="Open mobile menu"
-        className="flex h-11 w-11 items-center justify-center rounded-md border border-neutral-200 text-black transition-colors md:hidden dark:border-neutral-700 dark:text-white"
+        onClick={() => setIsOpen(true)}
+        aria-label="Open menu"
+        className="flex items-center text-ink transition-colors hover:text-oxblood"
       >
-        <Bars3Icon className="h-4" />
+        <Bars3Icon className="h-6 w-6" />
       </button>
 
       <Transition show={isOpen}>
-        <Dialog onClose={closeMobileMenu} className="relative z-50">
-          <Transition.Child
+        <Dialog onClose={close} className="relative z-[1000]">
+          <TransitionChild
             as={Fragment}
-            enter="transition-all ease-in-out duration-300"
-            enterFrom="opacity-0 backdrop-blur-none"
-            enterTo="opacity-100 backdrop-blur-[.5px]"
-            leave="transition-all ease-in-out duration-200"
-            leaveFrom="opacity-100 backdrop-blur-[.5px]"
-            leaveTo="opacity-0 backdrop-blur-none"
+            enter="transition-opacity ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition-opacity ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-          </Transition.Child>
-          <Transition.Child
+            <div className="fixed inset-0 bg-espresso/40" aria-hidden />
+          </TransitionChild>
+          <TransitionChild
             as={Fragment}
-            enter="transition-all ease-in-out duration-300"
-            enterFrom="translate-x-[-100%]"
+            enter="transition-transform ease-editorial duration-500"
+            enterFrom="-translate-x-full"
             enterTo="translate-x-0"
-            leave="transition-all ease-in-out duration-200"
+            leave="transition-transform ease-in duration-200"
             leaveFrom="translate-x-0"
-            leaveTo="translate-x-[-100%]"
+            leaveTo="-translate-x-full"
           >
-            <Dialog.Panel className="fixed bottom-0 left-0 right-0 top-0 flex h-full w-full flex-col bg-white pb-6 dark:bg-black">
-              <div className="p-4">
-                <button
-                  className="mb-4 flex h-11 w-11 items-center justify-center rounded-md border border-neutral-200 text-black transition-colors dark:border-neutral-700 dark:text-white"
-                  onClick={closeMobileMenu}
-                  aria-label="Close mobile menu"
-                >
-                  <XMarkIcon className="h-6" />
+            <DialogPanel className="fixed inset-y-0 left-0 flex w-full max-w-md flex-col overflow-y-auto bg-paper">
+              <div className="flex items-center justify-between border-b border-ink/15 px-5 py-5">
+                <Link href="/" onClick={close}>
+                  <LogoSquare size="sm" />
+                </Link>
+                <button onClick={close} aria-label="Close menu">
+                  <XMarkIcon className="h-6 w-6" />
                 </button>
-                <div className="mb-4 w-full">
-                  <Search />
-                </div>
-                {menu.length > 0 ? (
-                  <ul className="flex w-full flex-col">
-                    {menu.map((item: Menu) => (
-                      <li
-                        className="py-2 text-xl text-black transition-colors hover:text-neutral-500 dark:text-white"
-                        key={item.title}
-                      >
-                        <Link
-                          href={item.path}
-                          prefetch={true}
-                          onClick={closeMobileMenu}
-                        >
-                          {item.title}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
               </div>
-            </Dialog.Panel>
-          </Transition.Child>
+
+              <div className="px-5 py-6">
+                <SearchBar />
+              </div>
+
+              <nav className="px-5">
+                <ul className="flex flex-col">
+                  {menu.map((item: Menu) => (
+                    <li key={item.title} className="border-b border-ink/10">
+                      <Link
+                        href={item.path}
+                        prefetch
+                        onClick={close}
+                        className="block py-4 font-display text-3xl transition-colors hover:text-oxblood"
+                      >
+                        {item.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="eyebrow mb-4 mt-10">Browse by brew</p>
+                <ul className="grid grid-cols-2 gap-x-6 gap-y-3">
+                  {brewFormats.map((format) => (
+                    <li key={format.handle}>
+                      <Link
+                        href={`/search/${format.handle}`}
+                        onClick={close}
+                        className="font-display text-lg italic transition-colors hover:text-oxblood"
+                      >
+                        {format.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+
+              <div className="mt-auto border-t border-ink/15 px-5 py-6">
+                <Link
+                  href="/account"
+                  onClick={close}
+                  className="link-rule mb-6 inline-block"
+                >
+                  My account
+                </Link>
+                <ul className="flex flex-wrap gap-x-5 gap-y-2">
+                  {socialLinks.map((social) => (
+                    <li key={social.title}>
+                      <a href={social.href} className="eyebrow hover:text-oxblood">
+                        {social.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="eyebrow mt-6">
+                  {site.origin} · Est. {site.since}
+                </p>
+              </div>
+            </DialogPanel>
+          </TransitionChild>
         </Dialog>
       </Transition>
     </>
