@@ -79,6 +79,15 @@ function clampQuantity(quantity: number): number {
   return Math.min(Math.max(Math.trunc(quantity), 0), MAX_LINE_QUANTITY);
 }
 
+/**
+ * Quantity 0 legitimately means "remove this line", so a malformed quantity
+ * must be rejected outright rather than clamped — clamping NaN to 0 would turn
+ * a corrupt payload into a silent deletion.
+ */
+function isUsableQuantity(quantity: unknown): quantity is number {
+  return typeof quantity === "number" && Number.isFinite(quantity) && quantity >= 0;
+}
+
 function isValidMerchandiseId(id: unknown): id is string {
   return typeof id === "string" && MERCHANDISE_ID_PATTERN.test(id);
 }
@@ -123,7 +132,12 @@ export async function addItem(
     return fail("Please select an option before adding to the cart.");
   }
 
-  const quantity = clampQuantity(payload.quantity ?? 1);
+  const requested = payload.quantity ?? 1;
+  if (!isUsableQuantity(requested)) {
+    return fail("That quantity isn't valid.");
+  }
+
+  const quantity = clampQuantity(requested);
   if (quantity < 1) {
     return fail("Quantity must be at least 1.");
   }
@@ -186,6 +200,10 @@ export async function updateItemQuantity(
 ): Promise<CartActionState> {
   if (!isValidMerchandiseId(payload?.merchandiseId)) {
     return fail("We couldn't update that item.");
+  }
+
+  if (!isUsableQuantity(payload.quantity)) {
+    return fail("We couldn't update that quantity.");
   }
 
   const { merchandiseId } = payload;
@@ -267,24 +285,9 @@ export async function removeItem(
   }
 }
 
-/**
- * Pre-creates a cart so the checkout URL exists before the first add. Safe to
- * call repeatedly — it no-ops when a live cart is already attached.
- */
-export async function createCartAndSetCookie(): Promise<void> {
-  try {
-    const existingId = await readCartCookie();
-    if (existingId && (await getCart(existingId, { fresh: true }))) {
-      return;
-    }
-
-    const cart = await createCart();
-    if (cart.id) {
-      await setCartCookie(cart.id);
-      updateTag(TAGS.cart);
-    }
-  } catch (error) {
-    // Non-fatal: the next add-to-cart creates the cart on demand.
-    console.error("Failed to pre-create cart", error);
-  }
-}
+// `createCartAndSetCookie` used to live here and was called from an effect in
+// the cart modal. It is gone deliberately: `addItem` now creates the cart
+// inside the same action that adds the line, so pre-creation bought nothing
+// while minting a Shopify cart for every visitor — and every exported Server
+// Action is a publicly callable endpoint, so an unused one is a free way for
+// anyone to create carts in bulk.
