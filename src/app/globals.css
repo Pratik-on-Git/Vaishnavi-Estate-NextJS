@@ -10,12 +10,12 @@
      Dark Brown  #1C0A00  ink      — body, nav, UI, prices        19.2:1 on paper
      Oxblood     #7B1526  accent   — display, links, buttons      10.6:1 on paper
      Light Brown #8E3200  soft     — meta text and hairlines        8.1:1 on paper
-     Yellow      #FF9D00  amber    — FILL ONLY / on-dark accent     2.1:1 on paper
+     Amber       #FFCF71  amber    — FILL ONLY / on-dark accent     1.5:1 on paper
      White       #FFFFFF  paper    — ground, and text on fills
 
    Two hard rules fall out of those numbers:
-     1. Amber is never text on paper. It is a fill, or text on Dark Brown
-        (9.2:1) / Oxblood (5.1:1).
+     1. Amber is never text on paper. It is a fill (carrying Dark Brown at
+        13.2:1), or text on Dark Brown (13.2:1) / Oxblood (7.3:1).
      2. Dark grounds take paper or amber only — Oxblood (1.8:1) and Light
         Brown (2.4:1) are invisible on Dark Brown.
 
@@ -32,7 +32,7 @@
   --ink: #1c0a00;
   --ink-soft: #8e3200;
   --oxblood: #7b1526;
-  --amber: #ff9d00;
+  --amber: #ffcf71;
 
   /* Light Brown at 8% over paper — the product-image tile ground. */
   --tint: #f6efeb;

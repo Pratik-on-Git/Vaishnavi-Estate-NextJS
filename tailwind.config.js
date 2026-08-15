@@ -22,8 +22,8 @@ module.exports = {
         },
         // The brand voice: display headings, links, buttons, active states.
         oxblood: "#7B1526",
-        // Fill-only accent. NEVER text on paper (2.1:1) — see DESIGN.md §1.
-        amber: "#FF9D00",
+        // Fill-only accent. NEVER text on paper (1.5:1) — see DESIGN.md §1.
+        amber: "#FFCF71",
         // Light Brown at 8% over paper: the product-image tile ground.
         tint: "#F6EFEB",
         rule: "rgba(142, 50, 0, 0.22)",
