@@ -1,5 +1,6 @@
 "use client";
 
+import { PauseIcon, PlayIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -24,7 +25,8 @@ export type HeroVideoClip = {
  *   - `prefers-reduced-motion: reduce` stops playback entirely — no autoplay,
  *     no crossfade — and simply holds the first clip's opening frame.
  *   - WCAG 2.2.2 requires a way to stop motion that runs for more than five
- *     seconds, hence the visible toggle.
+ *     seconds, hence the visible toggle — icon-only, so it carries its state
+ *     through `aria-label` rather than visible text.
  *
  * Every clip is `aria-hidden`: none carries information the visually hidden
  * `<h1>` elsewhere on the page doesn't already state.
@@ -135,11 +137,18 @@ export default function HeroVideo({
       <button
         type="button"
         onClick={toggle}
+        // The icon is the only content, so the accessible name has to come
+        // from aria-label rather than a visible/sr-only label — a sighted
+        // and a screen-reader user both learn the current state the same way.
+        aria-label={playing ? "Pause background video" : "Play background video"}
         aria-pressed={!playing}
-        className="on-dark absolute bottom-4 right-4 z-10 rounded-full border border-amber px-4 py-1.5 font-mono text-micro uppercase tracking-micro text-amber transition-colors hover:bg-amber hover:text-ink"
+        className="on-dark absolute bottom-4 right-4 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-amber text-amber transition-colors hover:bg-amber hover:text-ink"
       >
-        {playing ? "Pause" : "Play"}
-        <span className="sr-only"> background video</span>
+        {playing ? (
+          <PauseIcon aria-hidden className="h-4 w-4" />
+        ) : (
+          <PlayIcon aria-hidden className="h-4 w-4 translate-x-[1px]" />
+        )}
       </button>
     </>
   );

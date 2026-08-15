@@ -14,9 +14,9 @@ module.exports = {
         // Roles are assigned by measured contrast, not by taste. See
         // DESIGN.md §1 for the ratio table and the two hard rules.
         paper: "#FFFFFF",
-        // The ink. Body, nav, UI, prices, table cells. 19.2:1 on paper.
+        // The ink. Body, nav, UI, prices, table cells. 16.5:1 on paper.
         ink: {
-          DEFAULT: "#1C0A00",
+          DEFAULT: "#341706",
           // Secondary and meta text, plus the hairline hue. 8.1:1 on paper.
           soft: "#8E3200",
         },
@@ -29,7 +29,7 @@ module.exports = {
         rule: "rgba(142, 50, 0, 0.22)",
         wash: "rgba(142, 50, 0, 0.06)",
         // Dark ground. Takes paper or amber text only.
-        coal: "#1C0A00",
+        coal: "#341706",
       },
       fontFamily: {
         display: ["var(--font-display)", "Georgia", "serif"],

@@ -45,7 +45,10 @@ export default function PromoTile({
       ) : (
         <div
           aria-hidden
-          className="absolute inset-0 bg-[radial-gradient(120%_90%_at_30%_15%,#4A1F0A_0%,#2B1004_45%,#1C0A00_100%)]"
+          // Darkest stop matches --coal, so the placeholder blends with the
+          // rest of the on-dark surface rather than reading as a mismatched
+          // near-black.
+          className="absolute inset-0 bg-[radial-gradient(120%_90%_at_30%_15%,#5A2A0F_0%,#42200C_45%,#341706_100%)]"
         />
       )}
 

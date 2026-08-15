@@ -124,15 +124,17 @@ function Hero() {
         {/* The statement rides across the lower third of the frame, in amber —
             the palette's on-dark accent. Lifted off the very edge (rather than
             a bottom-0/percentage offset) so descenders never brush the plate's
-            own clipping boundary. */}
-        <div className="absolute inset-x-0 bottom-6 sm:bottom-10 md:bottom-14">
+            own clipping boundary, and pulled down from the previous offsets so
+            the huge hero type has headroom at the top too, on short/wide crops
+            of the frame (e.g. the lg:aspect-[16/8] breakpoint). */}
+        <div className="absolute inset-x-0 bottom-0 sm:bottom-2 md:bottom-4">
           <Marquee
             phrases={heroPhrases}
             size="hero"
             separator=""
             // Slow, legible crawl — three short statements rather than one
             // long one repeated, so each gets a moment to actually be read.
-            duration={90}
+            duration={50}
             className="text-amber"
           />
         </div>
