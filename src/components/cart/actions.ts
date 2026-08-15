@@ -51,11 +51,6 @@ async function readCartCookie(): Promise<string | undefined> {
   return value && value.trim() ? value : undefined;
 }
 
-/**
- * Resolves the live cart, transparently replacing one that Shopify no longer
- * recognises (checked out, expired, or a cookie carried over from another
- * store). Returns `cart: undefined` only when `create` is false.
- */
 type ResolvedCart =
   | { cartId: string; cart: Cart }
   | { cartId: undefined; cart: undefined };
@@ -108,7 +103,7 @@ function describeWarnings(warnings: CartWarning[]): string {
     (warning) => warning.code === "MERCHANDISE_NOT_ENOUGH_STOCK"
   );
   return stockWarning
-    ? "Only part of that quantity is in stock — we added what was available."
+    ? "Limited stock — your cart was set to the quantity still available."
     : "";
 }
 
