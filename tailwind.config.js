@@ -11,98 +11,94 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Warm paper stack — the cream ground of the references.
-        paper: {
-          DEFAULT: "#FBF4E6",
-          50: "#FFFCF6",
-          100: "#F6EBD6",
-          200: "#EFDFC2",
-          300: "#E3CDA6",
-        },
-        // Oxblood — the brand primary, lifted from the red editorial refs.
-        oxblood: {
-          DEFAULT: "#7B1526",
-          50: "#F7E3E5",
-          400: "#9C2233",
-          600: "#7B1526",
-          800: "#54101C",
-          900: "#3A0B13",
-        },
-        // Roasted browns — hero imagery, dark sections.
-        espresso: {
-          DEFAULT: "#1C1210",
-          700: "#3A241C",
-          800: "#2A1813",
-          900: "#140C0A",
-        },
-        // Clay/amber accent — the candlelight warmth.
-        clay: {
-          DEFAULT: "#C08A4E",
-          400: "#D6A469",
-          600: "#A06E39",
-        },
+        // Roles are assigned by measured contrast, not by taste. See
+        // DESIGN.md §1 for the ratio table and the two hard rules.
+        paper: "#FFFFFF",
+        // The ink. Body, nav, UI, prices, table cells. 19.2:1 on paper.
         ink: {
-          DEFAULT: "#1C1210",
-          muted: "#6B5B4E",
-          faint: "#9C8B7C",
+          DEFAULT: "#1C0A00",
+          // Secondary and meta text, plus the hairline hue. 8.1:1 on paper.
+          soft: "#8E3200",
         },
+        // The brand voice: display headings, links, buttons, active states.
+        oxblood: "#7B1526",
+        // Fill-only accent. NEVER text on paper (2.1:1) — see DESIGN.md §1.
+        amber: "#FF9D00",
+        // Light Brown at 8% over paper: the product-image tile ground.
+        tint: "#F6EFEB",
+        rule: "rgba(142, 50, 0, 0.22)",
+        wash: "rgba(142, 50, 0, 0.06)",
+        // Dark ground. Takes paper or amber text only.
+        coal: "#1C0A00",
       },
       fontFamily: {
-        // Editorial didone-ish serif — headings and italic accents.
         display: ["var(--font-display)", "Georgia", "serif"],
-        // Tight neo-grotesk — oversized wordmarks, UI, body.
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        // Uppercase micro-labels and specs.
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+        // Nothing in this system is set in a sans — alias it to the mono so a
+        // stray `font-sans` cannot silently introduce a third typeface.
+        sans: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       fontSize: {
-        // Fluid display ramp for the full-bleed wordmark treatments.
-        "display-sm": ["clamp(2.25rem, 6vw, 4rem)", { lineHeight: "0.95", letterSpacing: "-0.02em" }],
-        "display-md": ["clamp(3rem, 9vw, 7rem)", { lineHeight: "0.9", letterSpacing: "-0.03em" }],
-        "display-lg": ["clamp(4rem, 16vw, 15rem)", { lineHeight: "0.82", letterSpacing: "-0.045em" }],
-        micro: ["0.625rem", { lineHeight: "1.2", letterSpacing: "0.14em" }],
-        spec: ["0.6875rem", { lineHeight: "1.3", letterSpacing: "0.12em" }],
+        "display-hero": [
+          "clamp(3.5rem, 11vw, 11rem)",
+          { lineHeight: "0.92", letterSpacing: "-0.015em" },
+        ],
+        "display-xl": [
+          "clamp(2.5rem, 5.5vw, 4.5rem)",
+          { lineHeight: "1.02", letterSpacing: "-0.01em" },
+        ],
+        "display-lg": [
+          "clamp(2rem, 4vw, 3.5rem)",
+          { lineHeight: "1.08", letterSpacing: "-0.01em" },
+        ],
+        "display-md": [
+          "clamp(1.5rem, 2.4vw, 2.5rem)",
+          { lineHeight: "1.1", letterSpacing: "0" },
+        ],
+        "display-sm": ["1.625rem", { lineHeight: "1.15" }],
+        eyebrow: ["0.8125rem", { lineHeight: "1.2", letterSpacing: "0.08em" }],
+        ui: ["0.875rem", { lineHeight: "1.3", letterSpacing: "0.04em" }],
+        body: ["0.875rem", { lineHeight: "1.6", letterSpacing: "0" }],
+        spec: ["0.75rem", { lineHeight: "1.4", letterSpacing: "0.06em" }],
+        micro: ["0.6875rem", { lineHeight: "1.2", letterSpacing: "0.1em" }],
       },
       letterSpacing: {
-        micro: "0.14em",
-        wider2: "0.22em",
+        ui: "0.04em",
+        eyebrow: "0.08em",
+        micro: "0.1em",
       },
-      maxWidth: {
-        shell: "96rem",
-        prose2: "34rem",
+      borderRadius: {
+        // Every photograph in the system shares this radius.
+        plate: "0.75rem",
       },
       borderColor: {
-        DEFAULT: "rgba(28, 18, 16, 0.14)",
+        DEFAULT: "rgba(142, 50, 0, 0.22)",
+      },
+      maxWidth: {
+        measure: "38rem",
       },
       keyframes: {
-        fadeIn: {
-          from: { opacity: 0 },
-          to: { opacity: 1 },
-        },
+        fadeIn: { from: { opacity: 0 }, to: { opacity: 1 } },
         blink: {
           "0%": { opacity: 0.2 },
           "20%": { opacity: 1 },
           "100%": { opacity: 0.2 },
         },
-        riseIn: {
-          from: { opacity: 0, transform: "translateY(1.25rem)" },
-          to: { opacity: 1, transform: "translateY(0)" },
-        },
         marquee: {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
-        slowZoom: {
-          from: { transform: "scale(1)" },
-          to: { transform: "scale(1.08)" },
+        marqueeReverse: {
+          from: { transform: "translateX(-50%)" },
+          to: { transform: "translateX(0)" },
         },
       },
       animation: {
         fadeIn: "fadeIn 0.3s ease-in-out",
         blink: "blink 1.4s both infinite",
-        riseIn: "riseIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both",
-        marquee: "marquee 38s linear infinite",
-        slowZoom: "slowZoom 18s ease-out both",
+        marquee: "marquee var(--marquee-duration, 40s) linear infinite",
+        marqueeReverse:
+          "marqueeReverse var(--marquee-duration, 40s) linear infinite",
       },
       transitionTimingFunction: {
         editorial: "cubic-bezier(0.16, 1, 0.3, 1)",
@@ -117,16 +113,8 @@ module.exports = {
     require("@tailwindcss/container-queries"),
     plugin(({ matchUtilities, theme }) => {
       matchUtilities(
-        {
-          "animation-delay": (value) => {
-            return {
-              "animation-delay": value,
-            };
-          },
-        },
-        {
-          values: theme("transitionDelay"),
-        }
+        { "animation-delay": (value) => ({ "animation-delay": value }) },
+        { values: theme("transitionDelay") }
       );
     }),
   ],

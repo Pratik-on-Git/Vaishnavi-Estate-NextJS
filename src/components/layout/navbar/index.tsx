@@ -5,9 +5,15 @@ import MobileMenu from "./mobile-menu";
 import SearchTrigger from "./search";
 import LogoSquare from "@/components/logo-square";
 import CartModal from "@/components/cart/modal";
+import Marquee from "@/components/ui/marquee";
 import { getCustomerSession } from "@/lib/customer-account";
-import { primaryNav, site } from "@/lib/site";
+import { announcement, primaryNav, site } from "@/lib/site";
 
+/**
+ * Header (DESIGN.md §5): a scrolling announcement strip over a three-part nav —
+ * menu left, logo optically centred, utilities right. Hairline bottom, sticky
+ * as one unit so `--header-h` stays the single offset for sticky children.
+ */
 export async function Navbar() {
   const shopifyMenu = await getMenu("vaishnavi-estate-nextjs-menu");
   const customerSession = await getCustomerSession();
@@ -17,54 +23,51 @@ export async function Navbar() {
   const menu: Menu[] = shopifyMenu.length ? shopifyMenu : primaryNav;
 
   return (
-    <header className="sticky top-0 z-[999]">
-      {/* Announcement strip — the estate's standing promises. */}
-      <div className="bg-oxblood text-paper">
-        <div className="shell flex h-9 items-center justify-center gap-6 overflow-hidden">
-          <p className="eyebrow-inverse whitespace-nowrap">
-            Free shipping across India
-          </p>
-          <span aria-hidden className="text-[0.4rem] opacity-50">
-            &#9679;
-          </span>
-          <p className="eyebrow-inverse hidden whitespace-nowrap sm:block">
-            Roasted daily · Ground on order
-          </p>
-          <span aria-hidden className="hidden text-[0.4rem] opacity-50 md:block">
-            &#9679;
-          </span>
-          <p className="eyebrow-inverse hidden whitespace-nowrap md:block">
-            {site.tagline}
-          </p>
-        </div>
+    <header className="sticky top-0 z-[999] bg-paper">
+      <div className="rule-b py-2">
+        <Marquee
+          phrases={Array.from({ length: 6 }, () => announcement)}
+          size="ui"
+          separator=""
+          duration={60}
+          className="text-oxblood"
+        />
       </div>
 
-      <nav className="border-b border-ink/15 bg-paper/90 backdrop-blur-md">
-        <div className="shell flex h-16 items-center justify-between gap-4 md:h-20">
-          <div className="flex items-center gap-8">
+      <nav className="rule-b bg-paper/95 backdrop-blur-md">
+        <div className="shell relative flex h-16 items-center justify-between gap-4">
+          {/* Left rail */}
+          <div className="flex items-center gap-6">
             <div className="md:hidden">
               <MobileMenu menu={menu} />
             </div>
-            <Link href="/" prefetch aria-label={`${site.name} home`}>
-              <LogoSquare />
-            </Link>
+            <ul className="hidden items-center gap-6 md:flex">
+              {menu.map((item: Menu) => (
+                <li key={item.title}>
+                  <Link
+                    href={item.path}
+                    prefetch
+                    className="ui-mono transition-opacity hover:opacity-60"
+                  >
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <ul className="hidden items-center gap-9 md:flex">
-            {menu.map((item: Menu) => (
-              <li key={item.title}>
-                <Link
-                  href={item.path}
-                  prefetch
-                  className="font-mono text-spec uppercase tracking-micro text-ink-muted transition-colors hover:text-oxblood"
-                >
-                  {item.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {/* Optically centred mark, independent of the rails' widths. */}
+          <Link
+            href="/"
+            prefetch
+            aria-label={`${site.name} home`}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          >
+            <LogoSquare />
+          </Link>
 
-          <div className="flex items-center gap-5">
+          {/* Right rail */}
+          <div className="flex items-center gap-6">
             <SearchTrigger />
             <Link
               href={
@@ -72,7 +75,7 @@ export async function Navbar() {
                   ? "/account"
                   : "/api/auth/login?returnTo=/account"
               }
-              className="hidden font-mono text-spec uppercase tracking-micro text-ink-muted transition-colors hover:text-oxblood sm:block"
+              className="ui-mono hidden transition-opacity hover:opacity-60 lg:block"
             >
               {customerSession.isAuthenticated ? "Account" : "Sign in"}
             </Link>

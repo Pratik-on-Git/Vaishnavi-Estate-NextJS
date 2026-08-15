@@ -37,11 +37,11 @@ export default async function Page({
 
   return (
     <article className="mx-auto max-w-3xl">
-      <Eyebrow>Vaishnavi Estate</Eyebrow>
-      <h1 className="mt-5 font-display text-display-sm">{page.title}</h1>
-      <hr className="my-10 border-ink/15" />
+      <Eyebrow align="left">Vaishnavi Estate</Eyebrow>
+      <h1 className="serif mt-5 text-display-xl">{page.title}</h1>
+      <hr className="my-10 border-rule" />
       <Prose html={page.body as string} />
-      <p className="eyebrow mt-14 border-t border-ink/15 pt-6">
+      <p className="eyebrow mt-14 border-t border-rule pt-6">
         {`Last updated ${new Intl.DateTimeFormat(undefined, {
           year: "numeric",
           month: "long",

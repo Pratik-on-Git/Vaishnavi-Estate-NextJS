@@ -18,7 +18,7 @@ function SubmitButton({
   hasOptionsToPick: boolean;
 }) {
   const { pending } = useFormStatus();
-  const base = "btn-primary w-full";
+  const base = "btn-outline w-full";
 
   if (!availableForSale) {
     return (
@@ -64,7 +64,7 @@ function SubmitButton({
       disabled={pending}
       className={clsx(base, pending && "cursor-wait opacity-70")}
     >
-      {pending ? "Adding…" : "Add to cart"}
+      {pending ? "Adding…" : "Add to cart"} <span aria-hidden>&rarr;</span>
     </button>
   );
 }
@@ -132,7 +132,7 @@ export function AddToCart({ product }: { product: Product }) {
       {errorMessage ? (
         <p
           role="alert"
-          className="mt-3 border border-oxblood/30 bg-oxblood/5 px-3 py-2 font-mono text-spec text-oxblood"
+          className="spec-mono mt-3 rounded-full border border-oxblood px-4 py-2 text-center"
         >
           {errorMessage}
         </p>

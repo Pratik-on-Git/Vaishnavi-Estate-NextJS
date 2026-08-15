@@ -23,26 +23,26 @@ export default async function AccountPage({
   if (!session.isAuthenticated) {
     return (
       <div className="shell flex min-h-[60vh] items-center py-20">
-        <div className="mx-auto w-full max-w-lg border border-ink/15 p-10 text-center">
+        <div className="mx-auto w-full max-w-lg rounded-plate border border-rule p-10 text-center">
           <Eyebrow>Account</Eyebrow>
-          <Headline as="h1" size="sm" className="mt-5">
+          <Headline as="h1" size="md" className="mt-4">
             Sign in to your account
           </Headline>
-          <p className="mt-5 text-sm leading-relaxed text-ink-muted">
+          <p className="body-mono mt-5">
             Sign in securely with Shopify to see your profile, saved addresses
             and order history. New customers can create an account on the same
             screen.
           </p>
           {error ? (
-            <p role="alert" className="mt-5 font-mono text-spec uppercase tracking-micro text-oxblood">
+            <p role="alert" className="spec-mono mt-5 uppercase">
               We couldn&apos;t complete sign-in. Please try again.
             </p>
           ) : null}
           <Link
             href="/api/auth/login?returnTo=/account"
-            className="btn-primary mt-8"
+            className="btn-solid mt-8"
           >
-            Sign in or create account
+            Sign in <span aria-hidden>&rarr;</span>
           </Link>
         </div>
       </div>
@@ -54,26 +54,26 @@ export default async function AccountPage({
   if (!customer) redirect("/api/auth/refresh?returnTo=/account");
 
   return (
-    <div className="shell py-16 md:py-20">
-      <div className="flex flex-wrap items-end justify-between gap-6 border-b border-ink/15 pb-10">
+    <div className="shell py-12 md:py-16">
+      <div className="rule-b flex flex-wrap items-end justify-between gap-6 pb-8">
         <div>
-          <Eyebrow>Welcome back</Eyebrow>
-          <h1 className="mt-4 font-display text-display-sm">
+          <Eyebrow align="left">Welcome back</Eyebrow>
+          <Headline as="h1" className="mt-3">
             {customer.displayName}
-          </h1>
-          <p className="mt-2 text-sm text-ink-muted">
+          </Headline>
+          <p className="body-mono mt-2">
             {customer.emailAddress?.emailAddress}
           </p>
         </div>
-        <Link href="/api/auth/logout" className="btn-ghost">
+        <Link href="/api/auth/logout" className="btn-outline">
           Sign out
         </Link>
       </div>
 
-      <div className="mt-12 grid gap-12 lg:grid-cols-12 lg:gap-10">
+      <div className="mt-10 grid gap-10 lg:grid-cols-12 lg:gap-10">
         <section className="lg:col-span-4">
-          <Eyebrow index="01">Profile</Eyebrow>
-          <dl className="mt-6 space-y-5 border-t border-ink/15 pt-6">
+          <Eyebrow align="left">Profile</Eyebrow>
+          <dl className="rule-t mt-5 pt-5">
             {[
               { term: "Name", value: customer.displayName },
               {
@@ -85,23 +85,23 @@ export default async function AccountPage({
                 value: customer.phoneNumber?.phoneNumber || "Not provided",
               },
             ].map((row) => (
-              <div key={row.term}>
-                <dt className="eyebrow">{row.term}</dt>
-                <dd className="mt-1.5 font-display text-lg">{row.value}</dd>
+              <div
+                key={row.term}
+                className="rule-b grid grid-cols-3 items-baseline gap-4 py-3"
+              >
+                <dt className="spec-mono uppercase">{row.term}</dt>
+                <dd className="spec-mono col-span-2">{row.value}</dd>
               </div>
             ))}
           </dl>
 
-          <Eyebrow index="02" className="mt-12">
+          <Eyebrow align="left" className="mt-10">
             Saved addresses
           </Eyebrow>
           {customer.addresses.nodes.length ? (
-            <ul className="mt-6 space-y-px border-t border-ink/15">
+            <ul className="rule-t mt-5">
               {customer.addresses.nodes.map((address) => (
-                <li
-                  key={address.id}
-                  className="border-b border-ink/12 py-4 text-sm leading-relaxed text-ink-muted"
-                >
+                <li key={address.id} className="rule-b body-mono py-4">
                   {address.formatted.map((line) => (
                     <span key={line} className="block">
                       {line}
@@ -111,29 +111,29 @@ export default async function AccountPage({
               ))}
             </ul>
           ) : (
-            <p className="mt-6 border-t border-ink/15 pt-6 text-sm text-ink-muted">
+            <p className="body-mono rule-t mt-5 pt-5">
               No saved addresses yet.
             </p>
           )}
         </section>
 
         <section className="lg:col-span-7 lg:col-start-6">
-          <Eyebrow index="03">Order history</Eyebrow>
+          <Eyebrow align="left">Order history</Eyebrow>
           {customer.orders.nodes.length ? (
-            <ul className="mt-6 border-t border-ink/15">
+            <ul className="rule-t mt-5">
               {customer.orders.nodes.map((order) => (
                 <li
                   key={order.id}
-                  className="flex flex-wrap items-start justify-between gap-6 border-b border-ink/12 py-6"
+                  className="rule-b flex flex-wrap items-start justify-between gap-6 py-5"
                 >
                   <div>
-                    <p className="font-display text-xl">{order.name}</p>
-                    <p className="mt-1.5 text-sm text-ink-muted">
+                    <p className="ui-mono normal-case">{order.name}</p>
+                    <p className="spec-mono mt-1.5">
                       {new Intl.DateTimeFormat("en", {
                         dateStyle: "medium",
                       }).format(new Date(order.processedAt))}
                     </p>
-                    <p className="eyebrow mt-2">
+                    <p className="micro-mono mt-2">
                       {[order.financialStatus, order.fulfillmentStatus]
                         .filter(Boolean)
                         .join(" · ")}
@@ -141,16 +141,16 @@ export default async function AccountPage({
                   </div>
                   <div className="text-right">
                     <Price
-                      className="font-display text-xl text-oxblood"
+                      className="serif text-display-sm"
                       amount={order.totalPrice.amount}
                       currencyCode={order.totalPrice.currencyCode}
                     />
                     {order.statusPageUrl ? (
                       <a
                         href={order.statusPageUrl}
-                        className="link-rule mt-3 inline-block"
+                        className="link-arrow mt-3"
                       >
-                        View order
+                        View order <span aria-hidden>&rarr;</span>
                       </a>
                     ) : null}
                   </div>
@@ -158,13 +158,13 @@ export default async function AccountPage({
               ))}
             </ul>
           ) : (
-            <div className="mt-6 border border-ink/15 px-8 py-16 text-center">
-              <p className="font-display text-2xl">No orders yet</p>
-              <p className="mt-3 text-sm text-ink-muted">
+            <div className="mt-5 rounded-plate border border-rule px-8 py-16 text-center">
+              <p className="serif text-display-md">No orders yet</p>
+              <p className="body-mono mt-3">
                 Your first bag from the estate is waiting.
               </p>
-              <Link href="/search" className="btn-ghost mt-8">
-                Start shopping
+              <Link href="/search" className="btn-outline mt-8">
+                Start shopping <span aria-hidden>&rarr;</span>
               </Link>
             </div>
           )}

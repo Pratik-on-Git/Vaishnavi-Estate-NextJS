@@ -35,7 +35,7 @@ export default async function SearchPage({
           {products.length === 0
             ? "No coffee matches"
             : `${products.length} ${resultsText} for`}{" "}
-          <span className="text-ink">&ldquo;{searchValue}&rdquo;</span>
+          <span className="text-oxblood">&ldquo;{searchValue}&rdquo;</span>
         </p>
       ) : null}
 
@@ -44,14 +44,14 @@ export default async function SearchPage({
           <ProductGridItems products={products} />
         </Grid>
       ) : (
-        <div className="border border-ink/15 px-8 py-20 text-center">
-          <p className="font-display text-3xl">Nothing on this shelf yet</p>
-          <p className="mx-auto mt-4 max-w-prose2 text-sm leading-relaxed text-ink-muted">
+        <div className="rounded-plate border border-rule px-8 py-20 text-center">
+          <p className="serif text-display-md">Nothing on this shelf yet</p>
+          <p className="body-mono mx-auto mt-4 max-w-measure">
             {searchValue
               ? "Try a broader term — a roast level, a brew method, or simply “Robusta”."
               : "The current harvest is being listed. Check back shortly."}
           </p>
-          <Link href="/search" className="btn-ghost mt-8">
+          <Link href="/search" className="btn-outline mt-8">
             View all coffee
           </Link>
         </div>

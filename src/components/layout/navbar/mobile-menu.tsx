@@ -18,7 +18,7 @@ export default function MobileMenu({ menu }: { menu: Menu[] }) {
       <button
         onClick={() => setIsOpen(true)}
         aria-label="Open menu"
-        className="flex items-center text-ink transition-colors hover:text-oxblood"
+        className="flex items-center transition-opacity hover:opacity-60"
       >
         <Bars3Icon className="h-6 w-6" />
       </button>
@@ -34,7 +34,7 @@ export default function MobileMenu({ menu }: { menu: Menu[] }) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-espresso/40" aria-hidden />
+            <div className="fixed inset-0 bg-coal/40" aria-hidden />
           </TransitionChild>
           <TransitionChild
             as={Fragment}
@@ -46,7 +46,7 @@ export default function MobileMenu({ menu }: { menu: Menu[] }) {
             leaveTo="-translate-x-full"
           >
             <DialogPanel className="fixed inset-y-0 left-0 flex w-full max-w-md flex-col overflow-y-auto bg-paper">
-              <div className="flex items-center justify-between border-b border-ink/15 px-5 py-5">
+              <div className="rule-b flex items-center justify-between px-5 py-4">
                 <Link href="/" onClick={close}>
                   <LogoSquare size="sm" />
                 </Link>
@@ -62,12 +62,12 @@ export default function MobileMenu({ menu }: { menu: Menu[] }) {
               <nav className="px-5">
                 <ul className="flex flex-col">
                   {menu.map((item: Menu) => (
-                    <li key={item.title} className="border-b border-ink/10">
+                    <li key={item.title} className="rule-b">
                       <Link
                         href={item.path}
                         prefetch
                         onClick={close}
-                        className="block py-4 font-display text-3xl transition-colors hover:text-oxblood"
+                        className="serif block py-4 text-display-md transition-opacity hover:opacity-60"
                       >
                         {item.title}
                       </Link>
@@ -82,7 +82,7 @@ export default function MobileMenu({ menu }: { menu: Menu[] }) {
                       <Link
                         href={`/search/${format.handle}`}
                         onClick={close}
-                        className="font-display text-lg italic transition-colors hover:text-oxblood"
+                        className="ui-mono transition-opacity hover:opacity-60"
                       >
                         {format.title}
                       </Link>
@@ -91,18 +91,18 @@ export default function MobileMenu({ menu }: { menu: Menu[] }) {
                 </ul>
               </nav>
 
-              <div className="mt-auto border-t border-ink/15 px-5 py-6">
+              <div className="rule-t mt-auto px-5 py-6">
                 <Link
                   href="/account"
                   onClick={close}
-                  className="link-rule mb-6 inline-block"
+                  className="link-arrow mb-6"
                 >
                   My account
                 </Link>
                 <ul className="flex flex-wrap gap-x-5 gap-y-2">
                   {socialLinks.map((social) => (
                     <li key={social.title}>
-                      <a href={social.href} className="eyebrow hover:text-oxblood">
+                      <a href={social.href} className="micro-mono hover:opacity-60">
                         {social.title}
                       </a>
                     </li>

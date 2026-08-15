@@ -49,13 +49,13 @@ export default async function CategoryPage({
   return (
     <section>
       {products.length === 0 ? (
-        <div className="border border-ink/15 px-8 py-20 text-center">
-          <p className="font-display text-3xl">This collection is empty</p>
-          <p className="mx-auto mt-4 max-w-prose2 text-sm leading-relaxed text-ink-muted">
+        <div className="rounded-plate border border-rule px-8 py-20 text-center">
+          <p className="serif text-display-md">This collection is empty</p>
+          <p className="body-mono mx-auto mt-4 max-w-measure">
             Nothing from this lot is in stock right now. The rest of the harvest
             is still on the shelf.
           </p>
-          <Link href="/search" className="btn-ghost mt-8">
+          <Link href="/search" className="btn-outline mt-8">
             View all coffee
           </Link>
         </div>

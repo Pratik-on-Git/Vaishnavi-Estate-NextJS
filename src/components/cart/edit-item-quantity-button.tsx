@@ -24,8 +24,8 @@ function SubmitButton({
       className={clsx(
         "flex h-9 w-9 items-center justify-center transition-colors",
         disabled
-          ? "cursor-not-allowed text-ink-faint"
-          : "text-ink hover:bg-ink hover:text-paper"
+          ? "cursor-not-allowed opacity-40"
+          : "hover:bg-oxblood hover:text-paper"
       )}
     >
       {type === "plus" ? (

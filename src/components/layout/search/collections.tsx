@@ -13,7 +13,7 @@ export default function Collections() {
       fallback={
         <div className="flex gap-6">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-3 w-20 animate-pulse bg-ink/10" />
+            <div key={i} className="h-3 w-20 animate-pulse rounded-full bg-wash" />
           ))}
         </div>
       }

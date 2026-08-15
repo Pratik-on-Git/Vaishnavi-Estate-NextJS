@@ -3,11 +3,12 @@ import { ProductProvider } from "@/components/product/product-context";
 import { ProductDescription } from "@/components/product/product-description";
 import ProductCard from "@/components/product-card";
 import Marquee from "@/components/ui/marquee";
-import { Eyebrow, Headline } from "@/components/ui/section";
+import Carousel from "@/components/ui/carousel";
+import { SectionHead } from "@/components/ui/section";
 import { HIDDEN_PRODUCT_TAG } from "@/lib/constants";
 import { getProduct, getProductRecommendations } from "@/lib/shopify";
 import { Image } from "@/lib/shopify/types";
-import { site, tickerPhrases } from "@/lib/site";
+import { featureBand, site } from "@/lib/site";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -34,9 +35,7 @@ export async function generateMetadata({
       follow: indexable,
       googleBot: { index: indexable, follow: indexable },
     },
-    openGraph: url
-      ? { images: [{ url, width, height, alt }] }
-      : null,
+    openGraph: url ? { images: [{ url, width, height, alt }] } : null,
   };
 }
 
@@ -67,6 +66,8 @@ export default async function ProductPage({
     },
   };
 
+  const band = Array.from({ length: 8 }, () => featureBand.label);
+
   return (
     <ProductProvider>
       <script
@@ -74,31 +75,14 @@ export default async function ProductPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
       />
 
-      {/* Breadcrumb rail */}
-      <div className="border-b border-ink/15">
-        <div className="shell flex items-center gap-3 py-4">
-          <Link href="/" className="eyebrow hover:text-oxblood">
-            Home
-          </Link>
-          <span aria-hidden className="text-ink-faint">
-            /
-          </span>
-          <Link href="/search" className="eyebrow hover:text-oxblood">
-            Coffee
-          </Link>
-          <span aria-hidden className="text-ink-faint">
-            /
-          </span>
-          <span className="eyebrow text-ink">{product.title}</span>
-        </div>
+      <div className="rule-b py-2">
+        <Marquee phrases={band} size="display" separator="↓↓↓↓" duration={45} className="text-oxblood" />
       </div>
 
-      <div className="shell grid gap-12 py-12 md:grid-cols-12 md:gap-12 md:py-16">
-        <div className="md:col-span-7">
+      <div className="grid grid-cols-1 lg:grid-cols-2">
+        <div className="p-3">
           <Suspense
-            fallback={
-              <div className="aspect-square w-full animate-pulse bg-paper-100" />
-            }
+            fallback={<div className="plate aspect-square w-full animate-pulse" />}
           >
             <Gallery
               images={product.images.slice(0, 6).map((image: Image) => ({
@@ -109,9 +93,9 @@ export default async function ProductPage({
           </Suspense>
         </div>
 
-        <div className="md:col-span-5">
+        <div className="border-rule p-6 lg:border-l lg:p-10">
           {/* Sticky so the buy panel stays reachable past a tall gallery. */}
-          <div className="md:sticky md:top-32">
+          <div className="lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
             <Suspense fallback={null}>
               <ProductDescription product={product} />
             </Suspense>
@@ -119,11 +103,36 @@ export default async function ProductPage({
         </div>
       </div>
 
-      <Marquee phrases={tickerPhrases} tone="espresso" />
+      <div className="rule-y py-2">
+        <Marquee
+          phrases={band}
+          size="display"
+          separator="↑↑↑↑"
+          duration={45}
+          reverse
+          className="text-oxblood"
+        />
+      </div>
 
       <Suspense fallback={null}>
         <RelatedProducts id={product.id} />
       </Suspense>
+
+      <nav className="shell rule-t flex flex-wrap items-center gap-x-4 gap-y-2 py-4">
+        <Link href="/" className="spec-mono hover:underline">
+          Home
+        </Link>
+        <span aria-hidden className="spec-mono opacity-50">
+          /
+        </span>
+        <Link href="/search" className="spec-mono hover:underline">
+          Shop
+        </Link>
+        <span aria-hidden className="spec-mono opacity-50">
+          /
+        </span>
+        <span className="spec-mono opacity-70">{product.title}</span>
+      </nav>
     </ProductProvider>
   );
 }
@@ -132,21 +141,22 @@ async function RelatedProducts({ id }: { id: string }) {
   const relatedProducts = await getProductRecommendations(id);
   if (!relatedProducts?.length) return null;
 
+  const shelf = relatedProducts.slice(0, 9);
+
   return (
-    <section className="py-20 md:py-24">
-      <div className="shell">
-        <Eyebrow>Also from the estate</Eyebrow>
-        <Headline className="mt-5" accent="you may also like">
-          Others
-        </Headline>
-        <ul className="mt-12 grid grid-cols-1 gap-px bg-ink/12 sm:grid-cols-2 lg:grid-cols-4">
-          {relatedProducts.slice(0, 4).map((product) => (
-            <li key={product.handle}>
-              <ProductCard product={product} />
-            </li>
-          ))}
-        </ul>
-      </div>
+    <section aria-labelledby="related">
+      <SectionHead
+        eyebrow="Also from the estate"
+        title={<span id="related">You May Also Like</span>}
+        count={shelf.length}
+        action="View all"
+        actionHref="/search"
+      />
+      <Carousel label="Related coffee">
+        {shelf.map((product) => (
+          <ProductCard key={product.handle} product={product} />
+        ))}
+      </Carousel>
     </section>
   );
 }

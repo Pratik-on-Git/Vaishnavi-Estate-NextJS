@@ -55,14 +55,14 @@ export default async function RootLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
-        {/* Instrument Serif carries the editorial headings, Inter Tight the
-            oversized wordmarks and UI, IBM Plex Mono the micro-labels. */}
+        {/* Two families, no exceptions: Instrument Serif for display, Space
+            Mono for everything else. See DESIGN.md §2. */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,300..800;1,300..800&family=IBM+Plex+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="flex min-h-screen flex-col bg-paper text-ink antialiased">
+      <body className="flex min-h-screen flex-col bg-paper text-oxblood antialiased">
         <CartProvider cartPromise={cart}>
           <Navbar />
           <main className="flex-1">{children}</main>

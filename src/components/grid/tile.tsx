@@ -3,8 +3,8 @@ import Image from "next/image";
 import Label from "../label";
 
 /**
- * Image tile used by the product gallery and its thumbnail rail. Square
- * corners, hairline border, oxblood active state — no rounded chrome.
+ * Image tile used by the product gallery and its thumbnail rail. Rounded plate
+ * on the mist ground, flame border when active.
  */
 export function GridTileImage({
   isInteractive = true,
@@ -26,11 +26,11 @@ export function GridTileImage({
   return (
     <div
       className={clsx(
-        "group flex h-full w-full items-center justify-center overflow-hidden bg-paper-100",
+        "group flex h-full w-full items-center justify-center overflow-hidden rounded-plate bg-tint",
         {
           relative: label,
           "border border-oxblood": active,
-          "border border-ink/12": !active,
+          "border border-transparent": !active,
         },
         className
       )}
@@ -38,7 +38,7 @@ export function GridTileImage({
       {props.src ? (
         <Image
           {...props}
-          className={clsx("relative h-full w-full object-cover", {
+          className={clsx("relative h-full w-full object-contain p-4", {
             "transition-transform duration-700 ease-editorial group-hover:scale-[1.04]":
               isInteractive,
           })}

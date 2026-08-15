@@ -2,13 +2,15 @@ import Collections from "@/components/layout/search/collections";
 import FilterList from "@/components/layout/search/filter";
 import { sorting } from "@/lib/constants";
 import { Eyebrow, Headline } from "@/components/ui/section";
-import { site } from "@/lib/site";
+import { collectionPills, site } from "@/lib/site";
+import Link from "next/link";
 import { Suspense } from "react";
 
 /**
- * Shop chrome for every browse surface. A masthead, then a sticky rail that
- * carries collections on the left and sort on the right — horizontal rather
- * than the starter's narrow side columns, so the grid gets the full measure.
+ * Shop chrome for every browse surface. The homepage's collection pills are
+ * repeated here as the primary filter — the same affordance in the same shape,
+ * so browsing feels continuous — with the Shopify-driven collection list and
+ * sort kept in a hairline rail beneath.
  */
 export default function SearchLayout({
   children,
@@ -17,22 +19,38 @@ export default function SearchLayout({
 }) {
   return (
     <>
-      <div className="border-b border-ink/15 bg-paper">
-        <div className="shell py-14 md:py-20">
-          <Eyebrow>The shop</Eyebrow>
-          <Headline className="mt-5" accent="from a single estate">
-            Every bag
-          </Headline>
-          <p className="mt-6 max-w-prose2 text-sm leading-relaxed text-ink-muted">
-            {site.description}
-          </p>
-        </div>
+      <div className="shell rule-b py-10 text-center md:py-14">
+        <Eyebrow>The shop</Eyebrow>
+        <Headline className="mt-4">Every bag from a single estate</Headline>
+        <p className="body-mono mx-auto mt-5 max-w-measure text-balance">
+          {site.description}
+        </p>
       </div>
 
-      {/* Offsets match the header stack: 2.25rem strip + 4rem nav (5rem at md). */}
-      <div className="sticky top-[6.25rem] z-40 border-b border-ink/15 bg-paper/95 backdrop-blur-md md:top-[7.25rem]">
-        <div className="shell flex flex-col gap-4 py-4 lg:flex-row lg:items-center lg:justify-between">
-          <Suspense fallback={<div className="h-6 w-64 animate-pulse bg-ink/10" />}>
+      <div className="rule-b py-8">
+        <ul className="shell mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3">
+          {collectionPills.map((pill) => (
+            <li key={pill.title}>
+              <Link
+                href={pill.handle ? `/search/${pill.handle}` : "/search"}
+                prefetch={false}
+                className="pill hover:bg-oxblood hover:text-paper"
+              >
+                {pill.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Sticky under the header stack — `--header-h` is the single source. */}
+      <div className="sticky top-[var(--header-h)] z-40 rule-b bg-paper/95 backdrop-blur-md">
+        <div className="shell flex flex-col gap-4 py-3 lg:flex-row lg:items-center lg:justify-between">
+          <Suspense
+            fallback={
+              <div className="h-4 w-64 animate-pulse rounded-full bg-wash" />
+            }
+          >
             <Collections />
           </Suspense>
           <Suspense fallback={null}>
@@ -41,7 +59,7 @@ export default function SearchLayout({
         </div>
       </div>
 
-      <div className="shell py-12 md:py-16">{children}</div>
+      <div className="py-6">{children}</div>
     </>
   );
 }

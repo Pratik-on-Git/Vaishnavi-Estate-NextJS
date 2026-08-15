@@ -95,7 +95,7 @@ export default function CartModal() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-espresso/50 backdrop-blur-sm" aria-hidden />
+            <div className="fixed inset-0 bg-coal/40 backdrop-blur-sm" aria-hidden />
           </TransitionChild>
           <TransitionChild
             as={Fragment}
@@ -106,8 +106,8 @@ export default function CartModal() {
             leaveFrom="translate-x-0"
             leaveTo="translate-x-full"
           >
-            <DialogPanel className="fixed inset-y-0 right-0 flex w-full flex-col bg-paper text-ink md:w-[26rem]">
-              <div className="flex items-center justify-between border-b border-ink/15 px-6 py-5">
+            <DialogPanel className="fixed inset-y-0 right-0 flex w-full flex-col bg-paper text-oxblood md:w-[27rem]">
+              <div className="rule-b flex items-center justify-between px-5 py-4">
                 <p className="eyebrow">
                   Your order
                   {totalQuantity ? ` · ${totalQuantity}` : ""}
@@ -115,7 +115,7 @@ export default function CartModal() {
                 <button
                   aria-label="Close cart"
                   onClick={closeCart}
-                  className="text-ink-muted transition-colors hover:text-oxblood"
+                  className="transition-opacity hover:opacity-60"
                 >
                   <XMarkIcon className="h-5 w-5" />
                 </button>
@@ -126,10 +126,8 @@ export default function CartModal() {
                   role={status.ok ? "status" : "alert"}
                   aria-live="polite"
                   className={clsx(
-                    "border-b px-6 py-3 font-mono text-spec",
-                    status.ok
-                      ? "border-ink/15 bg-paper-100 text-ink-muted"
-                      : "border-oxblood/25 bg-oxblood/5 text-oxblood"
+                    "spec-mono border-b border-rule px-5 py-3",
+                    status.ok ? "bg-tint" : "bg-wash"
                   )}
                 >
                   {status.message}
@@ -138,17 +136,17 @@ export default function CartModal() {
 
               {lines.length === 0 ? (
                 <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-                  <p className="font-display text-3xl">Your cart is empty</p>
-                  <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+                  <p className="serif text-display-md">Your cart is empty</p>
+                  <p className="body-mono mt-3">
                     Nothing picked yet. The current harvest is waiting.
                   </p>
-                  <Link href="/search" onClick={closeCart} className="btn-primary mt-8">
+                  <Link href="/search" onClick={closeCart} className="btn-outline mt-8">
                     Shop coffee
                   </Link>
                 </div>
               ) : (
                 <div className="flex h-full flex-col overflow-hidden">
-                  <ul className="flex-grow overflow-auto px-6">
+                  <ul className="flex-grow overflow-auto px-5">
                     {lines.map((item) => {
                       const merchandiseSearchParams =
                         {} as MerchandiseSearchParams;
@@ -174,16 +172,16 @@ export default function CartModal() {
                           // a sorted list reassigned rows to different products
                           // on every change.
                           key={item.merchandise.id}
-                          className="flex gap-4 border-b border-ink/12 py-5"
+                          className="rule-b flex gap-4 py-5"
                         >
                           <Link
                             href={merchandiseUrl}
                             onClick={closeCart}
-                            className="relative h-24 w-20 shrink-0 overflow-hidden border border-ink/12 bg-paper-100"
+                            className="plate h-24 w-20 shrink-0"
                           >
                             {item.merchandise.product.featuredImage?.url ? (
                               <Image
-                                className="h-full w-full object-cover"
+                                className="h-full w-full object-contain p-2"
                                 fill
                                 sizes="80px"
                                 alt={
@@ -202,25 +200,23 @@ export default function CartModal() {
                                 onClick={closeCart}
                                 className="min-w-0"
                               >
-                                <p className="font-display text-lg leading-tight">
+                                <p className="ui-mono normal-case">
                                   {item.merchandise.product.title}
                                 </p>
                                 {item.merchandise.title !== DEFAULT_OPTION ? (
-                                  <p className="eyebrow mt-1.5">
+                                  <p className="spec-mono mt-1.5">
                                     {item.merchandise.title}
                                   </p>
                                 ) : null}
                                 {isUnavailable ? (
-                                  <p className="mt-1.5 font-mono text-spec uppercase tracking-micro text-oxblood">
-                                    Out of stock
-                                  </p>
+                                  <p className="micro-mono mt-1.5">Out of stock</p>
                                 ) : null}
                               </Link>
                               <DeleteItemButton item={item} />
                             </div>
 
                             <div className="mt-auto flex items-end justify-between pt-4">
-                              <div className="flex items-center border border-ink/20">
+                              <div className="flex items-center rounded-full border border-oxblood">
                                 <EditItemQuantityButton
                                   item={item}
                                   type="minus"
@@ -234,7 +230,7 @@ export default function CartModal() {
                                 />
                               </div>
                               <Price
-                                className="font-mono text-spec tracking-micro"
+                                className="spec-mono"
                                 amount={item.cost.totalAmount.amount}
                                 currencyCode={item.cost.totalAmount.currencyCode}
                               />
@@ -245,13 +241,13 @@ export default function CartModal() {
                     })}
                   </ul>
 
-                  <div className="border-t border-ink/15 px-6 py-5">
+                  <div className="rule-t px-5 py-5">
                     <dl className="space-y-2.5">
                       <div className="flex items-center justify-between">
-                        <dt className="eyebrow">Taxes</dt>
+                        <dt className="spec-mono uppercase">Taxes</dt>
                         <dd>
                           <Price
-                            className="font-mono text-spec"
+                            className="spec-mono"
                             amount={cart!.cost.totalTaxAmount.amount}
                             currencyCode={
                               cart!.cost.totalTaxAmount.currencyCode
@@ -260,27 +256,25 @@ export default function CartModal() {
                         </dd>
                       </div>
                       <div className="flex items-center justify-between">
-                        <dt className="eyebrow">Shipping</dt>
-                        <dd className="font-mono text-spec">
-                          Free across India
-                        </dd>
+                        <dt className="spec-mono uppercase">Shipping</dt>
+                        <dd className="spec-mono">Free across India</dd>
                       </div>
-                      <div className="flex items-baseline justify-between border-t border-ink/15 pt-3">
-                        <dt className="eyebrow">Total</dt>
+                      <div className="rule-t flex items-baseline justify-between pt-3">
+                        <dt className="spec-mono uppercase">Total</dt>
                         <dd>
                           <Price
-                            className="font-display text-2xl text-oxblood"
+                            className="serif text-display-sm"
                             amount={cart!.cost.totalAmount.amount}
                             currencyCode={cart!.cost.totalAmount.currencyCode}
                             showCurrencyCode
-                            currencyCodeClassName="font-mono text-spec text-ink-muted"
+                            currencyCodeClassName="spec-mono"
                           />
                         </dd>
                       </div>
                     </dl>
 
                     {hasUnavailableLine ? (
-                      <p className="mt-4 font-mono text-spec text-oxblood">
+                      <p className="spec-mono mt-4">
                         Remove the out-of-stock items to check out.
                       </p>
                     ) : null}
@@ -290,14 +284,14 @@ export default function CartModal() {
                         customer mid-update checks them out against the previous
                         contents. */}
                     {canCheckout ? (
-                      <a href={cart!.checkoutUrl} className="btn-primary mt-5 w-full">
-                        Proceed to checkout
+                      <a href={cart!.checkoutUrl} className="btn-amber mt-5 w-full">
+                        Proceed to checkout <span aria-hidden>&rarr;</span>
                       </a>
                     ) : (
                       <button
                         disabled
                         aria-busy={isMutating}
-                        className="btn-primary mt-5 w-full cursor-wait opacity-70"
+                        className="btn-amber mt-5 w-full cursor-wait opacity-70"
                       >
                         {isMutating ? "Updating…" : "Proceed to checkout"}
                       </button>

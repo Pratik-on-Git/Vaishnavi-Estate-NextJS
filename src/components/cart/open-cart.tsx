@@ -12,12 +12,7 @@ export default function OpenCart({
   quantity?: number;
 }) {
   return (
-    <span
-      className={clsx(
-        "font-mono text-spec uppercase tracking-micro text-ink transition-colors hover:text-oxblood",
-        className
-      )}
-    >
+    <span className={clsx("ui-mono transition-opacity hover:opacity-60", className)}>
       Cart ({quantity ?? 0})
     </span>
   );

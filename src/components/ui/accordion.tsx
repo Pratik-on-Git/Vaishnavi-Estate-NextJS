@@ -14,13 +14,13 @@ export default function Accordion({
   items: readonly { question: string; answer: string }[];
 }) {
   return (
-    <div className="border-t border-ink/15">
+    <div className="rule-t">
       {items.map((item) => (
-        <Disclosure key={item.question} as="div" className="border-b border-ink/15">
+        <Disclosure key={item.question} as="div" className="rule-b">
           {({ open }) => (
             <>
               <DisclosureButton className="flex w-full items-start justify-between gap-6 py-6 text-left">
-                <span className="font-display text-xl leading-snug md:text-2xl">
+                <span className="serif text-display-sm">
                   {item.question}
                 </span>
                 <PlusIcon
@@ -31,7 +31,7 @@ export default function Accordion({
                   )}
                 />
               </DisclosureButton>
-              <DisclosurePanel className="max-w-prose2 pb-7 text-sm leading-relaxed text-ink-muted">
+              <DisclosurePanel className="body-mono max-w-measure pb-7">
                 {item.answer}
               </DisclosurePanel>
             </>

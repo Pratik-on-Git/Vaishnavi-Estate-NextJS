@@ -41,7 +41,7 @@ export function DeleteItemButton({ item }: { item: CartItem }) {
       <button
         type="submit"
         aria-label={`Remove ${item.merchandise.product.title} from cart`}
-        className="flex h-6 w-6 shrink-0 items-center justify-center text-ink-faint transition-colors hover:text-oxblood"
+        className="flex h-6 w-6 shrink-0 items-center justify-center transition-opacity hover:opacity-60"
       >
         <XMarkIcon className="h-4 w-4" />
       </button>

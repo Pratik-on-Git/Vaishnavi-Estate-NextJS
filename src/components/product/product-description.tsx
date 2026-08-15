@@ -3,91 +3,82 @@ import Price from "../price";
 import VariantSelector from "./variant-selector";
 import Prose from "../prose";
 import { AddToCart } from "../cart/add-to-cart";
-import Accordion from "../ui/accordion";
-import { site } from "@/lib/site";
+import { Headline } from "../ui/section";
 
 /**
  * Buy panel. Order follows how the decision is actually made: what it is, what
- * it costs, which grind, then the commitment — with the long-form detail
- * folded away underneath so it never pushes the button below the fold.
+ * it costs, which size and grind, then the commitment — with the specification
+ * table underneath so the detail never pushes the button below the fold.
  */
+
+/** Spec rows read from Shopify tags; unmatched vocabularies are omitted. */
+const SPEC_VOCABULARIES: { label: string; terms: string[] }[] = [
+  {
+    label: "Region",
+    terms: ["Coorg", "Chikmagalur", "Wayanad", "Araku", "Nilgiris", "India"],
+  },
+  { label: "Type", terms: ["Single Origin", "Blend"] },
+  { label: "Best for", terms: ["Espresso", "Filter", "Aeropress", "Pour over", "Cold brew"] },
+  { label: "Process", terms: ["Washed", "Natural", "Honey", "Monsooned"] },
+  { label: "Roast", terms: ["Light", "Medium", "Dark"] },
+];
+
+function specsFor(product: Product) {
+  const tags = (product.tags ?? []).map((tag) => tag.toLowerCase().trim());
+
+  return SPEC_VOCABULARIES.flatMap(({ label, terms }) => {
+    const value = terms.find((term) => tags.includes(term.toLowerCase()));
+    return value ? [{ label, value }] : [];
+  });
+}
+
 export function ProductDescription({ product }: { product: Product }) {
   const { minVariantPrice, maxVariantPrice } = product.priceRange;
   const isRange = minVariantPrice.amount !== maxVariantPrice.amount;
-  const kicker = product.tags?.find((tag) => !tag.startsWith("nextjs-"));
+  const specs = specsFor(product);
 
   return (
     <div>
-      {kicker ? <p className="eyebrow">{kicker}</p> : null}
+      <Headline as="h1">{product.title}</Headline>
 
-      <h1 className="mt-4 font-display text-4xl leading-[1.05] md:text-5xl">
-        {product.title}
-      </h1>
-
-      <div className="mt-6 flex items-baseline gap-3 border-b border-ink/15 pb-6">
-        {isRange ? (
-          <span className="font-mono text-spec uppercase tracking-micro text-ink-muted">
-            From
-          </span>
-        ) : null}
+      <p className="ui-mono mt-4 flex items-baseline gap-2">
+        {isRange ? <span>from</span> : null}
         <Price
-          className="font-display text-3xl text-oxblood"
           amount={minVariantPrice.amount}
           currencyCode={minVariantPrice.currencyCode}
         />
-        <span
-          className={`ml-auto font-mono text-spec uppercase tracking-micro ${
-            product.availableForSale ? "text-ink-muted" : "text-oxblood"
-          }`}
-        >
-          {product.availableForSale ? "In stock" : "Sold out"}
-        </span>
-      </div>
+        {!product.availableForSale ? (
+          <span className="ml-2 opacity-70">· Sold out</span>
+        ) : null}
+      </p>
 
       <div className="mt-8">
         <VariantSelector options={product.options} variants={product.variants} />
       </div>
 
-      <div className="mt-8">
+      <div className="mt-6">
         <AddToCart product={product} />
       </div>
 
-      {/* Standing promises, repeated at the point of decision. */}
-      <ul className="mt-6 grid grid-cols-3 gap-4 border-y border-ink/15 py-5">
-        {[
-          { label: "Shipping", value: "Free in India" },
-          { label: "Roasted", value: "Small batch" },
-          { label: "Ground", value: "On order" },
-        ].map((item) => (
-          <li key={item.label}>
-            <p className="eyebrow">{item.label}</p>
-            <p className="mt-1.5 font-display text-base">{item.value}</p>
-          </li>
-        ))}
-      </ul>
-
       {product.descriptionHtml ? (
-        <Prose
-          className="mt-10 text-sm leading-relaxed"
-          html={product.descriptionHtml}
-        />
+        <div className="rule-t mt-8 pt-6">
+          <Prose className="body-mono" html={product.descriptionHtml} />
+        </div>
       ) : null}
 
-      <div className="mt-10">
-        <Accordion
-          items={[
-            {
-              question: "Origin",
-              answer: `Single-origin shade-grown Robusta from our estate in ${site.origin}, planted in ${site.since}. Hand-picked at peak ripeness and dried on raised beds.`,
-            },
-            {
-              question: "Shipping & returns",
-              answer:
-                "Free shipping across India, dispatched within 48 hours of roasting. If a bag arrives damaged or stale, write to us and we will replace it.",
-            },
-          ]}
-        />
-      </div>
+      {specs.length ? (
+        <dl className="rule-t mt-8">
+          {specs.map((spec) => (
+            <div
+              key={spec.label}
+              className="rule-b grid grid-cols-3 items-baseline gap-4 py-3"
+            >
+              <dt className="spec-mono">{spec.label}</dt>
+              <dd className="spec-mono col-span-2">{spec.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
     </div>
   );
 }

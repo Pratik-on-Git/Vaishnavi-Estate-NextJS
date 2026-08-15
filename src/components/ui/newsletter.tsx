@@ -1,23 +1,24 @@
 "use client";
 
+import clsx from "clsx";
 import { useState } from "react";
 
 /**
- * Newsletter capture. Deliberately client-side and self-contained: there is no
- * subscriber backend wired up yet, so this validates and acknowledges without
- * claiming to have stored anything. Point `onSubmit` at a route handler or
- * Shopify customer-marketing mutation when that endpoint exists.
+ * Newsletter capture: a bare underlined field and an arrow link, no box and no
+ * fill (DESIGN.md §5).
+ *
+ * Deliberately client-side and self-contained — there is no subscriber backend
+ * wired up yet, so this validates and acknowledges without claiming to have
+ * stored anything. Point the submit handler at a route handler or Shopify
+ * customer-marketing mutation when that endpoint exists.
  */
-export default function Newsletter({ inverse = false }: { inverse?: boolean }) {
+export default function Newsletter({ className }: { className?: string }) {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "done">("idle");
+  const [done, setDone] = useState(false);
 
-  const line = inverse ? "border-paper/40" : "border-ink/30";
-  const muted = inverse ? "text-paper/60" : "text-ink-muted";
-
-  if (status === "done") {
+  if (done) {
     return (
-      <p className={`font-mono text-spec uppercase tracking-micro ${muted}`}>
+      <p className={clsx("ui-mono", className)} role="status">
         Thank you — we&apos;ll write when the next harvest is roasted.
       </p>
     );
@@ -27,30 +28,28 @@ export default function Newsletter({ inverse = false }: { inverse?: boolean }) {
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        if (email.trim()) setStatus("done");
+        if (email.trim()) setDone(true);
       }}
-      className="w-full max-w-md"
+      className={clsx("flex w-full items-end gap-4", className)}
     >
-      <label htmlFor="newsletter-email" className="sr-only">
-        Email address
-      </label>
-      <div className={`flex items-center gap-4 border-b ${line} pb-3`}>
+      <div className="flex-1">
+        <label htmlFor="newsletter-email" className="sr-only">
+          Email address
+        </label>
         <input
           id="newsletter-email"
           type="email"
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="your@email.com"
+          placeholder="Email address"
           autoComplete="email"
-          className={`w-full bg-transparent font-mono text-spec uppercase tracking-micro placeholder:opacity-40 focus-visible:ring-0 ${
-            inverse ? "text-paper" : "text-ink"
-          }`}
+          className="field-bare"
         />
-        <button type="submit" className="link-rule shrink-0">
-          Sign up
-        </button>
       </div>
+      <button type="submit" className="link-arrow shrink-0 pb-2">
+        Subscribe <span aria-hidden>&rarr;</span>
+      </button>
     </form>
   );
 }

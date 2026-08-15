@@ -9,10 +9,10 @@ import clsx from "clsx";
 
 const itemClass = (active: boolean) =>
   clsx(
-    "whitespace-nowrap font-mono text-spec uppercase tracking-micro transition-colors",
+    "ui-mono whitespace-nowrap transition-opacity",
     active
-      ? "text-oxblood underline decoration-1 underline-offset-4"
-      : "text-ink-muted hover:text-ink"
+      ? "underline decoration-1 underline-offset-4"
+      : "opacity-70 hover:opacity-100"
   );
 
 function PathFilterItem({ item }: { item: PathFilterItem }) {

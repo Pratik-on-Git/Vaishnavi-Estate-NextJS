@@ -1,138 +1,115 @@
 import clsx from "clsx";
+import Link from "next/link";
 
 /**
- * Editorial section scaffolding.
+ * Section scaffolding for the flame system (DESIGN.md §5).
  *
- * The reference layouts repeat one structure: a numbered micro-label, a serif
- * headline whose second half is italicised, and a narrow supporting column set
- * to the right. These primitives encode that so sections stay in rhythm.
+ * Every content section repeats one structure: a bulleted mono eyebrow, a
+ * centred serif heading carrying its collection size as a superscript, and an
+ * underlined "VIEW ALL →" link. These primitives encode that so sections stay
+ * in rhythm without each page re-deciding the spacing.
  */
 
-export function Section({
-  className,
-  tone = "paper",
-  ...props
-}: React.ComponentProps<"section"> & { tone?: "paper" | "espresso" | "oxblood" }) {
-  return (
-    <section
-      {...props}
-      className={clsx(
-        "relative",
-        {
-          "bg-paper text-ink": tone === "paper",
-          "on-dark bg-espresso text-paper": tone === "espresso",
-          "on-dark bg-oxblood text-paper": tone === "oxblood",
-        },
-        className
-      )}
-    >
-      {props.children}
-    </section>
-  );
-}
-
 export function Eyebrow({
-  index,
   children,
-  inverse,
+  align = "center",
   className,
 }: {
-  index?: string;
   children: React.ReactNode;
-  inverse?: boolean;
+  align?: "center" | "left";
   className?: string;
 }) {
   return (
-    <p className={clsx(inverse ? "eyebrow-inverse" : "eyebrow", className)}>
-      {index ? <span className="mr-3 opacity-60">{index}</span> : null}
+    <p
+      className={clsx(
+        "eyebrow flex items-center gap-2",
+        align === "center" ? "justify-center" : "justify-start",
+        className
+      )}
+    >
+      <span aria-hidden className="text-[0.5em] leading-none text-oxblood">
+        &#9679;
+      </span>
       {children}
     </p>
   );
 }
 
 /**
- * Serif headline. `accent` renders italic, echoing the "Ignite your *senses*"
- * and "We believe dining *is an art form*" treatment in the references.
+ * Display heading. `count` renders as the superscript numeral that marks how
+ * many products sit in the section below — a signature of this system.
  */
 export function Headline({
   children,
-  accent,
+  count,
   as: Tag = "h2",
-  size = "md",
+  size = "xl",
+  id,
   className,
 }: {
   children: React.ReactNode;
-  accent?: React.ReactNode;
+  count?: number;
   as?: "h1" | "h2" | "h3" | "p";
-  size?: "sm" | "md" | "lg";
+  size?: "xl" | "lg" | "md" | "sm";
+  id?: string;
   className?: string;
 }) {
   return (
     <Tag
+      id={id}
       className={clsx(
-        "font-display font-normal text-balance",
+        "serif text-balance",
         {
-          "text-2xl leading-[1.15] md:text-3xl": size === "sm",
-          "text-display-sm": size === "md",
-          "text-display-md": size === "lg",
+          "text-display-xl": size === "xl",
+          "text-display-lg": size === "lg",
+          "text-display-md": size === "md",
+          "text-display-sm": size === "sm",
         },
         className
       )}
     >
       {children}
-      {accent ? (
-        <>
-          {" "}
-          <em className="italic">{accent}</em>
-        </>
+      {count ? (
+        <sup className="count-sup" aria-hidden>
+          {count}
+        </sup>
       ) : null}
     </Tag>
   );
 }
 
-/** Two-column editorial header: headline left, supporting body right. */
-export function SectionHeader({
+/** Centred eyebrow → heading → link stack that opens most sections. */
+export function SectionHead({
   eyebrow,
-  index,
   title,
-  accent,
-  body,
+  count,
   action,
-  inverse,
+  actionHref,
   className,
 }: {
-  eyebrow?: string;
-  index?: string;
+  eyebrow: string;
   title: React.ReactNode;
-  accent?: React.ReactNode;
-  body?: React.ReactNode;
-  action?: React.ReactNode;
-  inverse?: boolean;
+  count?: number;
+  action?: string;
+  actionHref?: string;
   className?: string;
 }) {
   return (
-    <div className={clsx("grid gap-8 md:grid-cols-12 md:gap-10", className)}>
-      <div className="md:col-span-7">
-        {eyebrow ? (
-          <Eyebrow index={index} inverse={inverse} className="mb-6">
-            {eyebrow}
-          </Eyebrow>
-        ) : null}
-        <Headline accent={accent}>{title}</Headline>
-      </div>
-      <div className="flex flex-col justify-end gap-6 md:col-span-4 md:col-start-9">
-        {body ? (
-          <p
-            className={clsx(
-              "max-w-prose2 text-sm leading-relaxed",
-              inverse ? "text-paper/70" : "text-ink-muted"
-            )}
-          >
-            {body}
-          </p>
-        ) : null}
-        {action}
-      </div>
+    <div className={clsx("shell py-12 text-center md:py-16", className)}>
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <Headline count={count} className="mt-4">
+        {title}
+      </Headline>
+      {action && actionHref ? (
+        <Link href={actionHref} className="link-arrow mt-6">
+          {action} <span aria-hidden>&rarr;</span>
+        </Link>
+      ) : null}
     </div>
   );
+}
+
+/** Product status flag rendered over a plate. */
+export function Badge({ children }: { children: React.ReactNode }) {
+  return <span className="badge">{children}</span>;
 }

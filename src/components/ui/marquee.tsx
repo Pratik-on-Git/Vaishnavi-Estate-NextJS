@@ -1,30 +1,57 @@
 import clsx from "clsx";
 
 /**
- * Full-bleed scrolling ticker, as in the "With Urban Flair · Chic Coffee Vibes"
- * band of the reference. The phrase list is rendered twice so the -50%
- * translation in `.marquee-track` loops without a visible seam; the duplicate
- * is hidden from assistive tech.
+ * Scrolling ticker. The phrase list is rendered twice so the -50% translation
+ * in `.marquee-track` loops without a visible seam; the duplicate is hidden
+ * from assistive tech.
+ *
+ * Three sizes carry three jobs in the system (DESIGN.md §5):
+ *   `ui`      — the announcement strip and the shipping band, mono.
+ *   `display` — the "Brew of the Month" bands, serif at heading scale.
+ *   `hero`    — the giant statement over the hero image and in the footer.
  */
 export default function Marquee({
   phrases,
-  tone = "oxblood",
+  size = "ui",
+  separator = "·",
+  reverse = false,
+  duration,
   className,
 }: {
   phrases: readonly string[];
-  tone?: "oxblood" | "espresso" | "paper";
+  size?: "ui" | "display" | "hero";
+  /** Glyph set between phrases. Pass "" for none. */
+  separator?: string;
+  reverse?: boolean;
+  /** Seconds for one full pass. Longer text wants a longer duration. */
+  duration?: number;
   className?: string;
 }) {
+  const text = {
+    ui: "font-mono text-ui uppercase tracking-ui",
+    display: "font-display text-display-md",
+    hero: "font-display text-display-hero leading-none",
+  }[size];
+
+  const gap = {
+    ui: "px-8",
+    display: "px-6",
+    hero: "px-8",
+  }[size];
+
   const run = (ariaHidden: boolean) => (
-    <div className="flex shrink-0 items-center" aria-hidden={ariaHidden || undefined}>
+    <div
+      className="flex shrink-0 items-center"
+      aria-hidden={ariaHidden || undefined}
+    >
       {phrases.map((phrase, i) => (
         <span key={`${phrase}-${i}`} className="flex items-center">
-          <span className="whitespace-nowrap px-6 font-display text-xl italic md:px-10 md:text-2xl">
-            {phrase}
-          </span>
-          <span aria-hidden className="text-[0.5rem] opacity-50">
-            &#9679;
-          </span>
+          <span className={clsx("whitespace-nowrap", gap, text)}>{phrase}</span>
+          {separator ? (
+            <span aria-hidden className={clsx("shrink-0", text)}>
+              {separator}
+            </span>
+          ) : null}
         </span>
       ))}
     </div>
@@ -32,17 +59,14 @@ export default function Marquee({
 
   return (
     <div
-      className={clsx(
-        "overflow-hidden border-y py-4",
-        {
-          "border-paper/20 bg-oxblood text-paper": tone === "oxblood",
-          "border-paper/15 bg-espresso text-paper": tone === "espresso",
-          "border-ink/15 bg-paper text-ink": tone === "paper",
-        },
-        className
-      )}
+      className={clsx("overflow-hidden", className)}
+      style={
+        duration
+          ? ({ "--marquee-duration": `${duration}s` } as React.CSSProperties)
+          : undefined
+      }
     >
-      <div className="marquee-track">
+      <div className={reverse ? "marquee-track-reverse" : "marquee-track"}>
         {run(false)}
         {run(true)}
       </div>

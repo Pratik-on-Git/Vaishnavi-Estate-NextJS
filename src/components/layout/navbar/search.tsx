@@ -61,11 +61,11 @@ export function SearchBar({
         placeholder="Search the estate…"
         autoComplete="off"
         defaultValue={searchParams?.get("q") || ""}
-        className="w-full border-b border-ink/25 bg-transparent py-4 pr-10 font-display text-2xl placeholder:text-ink-faint focus-visible:border-oxblood focus-visible:ring-0 md:text-3xl"
+        className="serif w-full border-b border-rule bg-transparent py-4 pr-10 text-display-md focus-visible:border-oxblood focus-visible:ring-0"
       />
       <MagnifyingGlassIcon
         aria-hidden
-        className="pointer-events-none absolute right-0 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-muted"
+        className="pointer-events-none absolute right-0 top-1/2 h-5 w-5 -translate-y-1/2"
       />
     </form>
   );
@@ -81,10 +81,10 @@ export default function SearchTrigger() {
         type="button"
         onClick={() => setIsOpen(true)}
         aria-label="Search"
-        className="flex items-center gap-2 font-mono text-spec uppercase tracking-micro text-ink-muted transition-colors hover:text-oxblood"
+        className="ui-mono flex items-center gap-2 transition-opacity hover:opacity-60"
       >
-        <MagnifyingGlassIcon aria-hidden className="h-4 w-4" />
-        <span className="hidden lg:inline">Search</span>
+        <span className="hidden sm:inline">Search</span>
+        <MagnifyingGlassIcon aria-hidden className="h-4 w-4 sm:hidden" />
       </button>
 
       <Transition show={isOpen}>
@@ -98,7 +98,7 @@ export default function SearchTrigger() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-espresso/40 backdrop-blur-sm" aria-hidden />
+            <div className="fixed inset-0 bg-coal/40 backdrop-blur-sm" aria-hidden />
           </TransitionChild>
           <TransitionChild
             as={Fragment}
@@ -109,7 +109,7 @@ export default function SearchTrigger() {
             leaveFrom="translate-y-0"
             leaveTo="-translate-y-full"
           >
-            <DialogPanel className="fixed inset-x-0 top-0 bg-paper pb-14 pt-8">
+            <DialogPanel className="rule-b fixed inset-x-0 top-0 bg-paper pb-12 pt-8">
               <div className="shell">
                 <div className="flex items-start justify-between gap-8">
                   <p className="eyebrow pt-2">Search</p>
@@ -117,7 +117,7 @@ export default function SearchTrigger() {
                     type="button"
                     onClick={() => setIsOpen(false)}
                     aria-label="Close search"
-                    className="text-ink-muted transition-colors hover:text-oxblood"
+                    className="transition-opacity hover:opacity-60"
                   >
                     <XMarkIcon className="h-6 w-6" />
                   </button>
@@ -127,13 +127,13 @@ export default function SearchTrigger() {
                 </div>
                 <div className="mt-10">
                   <p className="eyebrow mb-4">Browse by brew</p>
-                  <ul className="flex flex-wrap gap-x-6 gap-y-3">
+                  <ul className="flex flex-wrap gap-2">
                     {brewFormats.map((format) => (
                       <li key={format.handle}>
                         <a
                           href={`/search/${format.handle}`}
                           onClick={() => setIsOpen(false)}
-                          className="font-display text-xl italic transition-colors hover:text-oxblood"
+                          className="pill text-display-sm hover:bg-oxblood hover:text-paper"
                         >
                           {format.title}
                         </a>
@@ -167,11 +167,11 @@ function SearchOverlayForm({ onDone }: { onDone: () => void }) {
         placeholder="Search the estate…"
         autoComplete="off"
         defaultValue={searchParams?.get("q") || ""}
-        className="w-full border-b border-ink/25 bg-transparent py-4 pr-10 font-display text-3xl placeholder:text-ink-faint focus-visible:border-oxblood focus-visible:ring-0 md:text-5xl"
+        className="serif w-full border-b border-rule bg-transparent py-4 pr-10 text-display-xl focus-visible:border-oxblood focus-visible:ring-0"
       />
       <MagnifyingGlassIcon
         aria-hidden
-        className="pointer-events-none absolute right-0 top-1/2 h-6 w-6 -translate-y-1/2 text-ink-muted"
+        className="pointer-events-none absolute right-0 top-1/2 h-6 w-6 -translate-y-1/2"
       />
     </form>
   );
@@ -180,7 +180,7 @@ function SearchOverlayForm({ onDone }: { onDone: () => void }) {
 export function SearchSkeleton() {
   return (
     <div className="relative w-full">
-      <div className="h-14 w-full animate-pulse border-b border-ink/15" />
+      <div className="h-14 w-full animate-pulse border-b border-rule" />
     </div>
   );
 }

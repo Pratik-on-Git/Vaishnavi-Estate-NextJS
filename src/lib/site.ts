@@ -12,48 +12,103 @@ export const site = {
   wordmark: "VAISHNAVI",
   wordmarkAccent: "ESTATE",
   tagline: "Strong Coffee · Bold · Pure",
+  /** The line set in the giant footer wordmark and the hero marquee. */
+  statement: "Honestly Grown Coffee.",
   origin: "Coorg, Karnataka",
   since: "1928",
   description:
     "Single-origin, shade-grown Robusta from a four-generation family estate in Coorg. Roasted in small batches, ground to order, shipped across India.",
+  freeShippingThreshold: "₹1,500",
 } as const;
 
 /** Fallback navigation, used when the Shopify menu is empty or unreachable. */
 export const primaryNav: { title: string; path: string }[] = [
-  { title: "Coffee", path: "/search" },
-  { title: "Brew guides", path: "/search/brew-guides" },
-  { title: "The estate", path: "/about" },
-  { title: "Homestay", path: "/homestay" },
+  { title: "Shop", path: "/search" },
+  { title: "Journal", path: "/journal" },
+  { title: "About", path: "/about" },
 ];
 
-/** The hero spec strip — the row of micro-labels under the wordmark in ref 1. */
-export const heroSpecs = [
-  { label: "Single origin", value: "Coorg Robusta" },
-  { label: "Roasted", value: "In small batches" },
-  { label: "Ground", value: "Fresh on order" },
-  { label: "Shipping", value: "Free across India" },
-  { label: "Grown since", value: site.since },
+/** Scrolling announcement above the header. */
+export const announcement = `Spend ${site.freeShippingThreshold} to get free shipping`;
+
+/**
+ * Collection pills under the hero. Handles map to Shopify collections; the
+ * grid degrades gracefully when a handle does not exist yet.
+ */
+export const collectionPills = [
+  { title: "All coffee", handle: "" },
+  { title: "Popular", handle: "popular" },
+  { title: "Single Origin", handle: "single-origin" },
+  { title: "Blend", handle: "blend" },
+  { title: "Filter", handle: "filter" },
+  { title: "Espresso", handle: "espresso" },
+  { title: "Robusta", handle: "robusta" },
+  { title: "Arabica", handle: "arabica" },
+  { title: "Coorg", handle: "coorg" },
+  { title: "Dark Roast", handle: "dark-roast" },
+  { title: "Washed", handle: "washed" },
+  { title: "Natural", handle: "natural" },
 ] as const;
 
-/** Full-bleed scrolling ticker beneath the hero. */
-export const tickerPhrases = [
-  "Shade grown",
-  "Four generations deep",
-  "Roasted daily",
-  "Elegance in every roast",
-  "Single origin Coorg",
-  "Legacy in every bean",
+/** The paired dark promo panels between the product rails. */
+export const promoTiles = [
+  { title: "Shop Filter", handle: "filter" },
+  { title: "Shop Espresso", handle: "espresso" },
 ] as const;
 
-/** Estate numbers, set in the display serif like the reference stat block. */
-export const estateStats = [
-  { value: site.since, label: "the year the estate was planted" },
-  { value: "4", label: "generations of the same family" },
-  { value: "100%", label: "shade-grown single-origin Robusta" },
-  { value: "48h", label: "from roast to dispatch" },
-  { value: "3,500", label: "feet above sea level" },
-  { value: "5", label: "brew formats ground to order" },
+/** Centred statement set in the display serif above the about rail. */
+export const aboutStatement =
+  "Vaishnavi Estate started with a simple idea: great mornings begin with great coffee. We believe coffee should be fresh, honest, and something you actually look forward to drinking — every single day.";
+
+/** Alternating text cells in the about carousel. */
+export const aboutCards = [
+  "Our coffee is grown on our own land in Coorg, under a canopy of native shade trees. We pay our pickers above the district rate and have worked with the same families for three generations.",
+  "Quality is checked at every stage, from cherry selection to final roast. Each batch is profiled, cupped and evaluated to ensure consistency, balance and exceptional flavour in every roast.",
+  "Every cherry is picked by hand at peak ripeness, pulped the same evening, and dried on raised beds where air reaches it from every side. Nothing touches tarmac.",
 ] as const;
+
+/** Guides teaser — image right, copy left. */
+export const guidesFeature = {
+  eyebrow: "Guides",
+  title: "Pouring the perfect cup",
+  body: "Every brew method has its own feel, and part of the fun is figuring out what works for you. Start with these guides, make small adjustments, and follow your taste from there.",
+  cta: "Read now",
+  href: "/journal",
+} as const;
+
+/** Brew-of-the-month band copy. */
+export const featureBand = {
+  label: "Brew of the Month",
+  eyebrow: "This month",
+} as const;
+
+/**
+ * Journal entries. There is no blog API wired to the storefront yet, so these
+ * are editorial until one is — the card shape matches whatever replaces them.
+ */
+export const journalPosts = [
+  {
+    slug: "how-to-store-coffee-beans",
+    title: "How to Store Coffee Beans So They Stay Fresh Longer",
+    excerpt:
+      "Coffee tastes best when it's fresh. Even the highest-quality beans lose their flavour over time if they're stored incorrectly. The good news? Keeping...",
+  },
+  {
+    slug: "morning-coffee-routine",
+    title: "Morning Coffee: Make It Part of Your Routine",
+    excerpt:
+      "For many of us, mornings are a blur of alarms, emails and scrambling out the door. But what if your coffee wasn't just fuel — it was a moment to pau...",
+  },
+  {
+    slug: "upgrade-your-home-coffee",
+    title: "5 Easy Ways to Upgrade Your Home Coffee Game",
+    excerpt:
+      "You don't need a café setup — or a counter full of fancy gear — to make great coffee at home. A few small tweaks can make a big difference in flavour, f...",
+  },
+] as const;
+
+/** Footer shipping ticker. */
+export const shippingTicker = `Shipping's on us for orders over ${site.freeShippingThreshold}`;
 
 /** Brew-format grid. Handles map to Shopify collections where they exist. */
 export const brewFormats = [
@@ -89,29 +144,7 @@ export const brewFormats = [
   },
 ] as const;
 
-/** The estate story, told in three chapters down the page. */
-export const chapters = [
-  {
-    index: "01",
-    title: "We believe coffee",
-    titleAccent: "is an art form",
-    body: "Four generations have worked this land in Coorg. What began in 1928 as a smallholding under the shade of native rosewood is now an estate that still refuses shortcuts — no sun-drying on tarmac, no blending away a difficult harvest, no beans older than the season.",
-  },
-  {
-    index: "02",
-    title: "Grown slowly,",
-    titleAccent: "picked by hand",
-    body: "Our Robusta grows at three and a half thousand feet under a canopy that keeps the cherries cool and slow to ripen. Every cherry is picked by hand at peak red, pulped the same evening, and sun-dried on raised beds where the airflow can reach it from every side.",
-  },
-  {
-    index: "03",
-    title: "Roasted small,",
-    titleAccent: "ground on order",
-    body: "We roast in batches small enough to taste through, then hold the beans whole until your order arrives. Grinding happens after you buy, matched to the brew method you choose — because the aromatics you paid for start leaving the moment the bean is broken.",
-  },
-] as const;
-
-/** Homepage FAQ — mirrors the accordion in the reference layout. */
+/** Homepage FAQ. */
 export const faqs = [
   {
     question: "What makes Robusta worth seeking out?",
@@ -144,29 +177,20 @@ export const footerColumns = [
   {
     title: "Shop",
     links: [
-      { title: "All coffee", path: "/search" },
-      { title: "Ground", path: "/search/ground-coffee" },
-      { title: "Whole beans", path: "/search/whole-beans" },
-      { title: "Green beans", path: "/search/green-beans" },
-      { title: "Gift boxes", path: "/search/gift-boxes" },
+      { title: "All", path: "/search" },
+      { title: "Popular", path: "/search/popular" },
+      { title: "Filter", path: "/search/filter" },
+      { title: "Espresso", path: "/search/espresso" },
+      { title: "Full list", path: "/search" },
     ],
   },
   {
-    title: "The estate",
+    title: "More",
     links: [
-      { title: "Our story", path: "/about" },
-      { title: "How we roast", path: "/roasting" },
-      { title: "Homestay", path: "/homestay" },
-      { title: "Brew guides", path: "/search/brew-guides" },
-    ],
-  },
-  {
-    title: "Help",
-    links: [
-      { title: "My account", path: "/account" },
-      { title: "Shipping", path: "/shipping-policy" },
-      { title: "Returns", path: "/refund-policy" },
+      { title: "Merch", path: "/search/merch" },
       { title: "Contact", path: "/contact" },
+      { title: "FAQ", path: "/about" },
+      { title: "Brew guide", path: "/journal" },
     ],
   },
 ] as const;
@@ -174,6 +198,7 @@ export const footerColumns = [
 export const socialLinks = [
   { title: "Instagram", href: "https://instagram.com" },
   { title: "Facebook", href: "https://facebook.com" },
-  { title: "LinkedIn", href: "https://linkedin.com" },
-  { title: "Twitter", href: "https://twitter.com" },
+  { title: "YouTube", href: "https://youtube.com" },
+  { title: "WhatsApp", href: "https://wa.me/910000000000" },
+  { title: "Email", href: "mailto:hello@vaishnaviestate.com" },
 ] as const;

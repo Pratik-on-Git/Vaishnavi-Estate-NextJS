@@ -3,8 +3,9 @@ import LogoIcon from "./icons/logo";
 import { site } from "@/lib/site";
 
 /**
- * Wordmark lockup: estate monogram beside the name set in the display serif.
- * `compact` drops the wordmark to just the monogram for tight rails.
+ * Centred mark over a mono wordmark — the header lockup for this system. The
+ * estate monogram stays as the brand's own identity; only its setting follows
+ * the flame design language.
  */
 export default function LogoSquare({
   size,
@@ -16,26 +17,18 @@ export default function LogoSquare({
   className?: string;
 }) {
   return (
-    <span className={clsx("flex items-center gap-3", className)}>
+    <span className={clsx("flex flex-col items-center leading-none", className)}>
       <LogoIcon
-        className={clsx("shrink-0", {
-          "h-7 w-7": !size,
-          "h-5 w-5": size === "sm",
-        })}
+        className={clsx("shrink-0", size === "sm" ? "h-6 w-6" : "h-8 w-8")}
       />
       {!compact ? (
-        <span className="flex flex-col leading-none">
-          <span
-            className={clsx("font-display tracking-tight", {
-              "text-lg": !size,
-              "text-base": size === "sm",
-            })}
-          >
-            {site.name}
-          </span>
-          <span className="mt-0.5 font-mono text-[0.5rem] uppercase tracking-wider2 opacity-60">
-            {site.origin} · Est. {site.since}
-          </span>
+        <span
+          className={clsx(
+            "micro-mono mt-1 whitespace-nowrap",
+            size === "sm" && "text-[0.5625rem]"
+          )}
+        >
+          {site.name}
         </span>
       ) : null}
     </span>
