@@ -1,113 +1,295 @@
 "use server";
 
-import { TAGS } from "@/lib/constants";
+import { MAX_LINE_QUANTITY, TAGS } from "@/lib/constants";
 import {
+  CartMutationError,
   addToCart,
   createCart,
   getCart,
   removeFromCart,
   updateCart,
 } from "@/lib/shopify";
-import { revalidateTag } from "next/cache";
+import type { Cart, CartWarning } from "@/lib/shopify/types";
+import { updateTag } from "next/cache";
 import { cookies } from "next/headers";
 
-export async function addItem(
-  prevState: any,
-  selectedVariantId: string | undefined
-) {
-  const cartId = (await cookies()).get("cartId")?.value;
+export type CartActionState = {
+  ok: boolean;
+  message: string;
+} | null;
 
-  if (!cartId || !selectedVariantId) {
-    return "Error adding item to cart";
+const CART_COOKIE = "cartId";
+
+// One year. Shopify carts themselves expire after ~10 days of inactivity; the
+// cookie outliving the cart is fine because every action recovers from a dead
+// cart id, but a *session* cookie is not — it drops the cart when the browser
+// closes, which is the common "my cart vanished" report.
+const CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+
+const MERCHANDISE_ID_PATTERN = /^gid:\/\/shopify\/ProductVariant\/[\w-]+$/;
+
+function ok(message = ""): CartActionState {
+  return { ok: true, message };
+}
+
+function fail(message: string): CartActionState {
+  return { ok: false, message };
+}
+
+async function setCartCookie(cartId: string) {
+  (await cookies()).set(CART_COOKIE, cartId, {
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: CART_COOKIE_MAX_AGE,
+  });
+}
+
+async function readCartCookie(): Promise<string | undefined> {
+  const value = (await cookies()).get(CART_COOKIE)?.value;
+  return value && value.trim() ? value : undefined;
+}
+
+/**
+ * Resolves the live cart, transparently replacing one that Shopify no longer
+ * recognises (checked out, expired, or a cookie carried over from another
+ * store). Returns `cart: undefined` only when `create` is false.
+ */
+type ResolvedCart =
+  | { cartId: string; cart: Cart }
+  | { cartId: undefined; cart: undefined };
+
+/**
+ * Reads the live cart behind the cookie. Returns nothing when the id is absent
+ * or Shopify no longer recognises it (checked out, or expired).
+ */
+async function resolveCart(): Promise<ResolvedCart> {
+  const existingId = await readCartCookie();
+
+  if (existingId) {
+    // Fresh read: inside an action the tagged cache entry may still hold the
+    // pre-mutation cart, whose line ids are stale.
+    const cart = await getCart(existingId, { fresh: true });
+    if (cart?.id) {
+      return { cartId: cart.id, cart };
+    }
+  }
+
+  return { cartId: undefined, cart: undefined };
+}
+
+function clampQuantity(quantity: number): number {
+  if (!Number.isFinite(quantity)) return 0;
+  return Math.min(Math.max(Math.trunc(quantity), 0), MAX_LINE_QUANTITY);
+}
+
+function isValidMerchandiseId(id: unknown): id is string {
+  return typeof id === "string" && MERCHANDISE_ID_PATTERN.test(id);
+}
+
+/**
+ * Distinguishes "this cart id is dead" (checked out, expired, or minted by a
+ * different store) from every other rejection, so only the former triggers a
+ * replacement cart. Retrying blindly would mint an orphan cart on every bad
+ * variant id.
+ */
+function isMissingCartError(error: unknown): boolean {
+  return error instanceof CartMutationError && error.isMissingCart;
+}
+
+/**
+ * Shopify silently clamps a line to available inventory rather than failing, so
+ * a "success" can still mean the customer got fewer units than they asked for.
+ * Surface that instead of letting the number quietly snap back.
+ */
+function describeWarnings(warnings: CartWarning[]): string {
+  const stockWarning = warnings.find(
+    (warning) => warning.code === "MERCHANDISE_NOT_ENOUGH_STOCK"
+  );
+  return stockWarning
+    ? "Only part of that quantity is in stock — we added what was available."
+    : "";
+}
+
+function toMessage(error: unknown, fallback: string): string {
+  if (error instanceof CartMutationError) return error.message;
+  console.error(error);
+  return fallback;
+}
+
+export async function addItem(
+  _prevState: CartActionState,
+  payload: { merchandiseId: string | undefined; quantity?: number }
+): Promise<CartActionState> {
+  const merchandiseId = payload?.merchandiseId;
+
+  if (!isValidMerchandiseId(merchandiseId)) {
+    return fail("Please select an option before adding to the cart.");
+  }
+
+  const quantity = clampQuantity(payload.quantity ?? 1);
+  if (quantity < 1) {
+    return fail("Quantity must be at least 1.");
   }
 
   try {
-    await addToCart(cartId, [
-      { merchandiseId: selectedVariantId, quantity: 1 },
-    ]);
-    revalidateTag(TAGS.cart, "max");
+    const existingId = await readCartCookie();
+    let warnings: CartWarning[] = [];
+    let added = false;
+
+    // Fast path: add straight to the cart on the cookie, no read first.
+    if (existingId) {
+      try {
+        ({ warnings } = await addToCart(existingId, [
+          { merchandiseId, quantity },
+        ]));
+        added = true;
+      } catch (error) {
+        // Only a dead cart id falls through to a replacement; anything else
+        // (bad variant, sold out) is a real failure and propagates.
+        if (!isMissingCartError(error)) throw error;
+      }
+    }
+
+    // Creating the cart here, inside the same action that adds the line, closes
+    // the first-visit race: the cart used to be created by an effect in the
+    // modal, so a fast click hit a missing cookie and failed while the
+    // optimistic UI happily showed the item as added.
+    if (!added) {
+      const created = await createCart();
+      if (!created.id) {
+        throw new Error("Shopify returned a cart without an id");
+      }
+      await setCartCookie(created.id);
+      ({ warnings } = await addToCart(created.id, [
+        { merchandiseId, quantity },
+      ]));
+    }
+
+    // `updateTag`, not `revalidateTag`. Next 16 deliberately withholds the
+    // re-rendered RSC payload when `revalidateTag` is given a cache profile
+    // ("so that server actions don't pull their own writes"), so the root
+    // layout never re-runs, the cart promise never changes, and the optimistic
+    // state snaps back to the pre-action cart. `updateTag` expires the entry
+    // immediately AND marks the path revalidated, which is what makes the cart
+    // update without a reload.
+    updateTag(TAGS.cart);
+
+    return ok(describeWarnings(warnings));
   } catch (error) {
-    return "Error adding item to cart";
+    return fail(toMessage(error, "We couldn't add that to your cart."));
   }
 }
 
 export async function updateItemQuantity(
-  prevState: any,
+  _prevState: CartActionState,
   payload: {
     merchandiseId: string;
     quantity: number;
   }
-) {
-  const cartId = (await cookies()).get("cartId")?.value;
-  if (!cartId) {
-    return "Missing cart ID";
+): Promise<CartActionState> {
+  if (!isValidMerchandiseId(payload?.merchandiseId)) {
+    return fail("We couldn't update that item.");
   }
 
-  const { merchandiseId, quantity } = payload;
+  const { merchandiseId } = payload;
+  const quantity = clampQuantity(payload.quantity);
 
   try {
-    const cart = await getCart(cartId);
-    if (!cart) {
-      return "Error fetching cart";
+    const { cartId, cart } = await resolveCart();
+
+    if (!cartId || !cart) {
+      // Nothing to update against, and nothing was lost — the cart is already
+      // empty from the customer's point of view.
+      updateTag(TAGS.cart);
+      return quantity === 0
+        ? ok()
+        : fail("Your cart expired. Please add the item again.");
     }
 
-    const lineItem = cart.lines.find(
-      (line) => line.merchandise.id === merchandiseId
+    // Shopify permits several lines for the same variant. Collapse them rather
+    // than updating the first and leaving the rest to double the total.
+    const matching = cart.lines.filter(
+      (line) => line.merchandise.id === merchandiseId && line.id
     );
+    const [primary, ...duplicates] = matching;
 
-    if (lineItem && lineItem.id) {
-      if (quantity === 0) {
-        await removeFromCart(cartId, [lineItem.id]);
-      } else {
-        await updateCart(cartId, [
-          {
-            id: lineItem.id,
-            merchandiseId,
-            quantity,
-          },
-        ]);
+    let warnings: CartWarning[] = [];
+
+    if (!primary) {
+      if (quantity > 0) {
+        ({ warnings } = await addToCart(cartId, [{ merchandiseId, quantity }]));
       }
-    } else if (quantity > 0) {
-      // If the item doesn't exist in the cart and quantity > 0, add it
-      await addToCart(cartId, [{ merchandiseId, quantity }]);
+    } else if (quantity === 0) {
+      await removeFromCart(cartId, matching.map((line) => line.id!));
+    } else {
+      if (duplicates.length) {
+        await removeFromCart(cartId, duplicates.map((line) => line.id!));
+      }
+      ({ warnings } = await updateCart(cartId, [
+        { id: primary.id!, merchandiseId, quantity },
+      ]));
     }
 
-    revalidateTag(TAGS.cart, "max");
+    updateTag(TAGS.cart);
+    return ok(describeWarnings(warnings));
   } catch (error) {
-    console.error(error);
-    return "Error updating item quantity";
+    return fail(toMessage(error, "We couldn't update that quantity."));
   }
 }
 
-export async function removeItem(prevState: any, merchandiseId: string) {
-  const cartId = (await cookies()).get("cartId")?.value;
-
-  if (!cartId) {
-    return "Missing cart ID";
+export async function removeItem(
+  _prevState: CartActionState,
+  merchandiseId: string
+): Promise<CartActionState> {
+  if (!isValidMerchandiseId(merchandiseId)) {
+    return fail("We couldn't remove that item.");
   }
 
   try {
-    const cart = await getCart(cartId);
-    if (!cart) {
-      return "Error fetching cart";
+    const { cartId, cart } = await resolveCart();
+
+    if (!cartId || !cart) {
+      updateTag(TAGS.cart);
+      return ok();
     }
 
-    const lineItem = cart.lines.find(
-      (line) => line.merchandise.id === merchandiseId
-    );
+    const lineIds = cart.lines
+      .filter((line) => line.merchandise.id === merchandiseId && line.id)
+      .map((line) => line.id!);
 
-    if (lineItem && lineItem.id) {
-      await removeFromCart(cartId, [lineItem.id]);
-      revalidateTag(TAGS.cart, "max");
-    } else {
-      return "Item not found in cart";
+    // Already gone (a duplicate click, or removed in another tab) is the
+    // desired end state, not an error.
+    if (lineIds.length) {
+      await removeFromCart(cartId, lineIds);
     }
+
+    updateTag(TAGS.cart);
+    return ok();
   } catch (error) {
-    return "Error removing item from cart";
+    return fail(toMessage(error, "We couldn't remove that item."));
   }
 }
 
-export async function createCartAndSetCookie() {
-  const cart = await createCart();
-  (await cookies()).set("cartId", cart.id!);
+/**
+ * Pre-creates a cart so the checkout URL exists before the first add. Safe to
+ * call repeatedly — it no-ops when a live cart is already attached.
+ */
+export async function createCartAndSetCookie(): Promise<void> {
+  try {
+    const existingId = await readCartCookie();
+    if (existingId && (await getCart(existingId, { fresh: true }))) {
+      return;
+    }
+
+    const cart = await createCart();
+    if (cart.id) {
+      await setCartCookie(cart.id);
+      updateTag(TAGS.cart);
+    }
+  } catch (error) {
+    // Non-fatal: the next add-to-cart creates the cart on demand.
+    console.error("Failed to pre-create cart", error);
+  }
 }

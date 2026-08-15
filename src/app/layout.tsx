@@ -39,7 +39,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cartId = (await cookies()).get("cartId")?.value;
-  const cart = getCart(cartId);
+  // The promise is handed to a client component that unwraps it with `use()`,
+  // so a rejection surfaces at the root and blanks the whole site. Degrade to
+  // an empty cart instead — every other page still works without one.
+  const cart = getCart(cartId).catch((error) => {
+    console.error("Failed to load cart", error);
+    return undefined;
+  });
   return (
     <html lang="en">
       <head>

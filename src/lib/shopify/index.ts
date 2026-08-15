@@ -26,10 +26,13 @@ import {
 } from "./queries/product";
 import {
   Cart,
+  CartUserError,
+  CartWarning,
   Collection,
   Connection,
   Image,
   Menu,
+  Money,
   Page,
   Product,
   ShopifyAddToCartOperation,
@@ -75,6 +78,14 @@ export async function shopifyFetch<T>({
   tags?: string[];
   variables?: ExtractVariables<T>;
 }): Promise<{ status: number; body: T } | never> {
+  // Fail loudly and early rather than sending an unauthenticated request that
+  // Shopify answers with an opaque 403.
+  if (!domain || !key) {
+    throw new Error(
+      "Shopify is not configured: set SHOPIFY_STORE_DOMAIN and SHOPIFY_STOREFRONT_ACCESS_TOKEN."
+    );
+  }
+
   try {
     const result = await fetch(endpoint, {
       method: "POST",
@@ -376,17 +387,97 @@ export async function getProductRecommendations(
   return reshapeProducts(res.body.data.productRecommendations);
 }
 
-function reshapeCart(cart: ShopifyCart): Cart {
-  if (!cart.cost?.totalTaxAmount) {
-    cart.cost.totalTaxAmount = {
-      amount: "0.0",
-      currencyCode: "USD",
-    };
+/**
+ * Raised when Shopify accepts the request (HTTP 200, no top-level `errors`) but
+ * rejects the operation via `userErrors`. `message` is safe to show to a user.
+ */
+export class CartMutationError extends Error {
+  readonly code: string | null;
+  /** GraphQL path of the offending argument, e.g. `["cartId"]`. */
+  readonly field: string[] | null;
+
+  constructor(
+    message: string,
+    code: string | null = null,
+    field: string[] | null = null
+  ) {
+    super(message);
+    this.name = "CartMutationError";
+    this.code = code;
+    this.field = field;
   }
+
+  /** True when Shopify no longer recognises the cart id we sent. */
+  get isMissingCart(): boolean {
+    return this.field?.includes("cartId") ?? false;
+  }
+}
+
+/** Raised when the cart id no longer resolves — checked out, or expired. */
+export class CartNotFoundError extends Error {
+  constructor() {
+    super("Cart no longer exists");
+    this.name = "CartNotFoundError";
+  }
+}
+
+function reshapeCart(cart: ShopifyCart): Cart {
+  // `cost` and `totalTaxAmount` are both nullable on the Storefront API — a
+  // brand-new cart has no tax until an address is attached. Rebuild the object
+  // instead of mutating the response in place.
+  const currencyCode =
+    cart.cost?.totalAmount?.currencyCode ??
+    cart.cost?.subtotalAmount?.currencyCode ??
+    "INR";
+  const zero: Money = { amount: "0.0", currencyCode };
 
   return {
     ...cart,
-    lines: removeEdgesAndNodes(cart.lines),
+    checkoutUrl: cart.checkoutUrl ?? "",
+    totalQuantity: cart.totalQuantity ?? 0,
+    cost: {
+      subtotalAmount: cart.cost?.subtotalAmount ?? zero,
+      totalAmount: cart.cost?.totalAmount ?? zero,
+      totalTaxAmount: cart.cost?.totalTaxAmount ?? zero,
+    },
+    lines: cart.lines ? removeEdgesAndNodes(cart.lines) : [],
+  };
+}
+
+/**
+ * Unwraps a cart mutation payload. Shopify reports rejections through
+ * `userErrors` with a null cart, so both have to be checked before reshaping.
+ */
+function unwrapCartMutation(
+  payload: {
+    cart: ShopifyCart | null;
+    userErrors?: CartUserError[] | null;
+    warnings?: CartWarning[] | null;
+  },
+  operation: string
+): { cart: Cart; warnings: CartWarning[] } {
+  const userError = payload?.userErrors?.[0];
+
+  if (userError) {
+    throw new CartMutationError(
+      userError.message,
+      userError.code,
+      userError.field
+    );
+  }
+
+  if (!payload?.cart) {
+    // A null cart with no userErrors means the cart id resolved to nothing.
+    throw new CartMutationError(
+      `${operation} did not return a cart`,
+      null,
+      ["cartId"]
+    );
+  }
+
+  return {
+    cart: reshapeCart(payload.cart),
+    warnings: payload.warnings ?? [],
   };
 }
 
@@ -396,21 +487,30 @@ export async function createCart(): Promise<Cart> {
     cache: "no-store",
   });
 
-  return reshapeCart(res.body.data.cartCreate.cart);
+  return unwrapCartMutation(res.body.data.cartCreate, "cartCreate").cart;
 }
 
 export async function getCart(
-  cartId: string | undefined
+  cartId: string | undefined,
+  /**
+   * Server Actions must read through the cache, not from it. `revalidateTag`
+   * marks the entry stale rather than deleting it, so a cached read inside an
+   * action can hand back a pre-mutation cart and make the action operate on
+   * line ids that no longer exist.
+   */
+  options?: { fresh?: boolean }
 ): Promise<Cart | undefined> {
   if (!cartId) return undefined;
 
   const res = await shopifyFetch<ShopifyCartOperation>({
     query: getCartQuery,
     variables: { cartId },
-    tags: [TAGS.cart],
+    ...(options?.fresh
+      ? { cache: "no-store" as const }
+      : { tags: [TAGS.cart] }),
   });
 
-  // old carts becomes 'null' when you checkout
+  // Old carts become `null` once you check out.
   if (!res.body.data.cart) {
     return undefined;
   }
@@ -422,6 +522,12 @@ export async function removeFromCart(
   cartId: string,
   lineIds: string[]
 ): Promise<Cart> {
+  if (lineIds.length === 0) {
+    const cart = await getCart(cartId, { fresh: true });
+    if (!cart) throw new CartNotFoundError();
+    return cart;
+  }
+
   const res = await shopifyFetch<ShopifyRemoveFromCartOperation>({
     query: removeFromCartMutation,
     variables: {
@@ -431,13 +537,14 @@ export async function removeFromCart(
     cache: "no-store",
   });
 
-  return reshapeCart(res.body.data.cartLinesRemove.cart);
+  return unwrapCartMutation(res.body.data.cartLinesRemove, "cartLinesRemove")
+    .cart;
 }
 
 export async function updateCart(
   cartId: string,
   lines: { id: string; merchandiseId: string; quantity: number }[]
-): Promise<Cart> {
+): Promise<{ cart: Cart; warnings: CartWarning[] }> {
   const res = await shopifyFetch<ShopifyUpdateCartOperation>({
     query: editCartItemsMutation,
     variables: {
@@ -447,23 +554,23 @@ export async function updateCart(
     cache: "no-store",
   });
 
-  return reshapeCart(res.body.data.cartLinesUpdate.cart);
+  return unwrapCartMutation(res.body.data.cartLinesUpdate, "cartLinesUpdate");
 }
 
 export async function addToCart(
   cartId: string,
   lines: { merchandiseId: string; quantity: number }[]
-): Promise<Cart> {
+): Promise<{ cart: Cart; warnings: CartWarning[] }> {
   const res = await shopifyFetch<ShopifyAddToCartOperation>({
     query: addToCartMutation,
     variables: {
       cartId,
       lines,
     },
-    cache: "no-cache",
+    cache: "no-store",
   });
 
-  return reshapeCart(res.body.data.cartLinesAdd.cart);
+  return unwrapCartMutation(res.body.data.cartLinesAdd, "cartLinesAdd");
 }
 
 // This is called from `app/api/revalidate.ts` so providers can control revalidation logic.

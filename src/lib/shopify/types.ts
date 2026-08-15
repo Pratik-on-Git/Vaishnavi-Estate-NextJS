@@ -153,16 +153,45 @@ export type CartItem = {
   quantity: number;
   cost: {
     totalAmount: Money;
+    /** Per-unit price after line discounts. Absent on optimistic-only lines. */
+    amountPerQuantity?: Money;
   };
   merchandise: {
     id: string;
     title: string;
+    /** Variant-level availability — a product can be sellable while a variant is not. */
+    availableForSale?: boolean;
+    price?: Money;
     selectedOptions: {
       name: string;
       value: string;
     }[];
     product: CartProduct;
   };
+};
+
+/** A mutation Shopify rejected. Returned with HTTP 200 and a null cart. */
+export type CartUserError = {
+  field: string[] | null;
+  message: string;
+  code: string | null;
+};
+
+/**
+ * A mutation Shopify accepted but altered — most commonly
+ * `MERCHANDISE_NOT_ENOUGH_STOCK`, where the requested quantity was clamped to
+ * available inventory.
+ */
+export type CartWarning = {
+  code: string;
+  message: string;
+  target: string;
+};
+
+type CartMutationPayload = {
+  cart: ShopifyCart | null;
+  userErrors: CartUserError[];
+  warnings: CartWarning[] | null;
 };
 
 export type ShopifyCart = {
@@ -179,7 +208,8 @@ export type ShopifyCart = {
 
 export type ShopifyCartOperation = {
   data: {
-    cart: ShopifyCart;
+    // `null` once the cart has been checked out or has expired.
+    cart: ShopifyCart | null;
   };
   variables: {
     cartId: string;
@@ -187,14 +217,12 @@ export type ShopifyCartOperation = {
 };
 
 export type ShopifyCreateCartOperation = {
-  data: { cartCreate: { cart: ShopifyCart } };
+  data: { cartCreate: CartMutationPayload };
 };
 
 export type ShopifyUpdateCartOperation = {
   data: {
-    cartLinesUpdate: {
-      cart: ShopifyCart;
-    };
+    cartLinesUpdate: CartMutationPayload;
   };
   variables: {
     cartId: string;
@@ -208,9 +236,7 @@ export type ShopifyUpdateCartOperation = {
 
 export type ShopifyRemoveFromCartOperation = {
   data: {
-    cartLinesRemove: {
-      cart: ShopifyCart;
-    };
+    cartLinesRemove: CartMutationPayload;
   };
   variables: {
     cartId: string;
@@ -224,9 +250,7 @@ export type Cart = Omit<ShopifyCart, "lines"> & {
 
 export type ShopifyAddToCartOperation = {
   data: {
-    cartLinesAdd: {
-      cart: ShopifyCart;
-    };
+    cartLinesAdd: CartMutationPayload;
   };
   variables: {
     cartId: string;

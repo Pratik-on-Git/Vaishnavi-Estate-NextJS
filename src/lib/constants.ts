@@ -46,6 +46,12 @@ export const sorting: SortFilterItem[] = [
   },
 ];
 
+/**
+ * Upper bound for a single cart line. Guards against a stuck "+" button or a
+ * hand-crafted request driving the quantity to something absurd.
+ */
+export const MAX_LINE_QUANTITY = 99;
+
 export const HIDDEN_PRODUCT_TAG = "nextjs-frontend-hidden";
 export const DEFAULT_OPTION = "Default Title";
 export const SHOPIFY_GRAPHQL_API_ENDPOINT = "/api/2026-07/graphql.json";
