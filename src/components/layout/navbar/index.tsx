@@ -26,7 +26,7 @@ export async function Navbar() {
     <header className="sticky top-0 z-[999] bg-paper">
       {/* Inverted from the rest of the header: oxblood fill, paper text — the
           announcement strip is meant to read as a banner, not body copy. */}
-      <div className="on-dark border-b border-paper/20 bg-oxblood py-2">
+      <div className="on-dark border-b border-ink/30 bg-ink py-2">
         <Marquee
           phrases={Array.from({ length: 6 }, () => announcement)}
           size="ui"

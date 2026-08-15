@@ -207,11 +207,11 @@
 
   /* Collection filter: serif inside a pill. Fills on select. */
   .pill {
-    @apply inline-flex items-center rounded-full border border-oxblood px-6 py-2 font-display text-display-md font-normal text-oxblood transition-colors duration-150 hover:bg-oxblood hover:text-paper;
+    @apply inline-flex items-center rounded-full border border-ink px-6 py-2 font-display text-display-md font-normal text-ink transition-colors duration-150 hover:bg-ink hover:text-paper;
   }
 
   .pill-active {
-    @apply bg-oxblood text-paper;
+    @apply bg-ink text-paper;
   }
 
   /* Product status flag — amber fill, ink text. */

@@ -150,14 +150,14 @@ function Hero() {
 
 function CollectionFilters() {
   return (
-    <section aria-label="Browse collections" className="rule-b py-10 md:py-12">
+    <section aria-label="Browse collections" className="py-10 md:py-12">
       <ul className="shell mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3">
         {collectionPills.map((pill) => (
           <li key={pill.title}>
             <Link
               href={pill.handle ? `/search/${pill.handle}` : "/search"}
               prefetch={false}
-              className="pill hover:bg-oxblood hover:text-paper"
+              className="pill"
             >
               {pill.title}
             </Link>

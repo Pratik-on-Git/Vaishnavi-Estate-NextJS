@@ -34,7 +34,7 @@ export default function SearchLayout({
               <Link
                 href={pill.handle ? `/search/${pill.handle}` : "/search"}
                 prefetch={false}
-                className="pill hover:bg-oxblood hover:text-paper"
+                className="pill"
               >
                 {pill.title}
               </Link>

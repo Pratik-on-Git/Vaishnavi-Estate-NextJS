@@ -133,7 +133,7 @@ export default function SearchTrigger() {
                         <a
                           href={`/search/${format.handle}`}
                           onClick={() => setIsOpen(false)}
-                          className="pill text-display-sm hover:bg-oxblood hover:text-paper"
+                          className="pill text-display-sm"
                         >
                           {format.title}
                         </a>
