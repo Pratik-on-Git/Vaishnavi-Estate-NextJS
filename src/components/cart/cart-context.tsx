@@ -98,10 +98,16 @@ function unitPriceMinor(item: CartItem): number {
   return 0;
 }
 
+/**
+ * The lines win over the cart envelope. On the very first add there is no
+ * server cart, so the envelope is the placeholder from `createEmptyCart` — and
+ * reading its currency rendered the total in the placeholder currency while the
+ * line prices used the store's real one.
+ */
 function cartCurrency(cart: Cart | undefined, lines: CartItem[]): string {
   return (
-    cart?.cost?.totalAmount?.currencyCode ||
     lines[0]?.cost.totalAmount.currencyCode ||
+    cart?.cost?.totalAmount?.currencyCode ||
     DEFAULT_CURRENCY
   );
 }
