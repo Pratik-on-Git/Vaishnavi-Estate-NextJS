@@ -45,7 +45,10 @@ export default function MobileMenu({ menu }: { menu: Menu[] }) {
             leaveFrom="translate-x-0"
             leaveTo="-translate-x-full"
           >
-            <DialogPanel className="fixed inset-y-0 left-0 flex w-full max-w-md flex-col overflow-y-auto bg-paper">
+            <DialogPanel
+              data-lenis-prevent
+              className="fixed inset-y-0 left-0 flex w-full max-w-md flex-col overflow-y-auto bg-paper"
+            >
               <div className="rule-b flex items-center justify-between px-5 py-4">
                 <Link href="/" onClick={close}>
                   <LogoSquare size="sm" />

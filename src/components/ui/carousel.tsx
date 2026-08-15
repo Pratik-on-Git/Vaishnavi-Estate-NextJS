@@ -83,6 +83,7 @@ export default function Carousel({
     <div className={className}>
       <ul
         ref={railRef}
+        data-lenis-prevent-horizontal
         onScroll={measure}
         aria-label={label}
         className="rail rule-y border-y border-rule"

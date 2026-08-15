@@ -1,5 +1,4 @@
 import { ImageResponse } from "next/og";
-import LogoIcon from "./icons/logo";
 import { site } from "@/lib/site";
 
 export type Props = {
@@ -17,6 +16,12 @@ export default async function OpengraphImage(
     ...{ title: process.env.SITE_NAME || site.name },
     ...props,
   };
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : "http://localhost:3000");
+  const logoUrl = new URL("/Logo.png", baseUrl).toString();
 
   return new ImageResponse(
     (
@@ -25,7 +30,14 @@ export default async function OpengraphImage(
         style={{ backgroundColor: "#1C1210" }}
       >
         <div tw="flex items-center">
-          <LogoIcon width="52" height="52" fill="#FBF4E6" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={logoUrl}
+            alt=""
+            width={96}
+            height={96}
+            style={{ borderRadius: "9999px" }}
+          />
           <p
             tw="ml-5 text-2xl"
             style={{ color: "#C08A4E", letterSpacing: "0.14em" }}

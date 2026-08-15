@@ -2,8 +2,8 @@ import Collections from "@/components/layout/search/collections";
 import FilterList from "@/components/layout/search/filter";
 import { sorting } from "@/lib/constants";
 import { Eyebrow, Headline } from "@/components/ui/section";
-import { collectionPills, site } from "@/lib/site";
-import Link from "next/link";
+import CollectionPillRail from "@/components/ui/collection-pill-rail";
+import { site } from "@/lib/site";
 import { Suspense } from "react";
 
 /**
@@ -28,19 +28,7 @@ export default function SearchLayout({
       </div>
 
       <div className="rule-b py-8">
-        <ul className="shell mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3">
-          {collectionPills.map((pill) => (
-            <li key={pill.title}>
-              <Link
-                href={pill.handle ? `/search/${pill.handle}` : "/search"}
-                prefetch={false}
-                className="pill"
-              >
-                {pill.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <CollectionPillRail />
       </div>
 
       {/* Sticky under the header stack — `--header-h` is the single source. */}

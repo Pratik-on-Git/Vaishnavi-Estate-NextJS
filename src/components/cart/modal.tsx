@@ -106,7 +106,10 @@ export default function CartModal() {
             leaveFrom="translate-x-0"
             leaveTo="translate-x-full"
           >
-            <DialogPanel className="fixed inset-y-0 right-0 flex w-full flex-col bg-paper text-oxblood md:w-[27rem]">
+            <DialogPanel
+              data-lenis-prevent
+              className="fixed inset-y-0 right-0 flex w-full flex-col bg-paper text-oxblood md:w-[27rem]"
+            >
               <div className="rule-b flex items-center justify-between px-5 py-4">
                 <p className="eyebrow">
                   Your order
@@ -146,7 +149,7 @@ export default function CartModal() {
                 </div>
               ) : (
                 <div className="flex h-full flex-col overflow-hidden">
-                  <ul className="flex-grow overflow-auto px-5">
+                  <ul data-lenis-prevent className="flex-grow overflow-auto px-5">
                     {lines.map((item) => {
                       const merchandiseSearchParams =
                         {} as MerchandiseSearchParams;

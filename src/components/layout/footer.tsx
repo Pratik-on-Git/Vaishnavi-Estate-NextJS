@@ -1,7 +1,7 @@
 import { getMenu } from "@/lib/shopify";
 import { Menu } from "@/lib/shopify/types";
 import Link from "next/link";
-import LogoIcon from "@/components/icons/logo";
+import LogoSquare from "@/components/logo-square";
 import Newsletter from "@/components/ui/newsletter";
 import Marquee from "@/components/ui/marquee";
 import { footerColumns, shippingTicker, site, socialLinks } from "@/lib/site";
@@ -40,8 +40,10 @@ export default async function Footer() {
 
       {/* Hairline columns */}
       <div className="rule-b grid grid-cols-1 divide-y divide-rule md:grid-cols-4 md:divide-x md:divide-y-0">
-        <div className="flex items-center px-5 py-8">
-          <LogoIcon className="h-12 w-12" />
+        <div className="flex items-center justify-center px-5 py-8 md:justify-start">
+          <Link href="/" aria-label={`${site.name} home`}>
+            <LogoSquare size="lg" />
+          </Link>
         </div>
 
         <div className="px-5 py-8">

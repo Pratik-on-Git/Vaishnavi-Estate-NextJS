@@ -109,7 +109,10 @@ export default function SearchTrigger() {
             leaveFrom="translate-y-0"
             leaveTo="-translate-y-full"
           >
-            <DialogPanel className="rule-b fixed inset-x-0 top-0 bg-paper pb-12 pt-8">
+            <DialogPanel
+              data-lenis-prevent
+              className="rule-b fixed inset-x-0 top-0 max-h-[100dvh] overflow-y-auto bg-paper pb-12 pt-8"
+            >
               <div className="shell">
                 <div className="flex items-start justify-between gap-8">
                   <p className="eyebrow pt-2">Search</p>

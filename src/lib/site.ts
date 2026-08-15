@@ -48,24 +48,69 @@ export const announcement = `Spend ${site.freeShippingThreshold} to get free shi
  * grid degrades gracefully when a handle does not exist yet.
  */
 export const collectionPills = [
-  { title: "All coffee", handle: "" },
-  { title: "Popular", handle: "popular" },
-  { title: "Single Origin", handle: "single-origin" },
-  { title: "Blend", handle: "blend" },
-  { title: "Filter", handle: "filter" },
-  { title: "Espresso", handle: "espresso" },
-  { title: "Robusta", handle: "robusta" },
-  { title: "Arabica", handle: "arabica" },
-  { title: "Coorg", handle: "coorg" },
-  { title: "Dark Roast", handle: "dark-roast" },
-  { title: "Washed", handle: "washed" },
-  { title: "Natural", handle: "natural" },
+  { title: "All coffee", handle: "", previewVideo: "/Coffee.mp4" },
+  {
+    title: "Popular",
+    handle: "popular",
+    previewVideo: "/209419_small.mp4",
+  },
+  {
+    title: "Single Origin",
+    handle: "single-origin",
+    previewVideo:
+      "/vecteezy_slow-motion-of-raw-coffee-beans-fall-to-the-ground_1620174.mp4",
+  },
+  {
+    title: "Blend",
+    handle: "blend",
+    previewVideo: "/45358-443057031.mp4",
+  },
+  { title: "Filter", handle: "filter", previewVideo: "/209419_small.mp4" },
+  { title: "Espresso", handle: "espresso", previewVideo: "/Coffee.mp4" },
+  {
+    title: "Robusta",
+    handle: "robusta",
+    previewVideo:
+      "/vecteezy_slow-motion-of-raw-coffee-beans-fall-to-the-ground_1620174.mp4",
+  },
+  {
+    title: "Arabica",
+    handle: "arabica",
+    previewVideo: "/45358-443057031.mp4",
+  },
+  {
+    title: "Coorg",
+    handle: "coorg",
+    previewVideo: "/209419_small.mp4",
+  },
+  {
+    title: "Dark Roast",
+    handle: "dark-roast",
+    previewVideo:
+      "/vecteezy_slow-motion-of-raw-coffee-beans-fall-to-the-ground_1620174.mp4",
+  },
+  {
+    title: "Washed",
+    handle: "washed",
+    previewVideo: "/45358-443057031.mp4",
+  },
+  { title: "Natural", handle: "natural", previewVideo: "/Coffee.mp4" },
 ] as const;
 
 /** The paired dark promo panels between the product rails. */
 export const promoTiles = [
-  { title: "Shop Filter", handle: "filter" },
-  { title: "Shop Espresso", handle: "espresso" },
+  {
+    title: "Shop Filter",
+    handle: "filter",
+    image: null,
+    labelPosition: "top",
+  },
+  {
+    title: "Shop Espresso",
+    handle: "espresso",
+    image: "/2(4).jpg",
+    labelPosition: "bottom",
+  },
 ] as const;
 
 /** Centred statement set in the display serif above the about rail. */

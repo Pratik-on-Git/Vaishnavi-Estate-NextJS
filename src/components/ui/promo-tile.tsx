@@ -16,6 +16,7 @@ export default function PromoTile({
   src,
   alt = "",
   priority,
+  labelPosition = "top",
   className,
 }: {
   title: string;
@@ -23,6 +24,7 @@ export default function PromoTile({
   src?: string | null;
   alt?: string;
   priority?: boolean;
+  labelPosition?: "top" | "bottom";
   className?: string;
 }) {
   return (
@@ -55,10 +57,20 @@ export default function PromoTile({
       {/* Keeps the label legible over a bright frame in the photograph. */}
       <div
         aria-hidden
-        className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-black/45 to-transparent"
+        className={clsx(
+          "absolute inset-x-0 h-1/3 from-black/75 to-transparent",
+          labelPosition === "bottom"
+            ? "bottom-0 bg-gradient-to-t"
+            : "top-0 bg-gradient-to-b"
+        )}
       />
 
-      <div className="relative flex h-full items-start justify-center p-8">
+      <div
+        className={clsx(
+          "relative flex h-full justify-center p-8",
+          labelPosition === "bottom" ? "items-end" : "items-start"
+        )}
+      >
         {/* Amber, not oxblood: oxblood on this ground measures 1.8:1 and
             simply disappears. Amber reads at 9.2:1. */}
         <h3 className="serif text-display-md text-amber">{title}</h3>

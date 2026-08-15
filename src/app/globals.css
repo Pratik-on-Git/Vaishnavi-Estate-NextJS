@@ -40,6 +40,8 @@
   --wash: rgba(142, 50, 0, 0.06);
 
   --gutter: 1rem;
+  --scroll-progress: 0;
+  --scroll-velocity: 0;
   /* Announcement strip + nav. Sticky children offset by this. */
   --header-h: 6.25rem;
 }
@@ -207,7 +209,7 @@
 
   /* Collection filter: serif inside a pill. Fills on select. */
   .pill {
-    @apply inline-flex items-center rounded-full border border-ink px-6 py-2 font-display text-display-md font-normal text-ink transition-colors duration-150 hover:bg-ink hover:text-paper;
+    @apply inline-flex items-center rounded-full border border-ink px-6 py-2 font-display text-display-md font-normal text-ink transition-colors duration-150 hover:bg-wash hover:text-ink;
   }
 
   .pill-active {

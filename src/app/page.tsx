@@ -9,11 +9,11 @@ import Carousel from "@/components/ui/carousel";
 import HeroVideo from "@/components/ui/hero-video";
 import PromoTile from "@/components/ui/promo-tile";
 import ProductTable from "@/components/ui/product-table";
+import CollectionPillRail from "@/components/ui/collection-pill-rail";
 import { Eyebrow, Headline, SectionHead } from "@/components/ui/section";
 import {
   aboutCards,
   aboutStatement,
-  collectionPills,
   featureBand,
   guidesFeature,
   heroPhrases,
@@ -105,14 +105,16 @@ function Hero() {
       <div className="plate relative aspect-[4/5] w-full overflow-hidden bg-coal sm:aspect-[16/10] lg:aspect-[16/8]">
         {/* Leading slash matters on every clip — a bare filename resolves
             against the current route, so it would 404 on any page but "/".
-            Coffee.mp4 opens the loop; the beans clip crossfades in after it
-            finishes, then the loop crossfades back to Coffee.mp4. */}
+            Coffee.mp4 opens the loop; each clip crossfades into the next,
+            then the final clip crossfades back to Coffee.mp4. */}
         <HeroVideo
           clips={[
             { src: "/Coffee.mp4" },
             {
               src: "/vecteezy_slow-motion-of-raw-coffee-beans-fall-to-the-ground_1620174.mp4",
             },
+            { src: "/209419_small.mp4" },
+            { src: "/45358-443057031.mp4" },
           ]}
         />
         {/* Scrim first: the statement has to hold over whatever the
@@ -151,19 +153,7 @@ function Hero() {
 function CollectionFilters() {
   return (
     <section aria-label="Browse collections" className="py-10 md:py-12">
-      <ul className="shell mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3">
-        {collectionPills.map((pill) => (
-          <li key={pill.title}>
-            <Link
-              href={pill.handle ? `/search/${pill.handle}` : "/search"}
-              prefetch={false}
-              className="pill"
-            >
-              {pill.title}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <CollectionPillRail />
     </section>
   );
 }
@@ -229,6 +219,8 @@ function PromoPair() {
           key={tile.handle}
           title={tile.title}
           href={`/search/${tile.handle}`}
+          src={tile.image}
+          labelPosition={tile.labelPosition}
           className="aspect-[4/3] md:aspect-square"
         />
       ))}

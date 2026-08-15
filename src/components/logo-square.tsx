@@ -10,9 +10,16 @@ export default function LogoSquare({
   size,
   className,
 }: {
-  size?: "sm" | undefined;
+  size?: "sm" | "lg";
   className?: string;
 }) {
+  const dimensions =
+    size === "sm"
+      ? "h-10 w-10"
+      : size === "lg"
+        ? "h-24 w-24"
+        : "h-11 w-11";
+
   return (
     <span className={clsx("block leading-none", className)}>
       <Image
@@ -21,10 +28,7 @@ export default function LogoSquare({
         width={571}
         height={571}
         priority={size !== "sm"}
-        className={clsx(
-          "object-contain",
-          size === "sm" ? "h-10 w-10" : "h-11 w-11"
-        )}
+        className={clsx("object-contain", dimensions)}
       />
     </span>
   );

@@ -52,7 +52,7 @@ export default function ProductTable({ products }: { products: Product[] }) {
   if (!products.length) return null;
 
   return (
-    <div className="rule-t overflow-x-auto">
+    <div data-lenis-prevent-horizontal className="rule-t overflow-x-auto">
       <table className="w-full min-w-[40rem] border-collapse text-left">
         <caption className="sr-only">
           Single-origin coffee, by region and brew method
