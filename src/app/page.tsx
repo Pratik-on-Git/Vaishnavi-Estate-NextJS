@@ -6,6 +6,7 @@ import ProductCard from "@/components/product-card";
 import Price from "@/components/price";
 import Marquee from "@/components/ui/marquee";
 import Carousel from "@/components/ui/carousel";
+import HeroVideo from "@/components/ui/hero-video";
 import PromoTile from "@/components/ui/promo-tile";
 import ProductTable from "@/components/ui/product-table";
 import { Eyebrow, Headline, SectionHead } from "@/components/ui/section";
@@ -98,17 +99,14 @@ async function productsFrom(
 function Hero() {
   return (
     <section className="shell pt-3">
-      <div className="plate relative aspect-[4/5] w-full overflow-hidden sm:aspect-[16/10] lg:aspect-[16/8]">
-        <Image
-          src="/banner.png"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
+      {/* `bg-coal` overrides the plate's light tint: the amber statement sits
+          on this panel before the video paints, and amber needs a dark ground. */}
+      <div className="plate relative aspect-[4/5] w-full overflow-hidden bg-coal sm:aspect-[16/10] lg:aspect-[16/8]">
+        {/* Leading slash matters — a bare "Coffee.mp4" resolves against the
+            current route, so it would 404 on any page but "/". */}
+        <HeroVideo src="/Coffee.mp4" />
         {/* Scrim first: the statement has to hold over whatever the
-            photograph is doing behind it. */}
+            footage is doing behind it. */}
         <div
           aria-hidden
           className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-coal/70 to-transparent"
