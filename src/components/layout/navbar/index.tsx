@@ -24,13 +24,15 @@ export async function Navbar() {
 
   return (
     <header className="sticky top-0 z-[999] bg-paper">
-      <div className="rule-b py-2">
+      {/* Inverted from the rest of the header: oxblood fill, paper text — the
+          announcement strip is meant to read as a banner, not body copy. */}
+      <div className="on-dark border-b border-paper/20 bg-oxblood py-2">
         <Marquee
           phrases={Array.from({ length: 6 }, () => announcement)}
           size="ui"
           separator=""
           duration={60}
-          className="text-oxblood"
+          className="text-paper"
         />
       </div>
 

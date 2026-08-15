@@ -16,6 +16,7 @@ import {
   collectionPills,
   featureBand,
   guidesFeature,
+  heroPhrases,
   journalPosts,
   promoTiles,
   site,
@@ -102,9 +103,18 @@ function Hero() {
       {/* `bg-coal` overrides the plate's light tint: the amber statement sits
           on this panel before the video paints, and amber needs a dark ground. */}
       <div className="plate relative aspect-[4/5] w-full overflow-hidden bg-coal sm:aspect-[16/10] lg:aspect-[16/8]">
-        {/* Leading slash matters — a bare "Coffee.mp4" resolves against the
-            current route, so it would 404 on any page but "/". */}
-        <HeroVideo src="/Coffee.mp4" />
+        {/* Leading slash matters on every clip — a bare filename resolves
+            against the current route, so it would 404 on any page but "/".
+            Coffee.mp4 opens the loop; the beans clip crossfades in after it
+            finishes, then the loop crossfades back to Coffee.mp4. */}
+        <HeroVideo
+          clips={[
+            { src: "/Coffee.mp4" },
+            {
+              src: "/vecteezy_slow-motion-of-raw-coffee-beans-fall-to-the-ground_1620174.mp4",
+            },
+          ]}
+        />
         {/* Scrim first: the statement has to hold over whatever the
             footage is doing behind it. */}
         <div
@@ -112,13 +122,17 @@ function Hero() {
           className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-coal/70 to-transparent"
         />
         {/* The statement rides across the lower third of the frame, in amber —
-            the palette's on-dark accent. */}
-        <div className="absolute inset-x-0 bottom-[8%]">
+            the palette's on-dark accent. Lifted off the very edge (rather than
+            a bottom-0/percentage offset) so descenders never brush the plate's
+            own clipping boundary. */}
+        <div className="absolute inset-x-0 bottom-6 sm:bottom-10 md:bottom-14">
           <Marquee
-            phrases={Array.from({ length: 4 }, () => site.statement)}
+            phrases={heroPhrases}
             size="hero"
             separator=""
-            duration={38}
+            // Slow, legible crawl — three short statements rather than one
+            // long one repeated, so each gets a moment to actually be read.
+            duration={90}
             className="text-amber"
           />
         </div>

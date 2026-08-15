@@ -1,70 +1,105 @@
 "use client";
 
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+export type HeroVideoClip = {
+  src: string;
+  poster?: string;
+};
 
 /**
- * Decorative background video for the hero.
+ * Decorative background video for the hero. Plays a short playlist of clips
+ * on a loop, crossfading between them rather than hard-cutting: each clip
+ * plays to its natural end, the next one fades in underneath while it fades
+ * out, and the sequence wraps back to the first clip indefinitely.
  *
  * Autoplay only works when the video is both `muted` and `playsInline` — every
- * browser blocks it otherwise, so those are not optional.
+ * browser blocks it otherwise, so those are not optional. The native `loop`
+ * attribute is deliberately never set: it would suppress the `ended` event
+ * this component uses to trigger each crossfade.
  *
  * Two accessibility obligations come with an auto-playing loop, and this
  * component owns both:
- *   - `prefers-reduced-motion: reduce` pauses it, matching the global rule the
- *     rest of the design system already follows for animation.
+ *   - `prefers-reduced-motion: reduce` stops playback entirely — no autoplay,
+ *     no crossfade — and simply holds the first clip's opening frame.
  *   - WCAG 2.2.2 requires a way to stop motion that runs for more than five
- *     seconds, hence the toggle.
+ *     seconds, hence the visible toggle.
  *
- * The video itself is `aria-hidden`: it carries no information the visually
- * hidden `<h1>` does not already state.
+ * Every clip is `aria-hidden`: none carries information the visually hidden
+ * `<h1>` elsewhere on the page doesn't already state.
  */
 export default function HeroVideo({
-  src,
-  poster,
+  clips,
   className,
 }: {
-  src: string;
-  poster?: string;
+  clips: readonly HeroVideoClip[];
   className?: string;
 }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
+  const reducedMotion = useRef(false);
+
+  const play = useCallback((index: number) => {
+    const video = videoRefs.current[index];
+    if (!video) return;
+    // Autoplay can still be refused (low power mode, data saver). Failing to
+    // start is not an error worth surfacing — the frame stays put.
+    video.play().then(
+      () => setPlaying(true),
+      () => setPlaying(false)
+    );
+  }, []);
+
+  // Crossfades from the given clip to the next one in the playlist, wrapping
+  // at the end. Takes the outgoing index explicitly rather than reading
+  // `activeIndex` from closure, since this fires from each video's own
+  // `onEnded` handler and must always advance from *that* clip.
+  const advanceFrom = useCallback(
+    (index: number) => {
+      if (reducedMotion.current) return;
+      const next = (index + 1) % clips.length;
+      const nextVideo = videoRefs.current[next];
+      if (nextVideo) {
+        nextVideo.currentTime = 0;
+        play(next);
+      }
+      setActiveIndex(next);
+    },
+    [clips.length, play]
+  );
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const apply = () => {
+      reducedMotion.current = media.matches;
+      const current = videoRefs.current[activeIndex];
+      if (!current) return;
+
       if (media.matches) {
-        video.pause();
+        current.pause();
         setPlaying(false);
       } else {
-        // Autoplay can still be refused (low power mode, data saver). Failing
-        // to start is not an error worth surfacing — the frame stays put.
-        video.play().then(
-          () => setPlaying(true),
-          () => setPlaying(false)
-        );
+        play(activeIndex);
       }
     };
 
     apply();
     media.addEventListener("change", apply);
     return () => media.removeEventListener("change", apply);
-  }, []);
+    // Re-checks on every crossfade too, so a mid-loop reduced-motion change
+    // (rare, but OS-level settings can flip live) pauses whichever clip is
+    // actually on screen rather than a stale one.
+  }, [activeIndex, play]);
 
   const toggle = () => {
-    const video = videoRef.current;
+    const video = videoRefs.current[activeIndex];
     if (!video) return;
 
     if (video.paused) {
-      video.play().then(
-        () => setPlaying(true),
-        () => setPlaying(false)
-      );
+      play(activeIndex);
     } else {
       video.pause();
       setPlaying(false);
@@ -73,23 +108,29 @@ export default function HeroVideo({
 
   return (
     <>
-      <video
-        ref={videoRef}
-        src={src}
-        poster={poster}
-        aria-hidden
-        autoPlay
-        muted
-        loop
-        playsInline
-        // `metadata` rather than `auto`: the file is several megabytes and must
-        // not compete with the product imagery below the fold.
-        preload="metadata"
-        className={clsx(
-          "absolute inset-0 h-full w-full object-cover",
-          className
-        )}
-      />
+      {clips.map((clip, index) => (
+        <video
+          key={clip.src}
+          ref={(el) => {
+            videoRefs.current[index] = el;
+          }}
+          src={clip.src}
+          poster={clip.poster}
+          aria-hidden
+          muted
+          playsInline
+          // The clip on screen first needs to be ready immediately; the rest
+          // of the playlist only needs to be buffered by the time its turn
+          // comes, so it can stay light until then.
+          preload={index === 0 ? "auto" : "metadata"}
+          onEnded={index === activeIndex ? () => advanceFrom(index) : undefined}
+          className={clsx(
+            "absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out",
+            index === activeIndex ? "opacity-100" : "opacity-0",
+            className
+          )}
+        />
+      ))}
 
       <button
         type="button"

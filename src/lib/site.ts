@@ -12,14 +12,26 @@ export const site = {
   wordmark: "VAISHNAVI",
   wordmarkAccent: "ESTATE",
   tagline: "Strong Coffee · Bold · Pure",
-  /** The line set in the giant footer wordmark and the hero marquee. */
-  statement: "Honestly Grown Coffee.",
+  /** The single line set in the giant footer wordmark. */
+  statement: "Elegance in Every Roast. Coffee Grown Four Generations in Coorg.",
   origin: "Coorg, Karnataka",
   since: "1928",
   description:
     "Single-origin, shade-grown Robusta from a four-generation family estate in Coorg. Roasted in small batches, ground to order, shipped across India.",
   freeShippingThreshold: "₹1,500",
 } as const;
+
+/**
+ * Rotating hero-marquee statements. Kept as short, distinct lines rather than
+ * one long sentence — at hero scale a single run-on phrase reads as a blur by
+ * the time it's midway across the frame, where three short ones each get a
+ * moment to actually be read.
+ */
+export const heroPhrases = [
+  "Legacy in Every Sip.",
+  "Elegance in Every Roast.",
+  "Coffee Grown Four Generations in Coorg.",
+] as const;
 
 /** Fallback navigation, used when the Shopify menu is empty or unreachable. */
 export const primaryNav: { title: string; path: string }[] = [

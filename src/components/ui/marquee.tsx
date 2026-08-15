@@ -30,13 +30,26 @@ export default function Marquee({
   const text = {
     ui: "font-mono text-ui uppercase tracking-ui",
     display: "font-display text-display-md",
-    hero: "font-display text-display-hero leading-none",
+    // `leading-none` (line-height: 1) sets the line box tighter than
+    // Instrument Serif's actual descent, so glyphs with descenders — the "g"
+    // in "Coorg", the "y" in "Every" — render below the box and get clipped
+    // by this wrapper's own `overflow-hidden` (needed to hide the duplicated
+    // track). A touch of headroom fixes it without loosening the set visibly.
+    hero: "font-display text-display-hero leading-[1.15]",
   }[size];
 
   const gap = {
     ui: "px-8",
     display: "px-6",
     hero: "px-8",
+  }[size];
+
+  // Extra clipping headroom at the outer edge, belt-and-braces alongside the
+  // loosened line-height above.
+  const bleed = {
+    ui: "",
+    display: "pb-1",
+    hero: "pb-3",
   }[size];
 
   const run = (ariaHidden: boolean) => (
@@ -59,7 +72,7 @@ export default function Marquee({
 
   return (
     <div
-      className={clsx("overflow-hidden", className)}
+      className={clsx("overflow-hidden", bleed, className)}
       style={
         duration
           ? ({ "--marquee-duration": `${duration}s` } as React.CSSProperties)
