@@ -23,7 +23,7 @@ export default function LogoSquare({
   return (
     <span className={clsx("block leading-none", className)}>
       <Image
-        src="/Logo.png"
+        src="/logo.png"
         alt={site.name}
         width={571}
         height={571}

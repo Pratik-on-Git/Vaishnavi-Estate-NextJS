@@ -21,7 +21,7 @@ export default async function OpengraphImage(
     (process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : "http://localhost:3000");
-  const logoUrl = new URL("/Logo.png", baseUrl).toString();
+  const logoUrl = new URL("/logo.png", baseUrl).toString();
 
   return new ImageResponse(
     (
