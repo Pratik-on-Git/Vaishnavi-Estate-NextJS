@@ -1,10 +1,21 @@
 "use client";
 
 import { createUrl } from "@/lib/utils";
-import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
+import {
+  Dialog,
+  DialogPanel,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Fragment, useRef, useState, useEffect, useCallback, KeyboardEvent } from "react";
+import {
+  Fragment,
+  useRef,
+  useState,
+  useEffect,
+  KeyboardEvent,
+} from "react";
 import clsx from "clsx";
 import { brewFormats } from "@/lib/site";
 import { useInstantSearch } from "@/hooks/use-instant-search";
@@ -39,7 +50,8 @@ function useSearchSubmit(onDone?: () => void) {
 }
 
 // ---------------------------------------------------------------------------
-// SearchBar — inline bar used in the mobile sidebar and the search results page
+// SearchBar — inline bar used in the mobile sidebar.
+// Results render inline (no floating box) so they flow inside the drawer.
 // ---------------------------------------------------------------------------
 export function SearchBar({
   autoFocus = false,
@@ -54,40 +66,21 @@ export function SearchBar({
 
   const [query, setQuery] = useState(searchParams?.get("q") || "");
   const { results, hasResults, isLoading } = useInstantSearch(query);
-  const [showResults, setShowResults] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Show results whenever there are any and query is non-empty
-  useEffect(() => {
-    setShowResults(!!query.trim() && (hasResults || isLoading));
-  }, [query, hasResults, isLoading]);
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    function onPointerDown(e: PointerEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setShowResults(false);
-      }
-    }
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, []);
+  const showResults = !!query.trim() && (hasResults || isLoading);
 
   function handleSelect(href: string) {
-    setShowResults(false);
     setQuery("");
     router.push(href);
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Escape") {
-      setShowResults(false);
-    }
+    if (e.key === "Escape") setQuery("");
   }
 
   return (
-    <div ref={containerRef} className={clsx("relative w-full", className)}>
-      <form onSubmit={onSubmit}>
+    <div className={clsx("w-full", className)}>
+      {/* Input */}
+      <form onSubmit={onSubmit} className="relative w-full">
         <label htmlFor="site-search" className="sr-only">
           Search
         </label>
@@ -101,9 +94,6 @@ export function SearchBar({
           autoComplete="off"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => {
-            if (query.trim() && (hasResults || isLoading)) setShowResults(true);
-          }}
           onKeyDown={handleKeyDown}
           className="serif w-full border-b border-rule bg-transparent py-4 pr-10 text-display-md focus-visible:border-oxblood focus-visible:ring-0"
         />
@@ -113,13 +103,14 @@ export function SearchBar({
         />
       </form>
 
-      {/* Instant results */}
+      {/* Inline results — flows naturally inside the drawer, no box-in-box */}
       {showResults && (
         <SearchResults
           query={query}
           results={results}
           isLoading={isLoading}
           onSelect={handleSelect}
+          variant="inline"
         />
       )}
     </div>
@@ -127,7 +118,7 @@ export function SearchBar({
 }
 
 // ---------------------------------------------------------------------------
-// SearchTrigger — navbar affordance; opens full-width overlay
+// SearchTrigger — navbar affordance; opens the full-width overlay
 // ---------------------------------------------------------------------------
 export default function SearchTrigger() {
   const [isOpen, setIsOpen] = useState(false);
@@ -146,6 +137,7 @@ export default function SearchTrigger() {
 
       <Transition show={isOpen}>
         <Dialog onClose={() => setIsOpen(false)} className="relative z-[1000]">
+          {/* Backdrop */}
           <TransitionChild
             as={Fragment}
             enter="transition-opacity ease-out duration-300"
@@ -155,8 +147,13 @@ export default function SearchTrigger() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-coal/40 backdrop-blur-sm" aria-hidden />
+            <div
+              className="fixed inset-0 bg-coal/40 backdrop-blur-sm"
+              aria-hidden
+            />
           </TransitionChild>
+
+          {/* Panel */}
           <TransitionChild
             as={Fragment}
             enter="transition-transform ease-editorial duration-500"
@@ -171,6 +168,7 @@ export default function SearchTrigger() {
               className="rule-b fixed inset-x-0 top-0 max-h-[100dvh] overflow-y-auto bg-paper pb-12 pt-8"
             >
               <div className="shell">
+                {/* Header row */}
                 <div className="flex items-start justify-between gap-8">
                   <p className="eyebrow pt-2">Search</p>
                   <button
@@ -182,25 +180,13 @@ export default function SearchTrigger() {
                     <XMarkIcon className="h-6 w-6" />
                   </button>
                 </div>
+
+                {/* Overlay search form + inline results */}
                 <div className="mt-6">
                   <SearchOverlayForm onDone={() => setIsOpen(false)} />
                 </div>
-                <div className="mt-10">
-                  <p className="eyebrow mb-4">Browse by brew</p>
-                  <ul className="flex flex-wrap gap-2">
-                    {brewFormats.map((format) => (
-                      <li key={format.handle}>
-                        <a
-                          href={`/search/${format.handle}`}
-                          onClick={() => setIsOpen(false)}
-                          className="pill text-display-sm"
-                        >
-                          {format.title}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+
+                {/* Browse by brew pills — only shown when there is no query */}
               </div>
             </DialogPanel>
           </TransitionChild>
@@ -211,7 +197,9 @@ export default function SearchTrigger() {
 }
 
 // ---------------------------------------------------------------------------
-// SearchOverlayForm — the large controlled input inside the overlay
+// SearchOverlayForm — large controlled input inside the overlay dialog.
+// Results are rendered inline below the input (NO floating card).
+// The "Browse by brew" pills are shown only when the input is empty.
 // ---------------------------------------------------------------------------
 function SearchOverlayForm({ onDone }: { onDone: () => void }) {
   const router = useRouter();
@@ -220,26 +208,10 @@ function SearchOverlayForm({ onDone }: { onDone: () => void }) {
 
   const [query, setQuery] = useState(searchParams?.get("q") || "");
   const { results, hasResults, isLoading } = useInstantSearch(query);
-  const [showResults, setShowResults] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setShowResults(!!query.trim() && (hasResults || isLoading));
-  }, [query, hasResults, isLoading]);
-
-  // Close on outside click (inside the overlay)
-  useEffect(() => {
-    function onPointerDown(e: PointerEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setShowResults(false);
-      }
-    }
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, []);
+  const showResults = !!query.trim() && (hasResults || isLoading);
+  const showBrowse = !query.trim();
 
   function handleSelect(href: string) {
-    setShowResults(false);
     setQuery("");
     onDone();
     router.push(href);
@@ -247,8 +219,8 @@ function SearchOverlayForm({ onDone }: { onDone: () => void }) {
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Escape") {
-      if (showResults) {
-        setShowResults(false);
+      if (query) {
+        setQuery("");
       } else {
         onDone();
       }
@@ -256,8 +228,9 @@ function SearchOverlayForm({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <div ref={containerRef} className="relative w-full">
-      <form onSubmit={onSubmit}>
+    <>
+      {/* Input row */}
+      <form onSubmit={onSubmit} className="relative w-full">
         <label htmlFor="overlay-search" className="sr-only">
           Search
         </label>
@@ -270,9 +243,6 @@ function SearchOverlayForm({ onDone }: { onDone: () => void }) {
           autoComplete="off"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => {
-            if (query.trim() && (hasResults || isLoading)) setShowResults(true);
-          }}
           onKeyDown={handleKeyDown}
           className="serif w-full border-b border-rule bg-transparent py-4 pr-10 text-display-xl focus-visible:border-oxblood focus-visible:ring-0"
         />
@@ -282,16 +252,37 @@ function SearchOverlayForm({ onDone }: { onDone: () => void }) {
         />
       </form>
 
-      {/* Instant results dropdown */}
+      {/* Inline results — no card, no shadow, part of the overlay content */}
       {showResults && (
         <SearchResults
           query={query}
           results={results}
           isLoading={isLoading}
           onSelect={handleSelect}
+          variant="inline"
         />
       )}
-    </div>
+
+      {/* Browse-by-brew pills — visible only when input is empty */}
+      {showBrowse && (
+        <div className="mt-10">
+          <p className="eyebrow mb-4">Browse by brew</p>
+          <ul className="flex flex-wrap gap-2">
+            {brewFormats.map((format) => (
+              <li key={format.handle}>
+                <a
+                  href={`/search/${format.handle}`}
+                  onClick={() => onDone()}
+                  className="pill text-display-sm"
+                >
+                  {format.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
   );
 }
 

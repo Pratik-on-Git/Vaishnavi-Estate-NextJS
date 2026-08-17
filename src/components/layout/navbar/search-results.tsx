@@ -12,77 +12,34 @@ type Props = {
   results: SearchResult;
   isLoading: boolean;
   onSelect: (href: string) => void;
+  /**
+   * "inline"  — results flow as part of the document (inside modals/drawers).
+   *             No floating box, no shadow, no absolute positioning.
+   * "dropdown" — floating card anchored below the input (future use for an
+   *              always-visible page-level search bar).
+   */
+  variant?: "inline" | "dropdown";
 };
 
-type Item =
-  | { kind: "product"; href: string; label: string; price: string; currencyCode: string; image: string | null; altText: string }
-  | { kind: "collection"; href: string; label: string }
-  | { kind: "page"; href: string; label: string }
-  | { kind: "all"; href: string; label: string };
-
-function buildItems(query: string, results: SearchResult): Item[] {
-  const items: Item[] = [];
-
-  for (const p of results.products) {
-    items.push({
-      kind: "product",
-      href: `/product/${p.handle}`,
-      label: p.title,
-      price: p.price,
-      currencyCode: p.currencyCode,
-      image: p.image,
-      altText: p.altText,
-    });
-  }
-
-  for (const c of results.collections) {
-    items.push({
-      kind: "collection",
-      href: `/search/${c.handle}`,
-      label: c.title,
-    });
-  }
-
-  for (const pg of results.pages) {
-    items.push({
-      kind: "page",
-      href: `/${pg.handle}`,
-      label: pg.title,
-    });
-  }
-
-  // "See all results" footer
-  const params = new URLSearchParams({ q: query });
-  items.push({
-    kind: "all",
-    href: createUrl("/search", params),
-    label: `See all results for "${query}"`,
-  });
-
-  return items;
-}
-
-function sectionLabel(kind: Item["kind"]): string {
-  if (kind === "product") return "Products";
-  if (kind === "collection") return "Collections";
-  if (kind === "page") return "Pages";
-  return "";
-}
-
-/**
- * Floating dropdown of instant-search results.
- * Handles keyboard navigation internally; calls onSelect(href) when an item
- * is activated via click or keyboard.
- */
-export default function SearchResults({ query, results, isLoading, onSelect }: Props) {
-  const items = buildItems(query, results);
+export default function SearchResults({
+  query,
+  results,
+  isLoading,
+  onSelect,
+  variant = "inline",
+}: Props) {
   const listRef = useRef<HTMLUListElement>(null);
   const activeIndex = useRef(-1);
 
-  // Expose keyboard handling so the parent <input> can forward its events here.
+  useEffect(() => {
+    activeIndex.current = -1;
+  }, [results]);
+
   function handleKeyDown(e: KeyboardEvent<HTMLElement>) {
     if (!listRef.current) return;
-    const els = Array.from(listRef.current.querySelectorAll<HTMLElement>("[data-sr-item]"));
+    const els = Array.from(
+      listRef.current.querySelectorAll<HTMLElement>("[data-sr-item]")
+    );
     if (!els.length) return;
 
     if (e.key === "ArrowDown") {
@@ -96,57 +53,72 @@ export default function SearchResults({ query, results, isLoading, onSelect }: P
     }
   }
 
-  // Reset active index when results change
-  useEffect(() => {
-    activeIndex.current = -1;
-  }, [results]);
+  const isEmpty =
+    results.products.length === 0 &&
+    results.collections.length === 0 &&
+    results.pages.length === 0;
 
-  const isEmpty = results.products.length === 0 && results.collections.length === 0 && results.pages.length === 0;
+  const allUrl = createUrl("/search", new URLSearchParams({ q: query }));
+
+  const wrapperClass =
+    variant === "dropdown"
+      ? "absolute left-0 right-0 top-full z-50 mt-2 rounded-plate border border-rule bg-paper shadow-[0_8px_40px_rgba(52,23,6,0.14)]"
+      : "w-full"; // inline: no box, flows naturally
 
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-    <div
-      className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-plate border border-rule bg-paper shadow-[0_8px_40px_rgba(52,23,6,0.14)]"
-      onKeyDown={handleKeyDown}
-    >
+    <div className={wrapperClass} onKeyDown={handleKeyDown}>
+      {/* Loading state */}
       {isLoading && isEmpty && (
-        <div className="flex items-center gap-3 px-5 py-5">
+        <div className="flex items-center gap-3 py-6">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-oxblood border-t-transparent" />
           <span className="eyebrow">Searching…</span>
         </div>
       )}
 
+      {/* Empty state */}
       {!isLoading && isEmpty && (
-        <div className="px-5 py-6 text-center">
-          <p className="body-mono text-ink-soft">No results found</p>
+        <div className="py-8">
+          <p className="body-mono text-ink-soft">No results found for &ldquo;{query}&rdquo;</p>
           <button
             data-sr-item
-            onClick={() => onSelect(createUrl("/search", new URLSearchParams({ q: query })))}
-            className="btn-outline mt-4 text-sm"
+            onClick={() => onSelect(allUrl)}
+            className="btn-outline mt-5"
           >
             Browse all products
           </button>
         </div>
       )}
 
+      {/* Results list */}
       {!isEmpty && (
-        <ul ref={listRef} role="listbox" aria-label="Search results" className="max-h-[70vh] overflow-y-auto py-2">
-          {/* Products */}
+        <ul
+          ref={listRef}
+          role="listbox"
+          aria-label="Search results"
+          className={variant === "dropdown" ? "max-h-[70vh] overflow-y-auto py-2" : "mt-6"}
+        >
+          {/* ── Products ─────────────────────────────────────────── */}
           {results.products.length > 0 && (
             <>
-              <li className="px-5 pb-1 pt-3">
-                <span className="eyebrow text-ink-soft" style={{ fontSize: "0.6rem" }}>Products</span>
+              <li className="pb-2">
+                <span className="eyebrow">Products</span>
               </li>
               {results.products.map((product) => (
-                <li key={`product-${product.handle}`} role="option" aria-selected="false">
+                <li
+                  key={`product-${product.handle}`}
+                  role="option"
+                  aria-selected="false"
+                  className="rule-b last:border-b-0"
+                >
                   <button
                     data-sr-item
                     tabIndex={0}
                     onClick={() => onSelect(`/product/${product.handle}`)}
-                    className="flex w-full items-center gap-4 px-5 py-3 transition-colors hover:bg-wash focus-visible:bg-wash focus-visible:outline-none"
+                    className="flex w-full items-center gap-4 py-3 text-left transition-opacity hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxblood focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
                   >
                     {/* Thumbnail */}
-                    <span className="plate h-12 w-12 flex-none">
+                    <span className="plate relative h-12 w-12 flex-none">
                       {product.image ? (
                         <Image
                           src={product.image}
@@ -162,9 +134,9 @@ export default function SearchResults({ query, results, isLoading, onSelect }: P
                       )}
                     </span>
 
-                    {/* Label + price */}
-                    <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
-                      <span className="body-mono truncate font-medium">{product.title}</span>
+                    {/* Title + price */}
+                    <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
+                      <span className="body-mono truncate w-full">{product.title}</span>
                       <Price
                         amount={product.price}
                         currencyCode={product.currencyCode}
@@ -177,68 +149,76 @@ export default function SearchResults({ query, results, isLoading, onSelect }: P
             </>
           )}
 
-          {/* Collections */}
+          {/* ── Collections ──────────────────────────────────────── */}
           {results.collections.length > 0 && (
             <>
-              <li className="px-5 pb-1 pt-3">
-                <span className="eyebrow text-ink-soft" style={{ fontSize: "0.6rem" }}>Collections</span>
+              <li className={results.products.length > 0 ? "pb-2 pt-6" : "pb-2"}>
+                <span className="eyebrow">Collections</span>
               </li>
               {results.collections.map((col) => (
-                <li key={`col-${col.handle}`} role="option" aria-selected="false">
+                <li
+                  key={`col-${col.handle}`}
+                  role="option"
+                  aria-selected="false"
+                  className="rule-b last:border-b-0"
+                >
                   <button
                     data-sr-item
                     tabIndex={0}
                     onClick={() => onSelect(`/search/${col.handle}`)}
-                    className="flex w-full items-center gap-3 px-5 py-3 transition-colors hover:bg-wash focus-visible:bg-wash focus-visible:outline-none"
+                    className="flex w-full items-center justify-between gap-4 py-3 text-left transition-opacity hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxblood"
                   >
-                    <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-rule">
-                      <MagnifyingGlassIcon className="h-3.5 w-3.5 text-ink-soft" />
-                    </span>
-                    <span className="body-mono text-left">{col.title}</span>
-                    <span className="ml-auto spec-mono text-ink-soft">Collection</span>
+                    <span className="body-mono">{col.title}</span>
+                    <span className="spec-mono shrink-0 text-ink-soft">Collection →</span>
                   </button>
                 </li>
               ))}
             </>
           )}
 
-          {/* Pages */}
+          {/* ── Pages ────────────────────────────────────────────── */}
           {results.pages.length > 0 && (
             <>
-              <li className="px-5 pb-1 pt-3">
-                <span className="eyebrow text-ink-soft" style={{ fontSize: "0.6rem" }}>Pages</span>
+              <li
+                className={
+                  results.products.length > 0 || results.collections.length > 0
+                    ? "pb-2 pt-6"
+                    : "pb-2"
+                }
+              >
+                <span className="eyebrow">Pages</span>
               </li>
               {results.pages.map((pg) => (
-                <li key={`page-${pg.handle}`} role="option" aria-selected="false">
+                <li
+                  key={`page-${pg.handle}`}
+                  role="option"
+                  aria-selected="false"
+                  className="rule-b last:border-b-0"
+                >
                   <button
                     data-sr-item
                     tabIndex={0}
                     onClick={() => onSelect(`/${pg.handle}`)}
-                    className="flex w-full items-center gap-3 px-5 py-3 transition-colors hover:bg-wash focus-visible:bg-wash focus-visible:outline-none"
+                    className="flex w-full items-center justify-between gap-4 py-3 text-left transition-opacity hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxblood"
                   >
-                    <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-rule">
-                      <span className="spec-mono text-ink-soft">P</span>
-                    </span>
-                    <span className="body-mono text-left">{pg.title}</span>
-                    <span className="ml-auto spec-mono text-ink-soft">Page</span>
+                    <span className="body-mono">{pg.title}</span>
+                    <span className="spec-mono shrink-0 text-ink-soft">Page →</span>
                   </button>
                 </li>
               ))}
             </>
           )}
 
-          {/* See all results footer */}
-          <li className="border-t border-rule" role="option" aria-selected="false">
+          {/* ── See all footer ───────────────────────────────────── */}
+          <li className="pt-6" role="option" aria-selected="false">
             <button
               data-sr-item
               tabIndex={0}
-              onClick={() => onSelect(createUrl("/search", new URLSearchParams({ q: query })))}
-              className="flex w-full items-center gap-3 px-5 py-4 transition-colors hover:bg-wash focus-visible:bg-wash focus-visible:outline-none"
+              onClick={() => onSelect(allUrl)}
+              className="link-arrow"
             >
-              <MagnifyingGlassIcon className="h-4 w-4 flex-none text-oxblood" />
-              <span className="ui-mono text-oxblood">
-                See all results for &ldquo;{query}&rdquo;
-              </span>
+              <MagnifyingGlassIcon className="h-4 w-4" />
+              See all results for &ldquo;{query}&rdquo;
             </button>
           </li>
         </ul>
