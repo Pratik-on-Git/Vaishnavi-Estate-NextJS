@@ -4,10 +4,15 @@ import { createUrl } from "@/lib/utils";
 import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState, useEffect, useCallback, KeyboardEvent } from "react";
 import clsx from "clsx";
 import { brewFormats } from "@/lib/site";
+import { useInstantSearch } from "@/hooks/use-instant-search";
+import SearchResults from "./search-results";
 
+// ---------------------------------------------------------------------------
+// Shared form-submit handler (Enter key → /search?q=)
+// ---------------------------------------------------------------------------
 function useSearchSubmit(onDone?: () => void) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -33,10 +38,9 @@ function useSearchSubmit(onDone?: () => void) {
   };
 }
 
-/**
- * Inline search field. Used in the mobile menu and on the search results page,
- * where a persistent input reads better than a modal.
- */
+// ---------------------------------------------------------------------------
+// SearchBar — inline bar used in the mobile sidebar and the search results page
+// ---------------------------------------------------------------------------
 export function SearchBar({
   autoFocus = false,
   className,
@@ -44,34 +48,87 @@ export function SearchBar({
   autoFocus?: boolean;
   className?: string;
 }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const onSubmit = useSearchSubmit();
 
+  const [query, setQuery] = useState(searchParams?.get("q") || "");
+  const { results, hasResults, isLoading } = useInstantSearch(query);
+  const [showResults, setShowResults] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Show results whenever there are any and query is non-empty
+  useEffect(() => {
+    setShowResults(!!query.trim() && (hasResults || isLoading));
+  }, [query, hasResults, isLoading]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function onPointerDown(e: PointerEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowResults(false);
+      }
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, []);
+
+  function handleSelect(href: string) {
+    setShowResults(false);
+    setQuery("");
+    router.push(href);
+  }
+
+  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Escape") {
+      setShowResults(false);
+    }
+  }
+
   return (
-    <form onSubmit={onSubmit} className={clsx("relative w-full", className)}>
-      <label htmlFor="site-search" className="sr-only">
-        Search coffee
-      </label>
-      <input
-        id="site-search"
-        key={searchParams?.get("q")}
-        type="text"
-        name="search"
-        autoFocus={autoFocus}
-        placeholder="Search the estate…"
-        autoComplete="off"
-        defaultValue={searchParams?.get("q") || ""}
-        className="serif w-full border-b border-rule bg-transparent py-4 pr-10 text-display-md focus-visible:border-oxblood focus-visible:ring-0"
-      />
-      <MagnifyingGlassIcon
-        aria-hidden
-        className="pointer-events-none absolute right-0 top-1/2 h-5 w-5 -translate-y-1/2"
-      />
-    </form>
+    <div ref={containerRef} className={clsx("relative w-full", className)}>
+      <form onSubmit={onSubmit}>
+        <label htmlFor="site-search" className="sr-only">
+          Search
+        </label>
+        <input
+          id="site-search"
+          key={searchParams?.get("q")}
+          type="text"
+          name="search"
+          autoFocus={autoFocus}
+          placeholder="Search the estate…"
+          autoComplete="off"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => {
+            if (query.trim() && (hasResults || isLoading)) setShowResults(true);
+          }}
+          onKeyDown={handleKeyDown}
+          className="serif w-full border-b border-rule bg-transparent py-4 pr-10 text-display-md focus-visible:border-oxblood focus-visible:ring-0"
+        />
+        <MagnifyingGlassIcon
+          aria-hidden
+          className="pointer-events-none absolute right-0 top-1/2 h-5 w-5 -translate-y-1/2"
+        />
+      </form>
+
+      {/* Instant results */}
+      {showResults && (
+        <SearchResults
+          query={query}
+          results={results}
+          isLoading={isLoading}
+          onSelect={handleSelect}
+        />
+      )}
+    </div>
   );
 }
 
-/** Navbar affordance: opens a full-width search overlay. */
+// ---------------------------------------------------------------------------
+// SearchTrigger — navbar affordance; opens full-width overlay
+// ---------------------------------------------------------------------------
 export default function SearchTrigger() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -153,33 +210,94 @@ export default function SearchTrigger() {
   );
 }
 
+// ---------------------------------------------------------------------------
+// SearchOverlayForm — the large controlled input inside the overlay
+// ---------------------------------------------------------------------------
 function SearchOverlayForm({ onDone }: { onDone: () => void }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const onSubmit = useSearchSubmit(onDone);
 
+  const [query, setQuery] = useState(searchParams?.get("q") || "");
+  const { results, hasResults, isLoading } = useInstantSearch(query);
+  const [showResults, setShowResults] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setShowResults(!!query.trim() && (hasResults || isLoading));
+  }, [query, hasResults, isLoading]);
+
+  // Close on outside click (inside the overlay)
+  useEffect(() => {
+    function onPointerDown(e: PointerEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowResults(false);
+      }
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, []);
+
+  function handleSelect(href: string) {
+    setShowResults(false);
+    setQuery("");
+    onDone();
+    router.push(href);
+  }
+
+  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Escape") {
+      if (showResults) {
+        setShowResults(false);
+      } else {
+        onDone();
+      }
+    }
+  }
+
   return (
-    <form onSubmit={onSubmit} className="relative w-full">
-      <label htmlFor="overlay-search" className="sr-only">
-        Search coffee
-      </label>
-      <input
-        id="overlay-search"
-        type="text"
-        name="search"
-        autoFocus
-        placeholder="Search the estate…"
-        autoComplete="off"
-        defaultValue={searchParams?.get("q") || ""}
-        className="serif w-full border-b border-rule bg-transparent py-4 pr-10 text-display-xl focus-visible:border-oxblood focus-visible:ring-0"
-      />
-      <MagnifyingGlassIcon
-        aria-hidden
-        className="pointer-events-none absolute right-0 top-1/2 h-6 w-6 -translate-y-1/2"
-      />
-    </form>
+    <div ref={containerRef} className="relative w-full">
+      <form onSubmit={onSubmit}>
+        <label htmlFor="overlay-search" className="sr-only">
+          Search
+        </label>
+        <input
+          id="overlay-search"
+          type="text"
+          name="search"
+          autoFocus
+          placeholder="Search the estate…"
+          autoComplete="off"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => {
+            if (query.trim() && (hasResults || isLoading)) setShowResults(true);
+          }}
+          onKeyDown={handleKeyDown}
+          className="serif w-full border-b border-rule bg-transparent py-4 pr-10 text-display-xl focus-visible:border-oxblood focus-visible:ring-0"
+        />
+        <MagnifyingGlassIcon
+          aria-hidden
+          className="pointer-events-none absolute right-0 top-1/2 h-6 w-6 -translate-y-1/2"
+        />
+      </form>
+
+      {/* Instant results dropdown */}
+      {showResults && (
+        <SearchResults
+          query={query}
+          results={results}
+          isLoading={isLoading}
+          onSelect={handleSelect}
+        />
+      )}
+    </div>
   );
 }
 
+// ---------------------------------------------------------------------------
+// SearchSkeleton — used in Suspense fallbacks
+// ---------------------------------------------------------------------------
 export function SearchSkeleton() {
   return (
     <div className="relative w-full">
