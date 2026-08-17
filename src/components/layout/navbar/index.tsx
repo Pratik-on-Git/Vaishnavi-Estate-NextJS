@@ -1,13 +1,14 @@
 import { getMenu } from "@/lib/shopify";
 import { Menu } from "@/lib/shopify/types";
-import Link from "next/link";
 import MobileMenu from "./mobile-menu";
+import DesktopMenu from "./desktop-menu";
 import SearchTrigger from "./search";
 import LogoSquare from "@/components/logo-square";
 import CartModal from "@/components/cart/modal";
 import Marquee from "@/components/ui/marquee";
 import { getCustomerSession } from "@/lib/customer-account";
 import { announcement, primaryNav, site } from "@/lib/site";
+import Link from "next/link";
 
 /**
  * Header (DESIGN.md §5): a scrolling announcement strip over a three-part nav —
@@ -15,7 +16,12 @@ import { announcement, primaryNav, site } from "@/lib/site";
  * as one unit so `--header-h` stays the single offset for sticky children.
  */
 export async function Navbar() {
-  const shopifyMenu = await getMenu("vaishnavi-estate-nextjs-menu");
+  const shopifyMenu = await getMenu("vaishnavi-estate-nextjs-menu").catch(
+    (error) => {
+      console.error("Failed to load the Shopify navigation", error);
+      return [] as Menu[];
+    }
+  );
   const customerSession = await getCustomerSession();
 
   // Shopify owns the menu when it is configured; the site config is the
@@ -43,19 +49,7 @@ export async function Navbar() {
             <div className="md:hidden">
               <MobileMenu menu={menu} />
             </div>
-            <ul className="hidden items-center gap-6 md:flex">
-              {menu.map((item: Menu) => (
-                <li key={item.title}>
-                  <Link
-                    href={item.path}
-                    prefetch
-                    className="ui-mono transition-opacity hover:opacity-60"
-                  >
-                    {item.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <DesktopMenu menu={menu} />
           </div>
 
           {/* Optically centred mark, independent of the rails' widths. */}

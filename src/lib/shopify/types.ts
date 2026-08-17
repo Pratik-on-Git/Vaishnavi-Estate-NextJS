@@ -1,15 +1,19 @@
 export type Menu = {
   title: string;
   path: string;
+  items?: Menu[];
+};
+
+type ShopifyMenuItem = {
+  title: string;
+  url: string;
+  items?: ShopifyMenuItem[];
 };
 
 export type ShopifyMenuOperation = {
   data: {
     menu?: {
-      items: {
-        title: string;
-        url: string;
-      }[];
+      items: ShopifyMenuItem[];
     };
   };
   variables: {

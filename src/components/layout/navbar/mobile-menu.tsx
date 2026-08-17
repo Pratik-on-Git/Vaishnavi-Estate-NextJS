@@ -74,6 +74,22 @@ export default function MobileMenu({ menu }: { menu: Menu[] }) {
                       >
                         {item.title}
                       </Link>
+                      {item.items?.length ? (
+                        <ul className="-mt-1 grid grid-cols-2 gap-x-6 gap-y-2 pb-5">
+                          {item.items.map((child) => (
+                            <li key={child.title}>
+                              <Link
+                                href={child.path}
+                                prefetch
+                                onClick={close}
+                                className="ui-mono transition-opacity hover:opacity-60"
+                              >
+                                {child.title}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
                     </li>
                   ))}
                 </ul>

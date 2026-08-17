@@ -182,21 +182,48 @@ function reshapeProducts(products: ShopifyProduct[]) {
 export async function getMenu(handle: string): Promise<Menu[]> {
   const res = await shopifyFetch<ShopifyMenuOperation>({
     query: getMenuQuery,
-    tags: [TAGS.collections],
+    // Menus are edited independently of collections in Shopify Admin. Read
+    // them fresh so header changes do not wait for a collection webhook or a
+    // new deployment to appear.
+    cache: "no-store",
     variables: {
       handle,
     },
   });
 
-  return (
-    res.body?.data?.menu?.items.map((item: { title: string; url: string }) => ({
-      title: item.title,
-      path: item.url
-        .replace(domain, "")
-        .replace("/collections", "/search")
-        .replace("/pages", ""),
-    })) || []
-  );
+  const normalizeMenuPath = (url: string) => {
+    const path = url.replace(domain, "");
+    const [pathname] = path.split("?");
+
+    if (pathname === "/collections") {
+      return "/search";
+    }
+
+    if (pathname.startsWith("/collections/")) {
+      const [, , collectionHandle] = pathname.split("/");
+      return collectionHandle ? `/search/${collectionHandle}` : "/search";
+    }
+
+    if (pathname.startsWith("/pages/")) {
+      return pathname.replace("/pages", "");
+    }
+
+    return pathname || path;
+  };
+
+  const reshapeMenuItem = (item: {
+    title: string;
+    url: string;
+    items?: typeof item[];
+  }): Menu => ({
+    title: item.title,
+    path: normalizeMenuPath(item.url),
+    ...(item.items?.length
+      ? { items: item.items.map(reshapeMenuItem) }
+      : {}),
+  });
+
+  return res.body?.data?.menu?.items.map(reshapeMenuItem) || [];
 }
 
 export async function getProducts({
