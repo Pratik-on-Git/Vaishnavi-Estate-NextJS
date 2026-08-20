@@ -164,19 +164,6 @@ export default function EstateReel({
           </li>
         ))}
       </ul>
-
-      {hasVideo ? (
-        <div className="shell flex justify-end pb-2 pt-6">
-          <button
-            type="button"
-            onClick={toggle}
-            aria-pressed={!playing}
-            className="ui-mono text-oxblood transition-opacity hover:opacity-60"
-          >
-            {playing ? "Pause reel" : "Play reel"}
-          </button>
-        </div>
-      ) : null}
     </div>
   );
 }

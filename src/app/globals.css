@@ -150,7 +150,7 @@
 
   /* Meta labels sit in oxblood, same as the display type they sit above. */
   .eyebrow {
-    @apply font-mono text-eyebrow uppercase tracking-eyebrow text-oxblood;
+    @apply font-mono text-eyebrow uppercase text-oxblood;
   }
 
   .body-mono {

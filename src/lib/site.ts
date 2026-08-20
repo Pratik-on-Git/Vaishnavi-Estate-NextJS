@@ -271,7 +271,7 @@ export const socialLinks = [
  */
 export const estatePhilosophy = {
   eyebrow: "Estate Philosophy",
-  title: ["We believe coffee", "is an art form"],
+  title: ["We believe coffee", " is an art form"],
   /**
    * Three paragraphs rather than one: the opening states the position, and
    * the two that follow are what earn it — the practice, then the people.

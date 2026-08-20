@@ -272,8 +272,8 @@ function Philosophy() {
             <p
               key={paragraph}
               className={clsx(
-                "body-mono text-pretty",
-                index === 0 ? "text-ui" : "text-ink/85"
+                "body-mono text-pretty tracking-normal",
+                index === 0 ? "text-ui" : "text-ink"
               )}
             >
               {paragraph}
