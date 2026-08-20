@@ -295,3 +295,65 @@ export type ShopifyPagesOperation = {
     pages: Connection<Page>;
   };
 };
+
+export type ShopifyArticle = {
+  id: string;
+  handle: string;
+  title: string;
+  excerpt: string | null;
+  /** Plain-text body, used to derive an excerpt when the merchant set none. */
+  content: string;
+  contentHtml?: string;
+  publishedAt: string;
+  tags: string[];
+  image: Image | null;
+  authorV2: { name: string } | null;
+  blog: { handle: string; title: string } | null;
+  seo?: SEO;
+};
+
+/** An article with the storefront path Shopify's own URLs use. */
+export type Article = Omit<ShopifyArticle, "blog" | "content"> & {
+  blogHandle: string;
+  blogTitle: string;
+  path: string;
+};
+
+export type ShopifyBlog = {
+  id: string;
+  handle: string;
+  title: string;
+  seo?: SEO;
+  articles?: Connection<ShopifyArticle>;
+};
+
+export type Blog = Omit<ShopifyBlog, "articles"> & {
+  path: string;
+  articles: Article[];
+};
+
+export type ShopifyBlogsOperation = {
+  data: { blogs: Connection<Omit<ShopifyBlog, "articles">> };
+  variables: { first: number };
+};
+
+export type ShopifyBlogOperation = {
+  data: { blog: ShopifyBlog | null };
+  variables: { handle: string; first: number };
+};
+
+export type ShopifyArticleOperation = {
+  data: {
+    blog:
+      | (Pick<ShopifyBlog, "handle" | "title"> & {
+          articleByHandle: ShopifyArticle | null;
+        })
+      | null;
+  };
+  variables: { blogHandle: string; handle: string };
+};
+
+export type ShopifyArticlesOperation = {
+  data: { articles: Connection<ShopifyArticle> };
+  variables: { first: number };
+};

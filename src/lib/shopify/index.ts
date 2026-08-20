@@ -25,6 +25,8 @@ import {
   searchProductsQuery,
 } from "./queries/product";
 import {
+  Article,
+  Blog,
   Cart,
   CartUserError,
   CartWarning,
@@ -36,6 +38,11 @@ import {
   Page,
   Product,
   ShopifyAddToCartOperation,
+  ShopifyArticle,
+  ShopifyArticleOperation,
+  ShopifyArticlesOperation,
+  ShopifyBlogOperation,
+  ShopifyBlogsOperation,
   ShopifyCart,
   ShopifyCartOperation,
   ShopifyCollection,
@@ -56,6 +63,12 @@ import {
 import { headers } from "next/headers";
 import { revalidateTag } from "next/cache";
 import { getPageQuery, getPagesQuery } from "./queries/page";
+import {
+  getArticleQuery,
+  getArticlesQuery,
+  getBlogQuery,
+  getBlogsQuery,
+} from "./queries/blog";
 
 const domain = process.env.SHOPIFY_STORE_DOMAIN
   ? ensureStartWith(process.env.SHOPIFY_STORE_DOMAIN, "https://")
@@ -615,17 +628,26 @@ export async function revalidate(req: NextRequest): Promise<NextResponse> {
     "products/delete",
     "products/update",
   ];
+  const blogWebhooks = [
+    "articles/create",
+    "articles/delete",
+    "articles/update",
+    "blogs/create",
+    "blogs/delete",
+    "blogs/update",
+  ];
   const topic = (await headers()).get("x-shopify-topic") || "unknown";
   const secret = req.nextUrl.searchParams.get("secret");
   const isCollectionUpdate = collectionWebhooks.includes(topic);
   const isProductUpdate = productWebhooks.includes(topic);
+  const isBlogUpdate = blogWebhooks.includes(topic);
 
   if (!secret || secret !== process.env.SHOPIFY_REVALIDATION_SECRET) {
     console.error("Invalid revalidation secret.");
     return NextResponse.json({ status: 200 });
   }
 
-  if (!isCollectionUpdate && !isProductUpdate) {
+  if (!isCollectionUpdate && !isProductUpdate && !isBlogUpdate) {
     // We don't need to revalidate anything for any other topics.
     return NextResponse.json({ status: 200 });
   }
@@ -636,6 +658,10 @@ export async function revalidate(req: NextRequest): Promise<NextResponse> {
 
   if (isProductUpdate) {
     revalidateTag(TAGS.products, "max");
+  }
+
+  if (isBlogUpdate) {
+    revalidateTag(TAGS.blogs, "max");
   }
 
   return NextResponse.json({ status: 200, revalidated: true, now: Date.now() });
@@ -658,4 +684,139 @@ export async function getPages(): Promise<Page[]> {
   });
 
   return removeEdgesAndNodes(res.body.data.pages);
+}
+
+/* --------------------------------------------------------------- blogs */
+
+/**
+ * Shopify leaves `excerpt` as an empty string when the merchant never filled
+ * one in, so cards would render as bare titles. Fall back to the opening of the
+ * body, cut on a word boundary.
+ */
+function summarize(content: string, limit = 180): string | null {
+  const text = content?.replace(/\s+/g, " ").trim();
+
+  if (!text) return null;
+  if (text.length <= limit) return text;
+
+  const cut = text.slice(0, limit);
+  const lastSpace = cut.lastIndexOf(" ");
+
+  return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).replace(/[.,;:]$/, "")}...`;
+}
+
+/**
+ * Shopify serves articles at `/blogs/<blog>/<article>`; the storefront mirrors
+ * that path exactly so links copied out of the admin — or already indexed by
+ * search engines — resolve without a redirect.
+ */
+function reshapeArticle(
+  article: ShopifyArticle,
+  blogHandle?: string,
+  blogTitle?: string
+): Article | undefined {
+  if (!article) return undefined;
+
+  const { blog, content, ...rest } = article;
+  const handleOfBlog = blog?.handle ?? blogHandle;
+
+  // Without a blog handle there is no addressable URL for the article.
+  if (!handleOfBlog) return undefined;
+
+  return {
+    ...rest,
+    excerpt: article.excerpt?.trim() || summarize(content),
+    blogHandle: handleOfBlog,
+    blogTitle: blog?.title ?? blogTitle ?? handleOfBlog,
+    path: `/blogs/${handleOfBlog}/${article.handle}`,
+  };
+}
+
+function reshapeArticles(
+  articles: ShopifyArticle[],
+  blogHandle?: string,
+  blogTitle?: string
+): Article[] {
+  const reshaped: Article[] = [];
+
+  for (const article of articles) {
+    const next = reshapeArticle(article, blogHandle, blogTitle);
+    if (next) reshaped.push(next);
+  }
+
+  return reshaped;
+}
+
+/** Every blog on the store, without their articles. */
+export async function getBlogs(first = 20): Promise<Omit<Blog, "articles">[]> {
+  const res = await shopifyFetch<ShopifyBlogsOperation>({
+    query: getBlogsQuery,
+    tags: [TAGS.blogs],
+    variables: { first },
+  });
+
+  return removeEdgesAndNodes(res.body.data.blogs).map((blog) => ({
+    ...blog,
+    path: `/blogs/${blog.handle}`,
+  }));
+}
+
+/** One blog with its articles, newest first. */
+export async function getBlog(
+  handle: string,
+  first = 50
+): Promise<Blog | undefined> {
+  const res = await shopifyFetch<ShopifyBlogOperation>({
+    query: getBlogQuery,
+    tags: [TAGS.blogs],
+    variables: { handle, first },
+  });
+
+  const blog = res.body.data.blog;
+
+  if (!blog) return undefined;
+
+  const { articles, ...rest } = blog;
+
+  return {
+    ...rest,
+    path: `/blogs/${blog.handle}`,
+    articles: articles
+      ? reshapeArticles(
+          removeEdgesAndNodes(articles),
+          blog.handle,
+          blog.title
+        )
+      : [],
+  };
+}
+
+/** A single article, addressed the way Shopify addresses it. */
+export async function getArticle(
+  blogHandle: string,
+  handle: string
+): Promise<Article | undefined> {
+  const res = await shopifyFetch<ShopifyArticleOperation>({
+    query: getArticleQuery,
+    tags: [TAGS.blogs],
+    variables: { blogHandle, handle },
+  });
+
+  const blog = res.body.data.blog;
+  const article = blog?.articleByHandle;
+
+  if (!article) return undefined;
+
+  return reshapeArticle(article, blog?.handle, blog?.title);
+}
+
+/** Articles across every blog, newest first. */
+export async function getArticles(first = 24): Promise<Article[]> {
+  const res = await shopifyFetch<ShopifyArticlesOperation>({
+    query: getArticlesQuery,
+    tags: [TAGS.blogs],
+    variables: { first },
+  });
+
+  return reshapeArticles(removeEdgesAndNodes(res.body.data.articles));
 }

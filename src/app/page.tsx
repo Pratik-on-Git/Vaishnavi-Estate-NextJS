@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { getCollectionProducts, getProducts } from "@/lib/shopify";
+import { getArticles, getCollectionProducts, getProducts } from "@/lib/shopify";
 import { Product } from "@/lib/shopify/types";
 import ProductCard from "@/components/product-card";
+import ArticleCard from "@/components/blog/article-card";
 import Price from "@/components/price";
 import Marquee from "@/components/ui/marquee";
 import Carousel from "@/components/ui/carousel";
@@ -69,7 +70,10 @@ export default function Home() {
       </Suspense>
 
       <Guides />
-      <Journal />
+
+      <Suspense fallback={null}>
+        <Journal />
+      </Suspense>
     </>
   );
 }
@@ -455,39 +459,52 @@ function Guides() {
 
 /* -------------------------------------------------------------- journal */
 
-function Journal() {
+/**
+ * Dispatch rail. Reads the three newest Shopify articles and links them at
+ * their canonical `/blogs/<blog>/<article>` paths; the editorial placeholders
+ * in `site.ts` only appear when the store has no blog configured.
+ */
+async function Journal() {
+  const articles = await getArticles(3).catch(() => []);
+
   return (
     <section aria-labelledby="journal">
       <SectionHead
         eyebrow="Dispatch"
         title={<span id="journal">From the Journal</span>}
         action="More news"
-        actionHref="/journal"
+        actionHref="/blogs"
       />
       <ul className="rule-y grid grid-cols-1 divide-y divide-rule md:grid-cols-3 md:divide-x md:divide-y-0">
-        {journalPosts.map((post, index) => (
-          <li key={post.slug} className="p-3">
-            <article>
-              <div className="plate aspect-[4/3] w-full">
-                <Image
-                  src={
-                    ["/sales-collection.png", "/mens-collection.png", "/kids-collection.png"][index] ??
-                    "/banner.png"
-                  }
-                  alt=""
-                  fill
-                  sizes="(min-width: 768px) 33vw, 100vw"
-                  className="object-cover"
-                />
-              </div>
-              <h3 className="serif mt-4 text-display-sm">{post.title}</h3>
-              <p className="body-mono mt-3">{post.excerpt}</p>
-              <Link href="/journal" className="link-arrow mt-4">
-                Read more <span aria-hidden>&rarr;</span>
-              </Link>
-            </article>
-          </li>
-        ))}
+        {articles.length
+          ? articles.map((article, index) => (
+              <li key={article.id} className="p-3">
+                <ArticleCard article={article} index={index} />
+              </li>
+            ))
+          : journalPosts.map((post, index) => (
+              <li key={post.slug} className="p-3">
+                <article>
+                  <div className="plate aspect-[4/3] w-full">
+                    <Image
+                      src={
+                        ["/sales-collection.png", "/mens-collection.png", "/kids-collection.png"][index] ??
+                        "/banner.png"
+                      }
+                      alt=""
+                      fill
+                      sizes="(min-width: 768px) 33vw, 100vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <h3 className="serif mt-4 text-display-sm">{post.title}</h3>
+                  <p className="body-mono mt-3">{post.excerpt}</p>
+                  <Link href="/blogs" className="link-arrow mt-4">
+                    Read more <span aria-hidden>&rarr;</span>
+                  </Link>
+                </article>
+              </li>
+            ))}
       </ul>
     </section>
   );

@@ -36,7 +36,7 @@ export const heroPhrases = [
 /** Fallback navigation, used when the Shopify menu is empty or unreachable. */
 export const primaryNav: { title: string; path: string }[] = [
   { title: "Shop", path: "/search" },
-  { title: "Journal", path: "/journal" },
+  { title: "Journal", path: "/blogs" },
   { title: "About", path: "/about" },
 ];
 
@@ -130,7 +130,7 @@ export const guidesFeature = {
   title: "Pouring the perfect cup",
   body: "Every brew method has its own feel, and part of the fun is figuring out what works for you. Start with these guides, make small adjustments, and follow your taste from there.",
   cta: "Read now",
-  href: "/journal",
+  href: "/blogs",
 } as const;
 
 /** Brew-of-the-month band copy. */
@@ -140,8 +140,9 @@ export const featureBand = {
 } as const;
 
 /**
- * Journal entries. There is no blog API wired to the storefront yet, so these
- * are editorial until one is — the card shape matches whatever replaces them.
+ * Fallback journal entries. The homepage and `/blogs` read real articles from
+ * the Shopify Storefront API; these only render when the store has no blog
+ * configured yet, so the section never collapses to empty scaffolding.
  */
 export const journalPosts = [
   {
@@ -245,9 +246,10 @@ export const footerColumns = [
     title: "More",
     links: [
       { title: "Merch", path: "/search/merch" },
+      { title: "Blog", path: "/blogs" },
       { title: "Contact", path: "/contact" },
       { title: "FAQ", path: "/about" },
-      { title: "Brew guide", path: "/journal" },
+      { title: "Brew guide", path: "/blogs" },
     ],
   },
 ] as const;

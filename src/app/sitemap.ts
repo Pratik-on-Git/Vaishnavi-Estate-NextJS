@@ -1,4 +1,10 @@
-import { getCollections, getPages, getProducts } from "@/lib/shopify";
+import {
+  getArticles,
+  getBlogs,
+  getCollections,
+  getPages,
+  getProducts,
+} from "@/lib/shopify";
 import { MetadataRoute } from "next";
 
 type Route = {
@@ -14,7 +20,7 @@ const baseUrl = "https://demo-next-store.pages.dev/";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const routesMap = [""].map((route) => ({
+  const routesMap = ["", "/blogs"].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date().toISOString(),
   }));
@@ -40,11 +46,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
+  const blogsPromise = getBlogs().then((blogs) =>
+    blogs.map((blog) => ({
+      url: `${baseUrl}${blog.path}`,
+      lastModified: new Date().toISOString(),
+    })),
+  );
+
+  const articlesPromise = getArticles(100).then((articles) =>
+    articles.map((article) => ({
+      url: `${baseUrl}${article.path}`,
+      lastModified: article.publishedAt,
+    })),
+  );
+
   let fetchedRoutes: Route[] = [];
 
   try {
     fetchedRoutes = (
-      await Promise.all([collectionsPromise, productsPromise, pagesPromise])
+      await Promise.all([
+        collectionsPromise,
+        productsPromise,
+        pagesPromise,
+        blogsPromise,
+        articlesPromise,
+      ])
     ).flat();
   } catch (error) {
     throw JSON.stringify(error, null, 2);
