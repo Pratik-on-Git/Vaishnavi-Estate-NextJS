@@ -261,3 +261,63 @@ export const socialLinks = [
   { title: "WhatsApp", href: "https://wa.me/910000000000" },
   { title: "Email", href: "mailto:hello@vaishnaviestate.com" },
 ] as const;
+
+/**
+ * Estate philosophy band — the brand's own statement of intent, set as an
+ * asymmetric two-column block rather than the centred `SectionHead` the
+ * product rails use. `title` is split into lines deliberately: at
+ * `display-xl` the break lands where the sentence breathes, which balance
+ * alone will not guarantee across breakpoints.
+ */
+export const estatePhilosophy = {
+  eyebrow: "Estate Philosophy",
+  title: ["We believe coffee", "is an art form"],
+  /**
+   * Three paragraphs rather than one: the opening states the position, and
+   * the two that follow are what earn it — the practice, then the people.
+   * Kept as an array so the section can space them without `<br />`.
+   */
+  body: [
+    "Set in the misty hills of Coorg since 1928, every cup of Vaishnavi Estate is the quiet sum of four generations - handcrafted beans, slow batch roasting, and an estate ritual that turns coffee into something closer to ceremony. Nothing here is rushed. Hand-picked at peak ripeness, pulped the same evening, and naturally dried on raised beds beneath native shade trees. Roasted in small batches and ground fresh only after you order.",
+  ],
+  cta: "Learn more",
+  href: "/about",
+} as const;
+
+/**
+ * The estate reel that follows the philosophy band: four staggered plates,
+ * mixed stills and silent loops, each captioned with a lowercase mono label
+ * and an italic serif line.
+ *
+ * `kind: "video"` cells autoplay muted and carry the LIVE badge; they are
+ * decorative, so they take no alt text. Stills do — they carry information
+ * the captions only allude to.
+ */
+export const estateReel = [
+  {
+    kind: "image",
+    src: "https://vaishnaviestate.com/cdn/shop/files/Girl_drinking_coffee.jpg?v=1778496876&width=900",
+    alt: "Two hands cradling a terracotta cup of filter coffee on a garden terrace, an estate pouch resting behind it.",
+    label: "the pour",
+    caption: "Slow extraction, served at golden hour",
+  },
+  {
+    kind: "video",
+    src: "https://cdn.shopify.com/videos/c/o/v/643e30e15c364663860fded49117578a.mp4",
+    label: "the bean",
+    caption: "Single-origin Robusta, hand-sorted",
+  },
+  {
+    kind: "image",
+    src: "https://vaishnaviestate.com/cdn/shop/files/vc-soc-web-13.jpg?v=1687196491&width=900",
+    alt: "A level scoop of freshly ground coffee beside a glass pour-over carafe and an estate pouch.",
+    label: "the dose",
+    caption: "One level scoop, ground the morning it's brewed",
+  },
+  {
+    kind: "video",
+    src: "https://cdn.shopify.com/videos/c/o/v/81da4c142d584a23b09d68399eff9a18.mp4",
+    label: "the ritual",
+    caption: "Mornings made of mist and porcelain",
+  },
+] as const;

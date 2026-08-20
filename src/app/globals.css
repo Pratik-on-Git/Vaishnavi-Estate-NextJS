@@ -8,16 +8,20 @@
    Five colours, with roles assigned by measured contrast rather than taste:
 
      Dark Brown  #341706  ink      — body, nav, UI, prices        16.5:1 on paper
-     Oxblood     #7B1526  accent   — display, links, buttons      10.6:1 on paper
-     Light Brown #8E3200  soft     — meta text and hairlines        8.1:1 on paper
+     Oxblood     #7B1526  accent   — display, links, buttons,
+                                     meta text, and the hairlines  10.6:1 on paper
      Amber       #FFCF71  amber    — FILL ONLY / on-dark accent     1.5:1 on paper
      White       #FFFFFF  paper    — ground, and text on fills
+
+   Four colours, not five: the old Light Brown (#8E3200) held both the meta
+   text and the hairline hue at 8.1:1, and Oxblood does both jobs at 10.6:1.
+   One fewer near-brown to confuse with the ink, and better contrast for it.
 
    Two hard rules fall out of those numbers:
      1. Amber is never text on paper. It is a fill (carrying Dark Brown at
         11.3:1), or text on Dark Brown (11.3:1) / Oxblood (7.3:1).
-     2. Dark grounds take paper or amber only — Oxblood (1.6:1) and Light
-        Brown (2.1:1) are invisible on Dark Brown.
+     2. Dark grounds take paper or amber only — Oxblood is invisible there
+        at 1.6:1.
 
    Single light theme by design; the warmth of this palette is the brand.
 --------------------------------------------------------------------------- */
@@ -30,14 +34,13 @@
 
   --paper: #ffffff;
   --ink: #341706;
-  --ink-soft: #8e3200;
   --oxblood: #7b1526;
   --amber: #ffcf71;
 
-  /* Light Brown at 8% over paper — the product-image tile ground. */
-  --tint: #f6efeb;
-  --rule: rgba(142, 50, 0, 0.22);
-  --wash: rgba(142, 50, 0, 0.06);
+  /* Oxblood at 8% over paper — the product-image tile ground. */
+  --tint: #f4ecee;
+  --rule: rgba(123, 21, 38, 0.22);
+  --wash: rgba(123, 21, 38, 0.06);
 
   --gutter: 1rem;
   --scroll-progress: 0;
@@ -106,7 +109,7 @@
 
   input::placeholder,
   textarea::placeholder {
-    color: var(--ink-soft);
+    color: var(--oxblood);
     opacity: 0.6;
   }
 }
@@ -129,7 +132,7 @@
   }
 
   /* Hairline: the primary structural device. Sections are separated by rules,
-     not by whitespace. Light Brown at 22% keeps them warm rather than grey. */
+     not by whitespace. Oxblood at 22% keeps them warm rather than grey. */
   .rule-t {
     @apply border-t border-rule;
   }
@@ -145,9 +148,9 @@
 
   /* ------------------------------------------------------------ typography */
 
-  /* Meta labels sit in Light Brown; the bullet is an amber spark. */
+  /* Meta labels sit in oxblood, same as the display type they sit above. */
   .eyebrow {
-    @apply font-mono text-eyebrow uppercase tracking-eyebrow text-ink-soft;
+    @apply font-mono text-eyebrow uppercase tracking-eyebrow text-oxblood;
   }
 
   .body-mono {
@@ -159,7 +162,7 @@
   }
 
   .spec-mono {
-    @apply font-mono text-spec text-ink-soft;
+    @apply font-mono text-spec text-oxblood;
   }
 
   .micro-mono {

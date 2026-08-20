@@ -79,7 +79,7 @@ export default function SearchResults({
       {/* Empty state */}
       {!isLoading && isEmpty && (
         <div className="py-8">
-          <p className="body-mono text-ink-soft">No results found for &ldquo;{query}&rdquo;</p>
+          <p className="body-mono text-oxblood">No results found for &ldquo;{query}&rdquo;</p>
           <button
             data-sr-item
             onClick={() => onSelect(allUrl)}
@@ -129,7 +129,7 @@ export default function SearchResults({
                         />
                       ) : (
                         <span className="flex h-full w-full items-center justify-center">
-                          <MagnifyingGlassIcon className="h-5 w-5 text-ink-soft opacity-40" />
+                          <MagnifyingGlassIcon className="h-5 w-5 text-oxblood opacity-40" />
                         </span>
                       )}
                     </span>
@@ -169,7 +169,7 @@ export default function SearchResults({
                     className="flex w-full items-center justify-between gap-4 py-3 text-left transition-opacity hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxblood"
                   >
                     <span className="body-mono">{col.title}</span>
-                    <span className="spec-mono shrink-0 text-ink-soft">Collection →</span>
+                    <span className="spec-mono shrink-0 text-oxblood">Collection →</span>
                   </button>
                 </li>
               ))}
@@ -202,7 +202,7 @@ export default function SearchResults({
                     className="flex w-full items-center justify-between gap-4 py-3 text-left transition-opacity hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxblood"
                   >
                     <span className="body-mono">{pg.title}</span>
-                    <span className="spec-mono shrink-0 text-ink-soft">Page →</span>
+                    <span className="spec-mono shrink-0 text-oxblood">Page →</span>
                   </button>
                 </li>
               ))}

@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getArticles, getCollectionProducts, getProducts } from "@/lib/shopify";
@@ -11,10 +12,13 @@ import HeroVideo from "@/components/ui/hero-video";
 import PromoTile from "@/components/ui/promo-tile";
 import ProductTable from "@/components/ui/product-table";
 import CollectionPillRail from "@/components/ui/collection-pill-rail";
+import EstateReel from "@/components/ui/estate-reel";
 import { Eyebrow, Headline, SectionHead } from "@/components/ui/section";
 import {
   aboutCards,
   aboutStatement,
+  estatePhilosophy,
+  estateReel,
   featureBand,
   guidesFeature,
   heroPhrases,
@@ -32,8 +36,8 @@ export const metadata = {
 
 /**
  * Homepage. Section order follows DESIGN.md: hero → filters → bestsellers →
- * promo pair → blends → about → the single-origin table → brew of the month →
- * merch → guides → journal.
+ * promo pair → philosophy → blends → about → the single-origin table → brew of
+ * the month → merch → guides → journal.
  *
  * Every product-backed section resolves its own data and degrades to nothing
  * when the store has no matching products, so a fresh or partially configured
@@ -44,6 +48,8 @@ export default function Home() {
     <>
       <Hero />
       <CollectionFilters />
+
+      <Philosophy />
 
       <Suspense fallback={<RailFallback />}>
         <Bestsellers />
@@ -228,6 +234,60 @@ function PromoPair() {
           className="aspect-[4/3] md:aspect-square"
         />
       ))}
+    </section>
+  );
+}
+
+/* ----------------------------------------------------------- philosophy */
+
+/**
+ * Estate philosophy, then the reel. One section rather than two: the band
+ * states the position and the plates below are the evidence for it, so a
+ * hairline between them would read as a change of subject.
+ *
+ * The head is deliberately not `SectionHead` — every product rail on this
+ * page opens centred, and holding this one to a left-hung asymmetric column
+ * is what marks it as the page's editorial pause rather than another rail.
+ */
+function Philosophy() {
+  return (
+    <section aria-labelledby="philosophy">
+      <div className="shell flex flex-col items-center py-12 text-center md:py-16">
+        <Eyebrow>{estatePhilosophy.eyebrow}</Eyebrow>
+        <Headline id="philosophy" className="mt-5">
+          {/* The break is authored rather than left to `text-balance`:
+              at display-xl the balanced break lands mid-phrase. */}
+          {estatePhilosophy.title.map((line) => (
+            <span key={line}>
+              {line}
+            </span>
+          ))}
+        </Headline>
+        {/* Wider than `max-w-measure`: centred copy under a two-line display
+            heading needs the extra width to avoid a ragged four-line stack.
+            The opening paragraph is set a step up from the two beneath it, so
+            the eye has somewhere to land before the detail. */}
+        <div className="mt-6 max-w-4xl space-y-5">
+          {estatePhilosophy.body.map((paragraph, index) => (
+            <p
+              key={paragraph}
+              className={clsx(
+                "body-mono text-pretty",
+                index === 0 ? "text-ui" : "text-ink/85"
+              )}
+            >
+              {paragraph}
+            </p>
+          ))}
+        </div>
+        <Link href={estatePhilosophy.href} className="link-arrow mt-8">
+          {estatePhilosophy.cta} <span aria-hidden>&rarr;</span>
+        </Link>
+      </div>
+
+      <div className="pb-12 md:pb-16">
+        <EstateReel items={estateReel} label="Life on the estate" />
+      </div>
     </section>
   );
 }

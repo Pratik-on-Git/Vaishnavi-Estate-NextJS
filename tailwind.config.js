@@ -15,19 +15,17 @@ module.exports = {
         // DESIGN.md §1 for the ratio table and the two hard rules.
         paper: "#FFFFFF",
         // The ink. Body, nav, UI, prices, table cells. 16.5:1 on paper.
-        ink: {
-          DEFAULT: "#341706",
-          // Secondary and meta text, plus the hairline hue. 8.1:1 on paper.
-          soft: "#8E3200",
-        },
-        // The brand voice: display headings, links, buttons, active states.
+        ink: "#341706",
+        // The brand voice: display headings, links, buttons, active states,
+        // and — since Light Brown was retired — secondary/meta text and the
+        // hairline hue as well. 10.6:1 on paper.
         oxblood: "#7B1526",
         // Fill-only accent. NEVER text on paper (1.5:1) — see DESIGN.md §1.
         amber: "#FFCF71",
-        // Light Brown at 8% over paper: the product-image tile ground.
-        tint: "#F6EFEB",
-        rule: "rgba(142, 50, 0, 0.22)",
-        wash: "rgba(142, 50, 0, 0.06)",
+        // Oxblood at 8% over paper: the product-image tile ground.
+        tint: "#F4ECEE",
+        rule: "rgba(123, 21, 38, 0.22)",
+        wash: "rgba(123, 21, 38, 0.06)",
         // Dark ground. Takes paper or amber text only.
         coal: "#341706",
       },
@@ -72,7 +70,7 @@ module.exports = {
         plate: "0.75rem",
       },
       borderColor: {
-        DEFAULT: "rgba(142, 50, 0, 0.22)",
+        DEFAULT: "rgba(123, 21, 38, 0.22)",
       },
       maxWidth: {
         measure: "38rem",

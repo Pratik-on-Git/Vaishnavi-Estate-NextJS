@@ -8,6 +8,14 @@ module.exports = {
         hostname: "cdn.shopify.com",
         pathname: "/s/files/**",
       },
+      // Storefront-served media. Shopify puts a shop's own uploads behind the
+      // primary domain at /cdn/shop/files, which is a different host and path
+      // from the /s/files CDN above — both are needed.
+      {
+        protocol: "https",
+        hostname: "vaishnaviestate.com",
+        pathname: "/cdn/shop/files/**",
+      },
     ],
   },
   async redirects() {
