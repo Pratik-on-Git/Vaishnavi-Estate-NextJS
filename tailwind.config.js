@@ -53,12 +53,30 @@ module.exports = {
           "clamp(1.5rem, 2.4vw, 2.5rem)",
           { lineHeight: "1.1", letterSpacing: "0" },
         ],
-        "display-sm": ["1.625rem", { lineHeight: "1.15" }],
-        eyebrow: ["0.9rem", { lineHeight: "1.2", fontWeight: "500", letterSpacing: "0em" }],
-        ui: ["0.9rem", { lineHeight: "1.3", letterSpacing: "0em" }],
-        body: ["0.875rem", { lineHeight: "1.6", letterSpacing: "0" }],
-        spec: ["0.75rem", { lineHeight: "1.4", letterSpacing: "0.06em" }],
-        micro: ["0.6875rem", { lineHeight: "1.2", letterSpacing: "0.1em" }],
+        "display-sm": [
+          "clamp(1.375rem, 1rem + 1.5vw, 1.625rem)",
+          { lineHeight: "1.15" },
+        ],
+        eyebrow: [
+          "clamp(0.8125rem, 0.75rem + 0.4vw, 0.9rem)",
+          { lineHeight: "1.2", fontWeight: "500", letterSpacing: "0em" },
+        ],
+        ui: [
+          "clamp(0.8125rem, 0.75rem + 0.4vw, 0.9rem)",
+          { lineHeight: "1.3", letterSpacing: "0em" },
+        ],
+        body: [
+          "clamp(0.8125rem, 0.75rem + 0.4vw, 0.875rem)",
+          { lineHeight: "1.6", letterSpacing: "0" },
+        ],
+        spec: [
+          "clamp(0.6875rem, 0.65rem + 0.3vw, 0.75rem)",
+          { lineHeight: "1.4", letterSpacing: "0.06em" },
+        ],
+        micro: [
+          "clamp(0.625rem, 0.6rem + 0.25vw, 0.6875rem)",
+          { lineHeight: "1.2", letterSpacing: "0.1em" },
+        ],
       },
       letterSpacing: {
         ui: "0em",

@@ -175,6 +175,23 @@
     @apply font-display font-normal text-oxblood;
   }
 
+  /* Rule 2, applied to the type utilities. `.on-dark` in the base layer already
+     promotes h1–h4 to amber, but each utility below sets its own colour in this
+     layer and would otherwise win on cascade order — leaving oxblood text at
+     1.6:1 on coal. Body-weight copy goes to paper (16.5:1), display and meta to
+     amber (11.3:1). */
+  .on-dark .body-mono,
+  .on-dark .ui-mono {
+    color: var(--paper);
+  }
+
+  .on-dark .serif,
+  .on-dark .spec-mono,
+  .on-dark .eyebrow,
+  .on-dark .eyebrow > * {
+    color: var(--amber);
+  }
+
   /* Section headings carry their collection size as a superscript numeral —
      "Hot off the Roaster⁶". A signature of the system. */
   .count-sup {
