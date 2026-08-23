@@ -13,7 +13,7 @@ import {
  * pill for the send.
  *
  * `useActionState` drives it, so the form still posts and works with
- * JavaScript disabled — the server action is the submit target either way, and
+ * JavaScript disabled - the server action is the submit target either way, and
  * the pending flag is the only thing the client adds.
  *
  * Validation deliberately lives in the action rather than here. The browser's
@@ -100,7 +100,7 @@ export default function ContactForm({ className }: { className?: string }) {
         <label htmlFor={`${id}-message`} className="ui-mono normal-case tracking-normal">
           Message
         </label>
-        {/* The one boxed control on the page — a textarea with only an
+        {/* The one boxed control on the page - a textarea with only an
             underline reads as a broken input once the text wraps. */}
         <textarea
           id={`${id}-message`}

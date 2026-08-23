@@ -53,7 +53,7 @@ export function EditItemQuantityButton({
   } = useCart();
 
   const merchandiseId = item.merchandise.id;
-  // Buttons stay clickable while a request is in flight — the queue keeps the
+  // Buttons stay clickable while a request is in flight - the queue keeps the
   // server in order, so rapid clicking stays responsive instead of being
   // throttled to one round trip per unit.
   const atCeiling = type === "plus" && item.quantity >= MAX_LINE_QUANTITY;

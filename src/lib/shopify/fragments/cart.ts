@@ -1,6 +1,6 @@
 /**
  * The cart only ever renders a line's product title, handle and thumbnail, so
- * it selects those directly instead of embedding the full product fragment —
+ * it selects those directly instead of embedding the full product fragment -
  * that one pulls 250 variants and 20 images *per line*, which is the single
  * biggest contributor to cart round-trip latency.
  */

@@ -6,7 +6,7 @@ import QuickAdd from "./quick-add";
 /**
  * The "Straight from the Source" listing (DESIGN.md §5). A dense mono table
  * that lets someone scan the whole single-origin range without scrolling a
- * carousel — the counterpoint to the image-led rails above it.
+ * carousel - the counterpoint to the image-led rails above it.
  */
 
 /**

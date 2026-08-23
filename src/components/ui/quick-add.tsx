@@ -8,7 +8,7 @@ import { Product } from "@/lib/shopify/types";
 /**
  * The `+` at the end of a product table row.
  *
- * Only products with a single purchasable variant can be added in one click —
+ * Only products with a single purchasable variant can be added in one click -
  * anything with a size or grind choice routes to the product page instead,
  * because silently picking a variant for someone is how you ship the wrong bag.
  * Adds reuse the same optimistic + serialised path as the rest of the cart.

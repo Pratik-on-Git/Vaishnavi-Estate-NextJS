@@ -9,7 +9,7 @@ import { footerColumns, shippingTicker, site, socialLinks } from "@/lib/site";
 /**
  * Footer (DESIGN.md §5): a shipping ticker, the newsletter line, hairline
  * columns, a legal row with payment marks, and then the brand statement set at
- * hero scale and clipped by the viewport — the closing gesture of the page.
+ * hero scale and clipped by the viewport - the closing gesture of the page.
  */
 export default async function Footer() {
   // Shopify owns the legal/policy links; the rest of the footer is editorial.
@@ -108,7 +108,7 @@ export default async function Footer() {
         </ul>
       </div>
 
-      {/* Closing statement — clipped by the viewport, as in the reference. */}
+      {/* Closing statement - clipped by the viewport, as in the reference. */}
       <div className="overflow-hidden py-6">
         <p aria-hidden className="serif select-none whitespace-nowrap text-center text-display-hero leading-none">
           {site.statement}

@@ -8,8 +8,8 @@ import { Suspense } from "react";
 
 /**
  * Shop chrome for every browse surface. The homepage's collection pills are
- * repeated here as the primary filter — the same affordance in the same shape,
- * so browsing feels continuous — with the Shopify-driven collection list and
+ * repeated here as the primary filter - the same affordance in the same shape,
+ * so browsing feels continuous - with the Shopify-driven collection list and
  * sort kept in a hairline rail beneath.
  */
 export default function SearchLayout({
@@ -31,7 +31,7 @@ export default function SearchLayout({
         <CollectionPillRail />
       </div>
 
-      {/* Sticky under the header stack — `--header-h` is the single source. */}
+      {/* Sticky under the header stack - `--header-h` is the single source. */}
       <div className="sticky top-[var(--header-h)] z-40 rule-b bg-paper/95 backdrop-blur-md">
         <div className="shell flex flex-col gap-4 py-3 lg:flex-row lg:items-center lg:justify-between">
           <Suspense

@@ -7,7 +7,7 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: `Notes from the estate — harvest, roasting and brewing, straight from ${site.origin}.`,
+  description: `Notes from the estate - harvest, roasting and brewing, straight from ${site.origin}.`,
   openGraph: { type: "website" },
 };
 

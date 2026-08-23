@@ -26,7 +26,7 @@ export const metadata: Metadata = {
  * (heritage) → why this bean (Robusta) → how we make it (farm to cup) → what
  * that costs the land (sustainability) → who is behind it (family) → the shop.
  *
- * Entirely static — every band reads from `site.ts`, so the page never waits on
+ * Entirely static - every band reads from `site.ts`, so the page never waits on
  * Shopify and the copy is revised in one file.
  *
  * Photography carries two bands and no more: the two-up masthead row and the
@@ -82,7 +82,7 @@ function Masthead() {
                 src={image.src}
                 alt={image.alt}
                 fill
-                // The first cell is the page's LCP — load it eagerly rather
+                // The first cell is the page's LCP - load it eagerly rather
                 // than waiting on the lazy observer.
                 priority={index === 0}
                 sizes="(min-width: 768px) 50vw, 100vw"
@@ -100,7 +100,7 @@ function Masthead() {
 
 /**
  * Five dates, one per row, ruled apart. The year hangs in its own column on
- * desktop so the dates read as a single vertical spine down the left edge —
+ * desktop so the dates read as a single vertical spine down the left edge -
  * the point being that they are a hundred years apart but one continuous line.
  */
 function Timeline() {
@@ -167,7 +167,7 @@ function WhyRobusta() {
       </dl>
 
       {/* Lenis is told to keep its hands off the horizontal axis here, the same
-          way the single-origin table does — otherwise the smooth-scroll
+          way the single-origin table does - otherwise the smooth-scroll
           provider swallows the sideways drag on a narrow screen. */}
       <div data-lenis-prevent-horizontal className="overflow-x-auto">
         <table className="w-full min-w-[36rem] border-collapse text-left">
@@ -194,7 +194,7 @@ function WhyRobusta() {
                   {row.trait}
                 </th>
                 <td className="spec-mono px-4 py-4 md:px-6">{row.arabica}</td>
-                {/* The estate's own bean carries the ink weight — this column is
+                {/* The estate's own bean carries the ink weight - this column is
                     the reason the table exists. */}
                 <td className="ui-mono px-4 py-4 normal-case tracking-normal md:px-6">
                   {row.robusta}
@@ -244,7 +244,7 @@ function FarmToCup() {
 
 /**
  * The page's one dark band. `.on-dark` promotes the display and meta type to
- * amber and the body copy to paper — on coal, oxblood measures 1.6:1 and
+ * amber and the body copy to paper - on coal, oxblood measures 1.6:1 and
  * disappears (DESIGN.md §1, Rule 2).
  */
 function Sustainability() {
@@ -351,7 +351,7 @@ function ShopCta() {
   return (
     <section aria-labelledby="shop" className="rule-b">
       <div className="grid grid-cols-1 items-center lg:grid-cols-2">
-        {/* Image first in the source and on the left at width — the page has
+        {/* Image first in the source and on the left at width - the page has
             just finished the story, and the product is what the last band is
             handing over to. `lg:order-*` is not needed: the natural order is
             already the reading order we want. */}

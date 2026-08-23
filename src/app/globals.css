@@ -3,15 +3,15 @@
 @tailwind utilities;
 
 /* ---------------------------------------------------------------------------
-   Vaishnavi Estate — design tokens.  Full spec in DESIGN.md.
+   Vaishnavi Estate - design tokens.  Full spec in DESIGN.md.
 
    Five colours, with roles assigned by measured contrast rather than taste:
 
-     Dark Brown  #341706  ink      — body, nav, UI, prices        16.5:1 on paper
-     Oxblood     #7B1526  accent   — display, links, buttons,
+     Dark Brown  #341706  ink      - body, nav, UI, prices        16.5:1 on paper
+     Oxblood     #7B1526  accent   - display, links, buttons,
                                      meta text, and the hairlines  10.6:1 on paper
-     Amber       #FFCF71  amber    — FILL ONLY / on-dark accent     1.5:1 on paper
-     White       #FFFFFF  paper    — ground, and text on fills
+     Amber       #FFCF71  amber    - FILL ONLY / on-dark accent     1.5:1 on paper
+     White       #FFFFFF  paper    - ground, and text on fills
 
    Four colours, not five: the old Light Brown (#8E3200) held both the meta
    text and the hairline hue at 8.1:1, and Oxblood does both jobs at 10.6:1.
@@ -20,7 +20,7 @@
    Two hard rules fall out of those numbers:
      1. Amber is never text on paper. It is a fill (carrying Dark Brown at
         11.3:1), or text on Dark Brown (11.3:1) / Oxblood (7.3:1).
-     2. Dark grounds take paper or amber only — Oxblood is invisible there
+     2. Dark grounds take paper or amber only - Oxblood is invisible there
         at 1.6:1.
 
    Single light theme by design; the warmth of this palette is the brand.
@@ -37,7 +37,7 @@
   --oxblood: #7b1526;
   --amber: #ffcf71;
 
-  /* Oxblood at 8% over paper — the product-image tile ground. */
+  /* Oxblood at 8% over paper - the product-image tile ground. */
   --tint: #f4ecee;
   --rule: rgba(123, 21, 38, 0.22);
   --wash: rgba(123, 21, 38, 0.06);
@@ -90,7 +90,7 @@
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxblood focus-visible:ring-offset-2 focus-visible:ring-offset-paper;
   }
 
-  /* On a dark ground oxblood disappears — amber is the visible focus ring. */
+  /* On a dark ground oxblood disappears - amber is the visible focus ring. */
   .on-dark {
     color: var(--paper);
   }
@@ -123,7 +123,7 @@
 @layer components {
   /* ---------------------------------------------------------------- layout */
 
-  /* Full bleed by design — the reference has no centred container, content
+  /* Full bleed by design - the reference has no centred container, content
      runs to the viewport edge with a consistent gutter. */
   .shell {
     width: 100%;
@@ -170,14 +170,14 @@
   }
 
   /* Display type carries the brand voice, so it defaults to oxblood. On dark
-     grounds callers override to amber — oxblood is invisible there. */
+     grounds callers override to amber - oxblood is invisible there. */
   .serif {
     @apply font-display font-normal text-oxblood;
   }
 
   /* Rule 2, applied to the type utilities. `.on-dark` in the base layer already
      promotes h1–h4 to amber, but each utility below sets its own colour in this
-     layer and would otherwise win on cascade order — leaving oxblood text at
+     layer and would otherwise win on cascade order - leaving oxblood text at
      1.6:1 on coal. Body-weight copy goes to paper (16.5:1), display and meta to
      amber (11.3:1). */
   .on-dark .body-mono,
@@ -192,7 +192,7 @@
     color: var(--amber);
   }
 
-  /* Section headings carry their collection size as a superscript numeral —
+  /* Section headings carry their collection size as a superscript numeral -
      "Hot off the Roaster⁶". A signature of the system. */
   .count-sup {
     font-size: 0.45em;
@@ -222,7 +222,7 @@
     @apply btn bg-amber text-ink hover:bg-ink hover:text-amber;
   }
 
-  /* Underlined text link with a trailing arrow — "VIEW ALL →". */
+  /* Underlined text link with a trailing arrow - "VIEW ALL →". */
   .link-arrow {
     @apply inline-flex items-center gap-2 font-mono text-ui uppercase tracking-ui text-oxblood underline decoration-rule decoration-1 underline-offset-[6px] transition-colors hover:decoration-oxblood;
   }
@@ -236,12 +236,12 @@
     @apply bg-ink text-paper;
   }
 
-  /* Product status flag — amber fill, ink text. */
+  /* Product status flag - amber fill, ink text. */
   .badge {
     @apply inline-flex items-center rounded-full bg-amber px-3 py-1 font-mono text-micro uppercase tracking-micro text-ink;
   }
 
-  /* Bare underlined field — newsletter, search. No box, no fill. */
+  /* Bare underlined field - newsletter, search. No box, no fill. */
   .field-bare {
     @apply w-full border-b border-rule bg-transparent py-2 font-mono text-ui uppercase tracking-ui text-ink focus-visible:border-oxblood focus-visible:ring-0;
   }

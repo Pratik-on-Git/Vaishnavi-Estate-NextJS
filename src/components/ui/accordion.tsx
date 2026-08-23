@@ -5,7 +5,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 
 /**
- * Rule-separated FAQ accordion — the "Find answers to your questions" block
+ * Rule-separated FAQ accordion - the "Find answers to your questions" block
  * in the reference. Kept to hairlines and a rotating plus, no card chrome.
  */
 export default function Accordion({

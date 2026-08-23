@@ -163,7 +163,7 @@ export type CartItem = {
   merchandise: {
     id: string;
     title: string;
-    /** Variant-level availability — a product can be sellable while a variant is not. */
+    /** Variant-level availability - a product can be sellable while a variant is not. */
     availableForSale?: boolean;
     price?: Money;
     selectedOptions: {
@@ -182,7 +182,7 @@ export type CartUserError = {
 };
 
 /**
- * A mutation Shopify accepted but altered — most commonly
+ * A mutation Shopify accepted but altered - most commonly
  * `MERCHANDISE_NOT_ENOUGH_STOCK`, where the requested quantity was clamped to
  * available inventory.
  */

@@ -6,7 +6,7 @@ import { contact, site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: `Questions about the beans, an order, or which roast to try next — write to ${site.name} at ${contact.email}.`,
+  description: `Questions about the beans, an order, or which roast to try next - write to ${site.name} at ${contact.email}.`,
   openGraph: { type: "website" },
 };
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
  * that divides every other pair of cells in the system; the two addresses and
  * the direct lines sit in a ruled band underneath.
  *
- * The form is the only client component on the page — the addresses are static
+ * The form is the only client component on the page - the addresses are static
  * copy from `site.ts`, so they render on the server and stay in the HTML for
  * crawlers and for anyone whose JavaScript never arrives.
  */
@@ -41,7 +41,7 @@ export default function ContactPage() {
           </div>
 
           {/* The divider is horizontal while the columns are stacked and
-              vertical once they sit side by side — it always separates them
+              vertical once they sit side by side - it always separates them
               along the axis they actually meet on. */}
           <div className="border-t border-rule px-[var(--gutter)] py-12 md:py-16 lg:border-l lg:border-t-0 lg:px-10">
             <ContactForm />

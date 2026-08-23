@@ -15,17 +15,17 @@ export type HeroVideoClip = {
  * plays to its natural end, the next one fades in underneath while it fades
  * out, and the sequence wraps back to the first clip indefinitely.
  *
- * Autoplay only works when the video is both `muted` and `playsInline` — every
+ * Autoplay only works when the video is both `muted` and `playsInline` - every
  * browser blocks it otherwise, so those are not optional. The native `loop`
  * attribute is deliberately never set: it would suppress the `ended` event
  * this component uses to trigger each crossfade.
  *
  * Two accessibility obligations come with an auto-playing loop, and this
  * component owns both:
- *   - `prefers-reduced-motion: reduce` stops playback entirely — no autoplay,
- *     no crossfade — and simply holds the first clip's opening frame.
+ *   - `prefers-reduced-motion: reduce` stops playback entirely - no autoplay,
+ *     no crossfade - and simply holds the first clip's opening frame.
  *   - WCAG 2.2.2 requires a way to stop motion that runs for more than five
- *     seconds, hence the visible toggle — icon-only, so it carries its state
+ *     seconds, hence the visible toggle - icon-only, so it carries its state
  *     through `aria-label` rather than visible text.
  *
  * Every clip is `aria-hidden`: none carries information the visually hidden
@@ -47,7 +47,7 @@ export default function HeroVideo({
     const video = videoRefs.current[index];
     if (!video) return;
     // Autoplay can still be refused (low power mode, data saver). Failing to
-    // start is not an error worth surfacing — the frame stays put.
+    // start is not an error worth surfacing - the frame stays put.
     video.play().then(
       () => setPlaying(true),
       () => setPlaying(false)
@@ -138,7 +138,7 @@ export default function HeroVideo({
         type="button"
         onClick={toggle}
         // The icon is the only content, so the accessible name has to come
-        // from aria-label rather than a visible/sr-only label — a sighted
+        // from aria-label rather than a visible/sr-only label - a sighted
         // and a screen-reader user both learn the current state the same way.
         aria-label={playing ? "Pause background video" : "Play background video"}
         aria-pressed={!playing}

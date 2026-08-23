@@ -44,7 +44,7 @@ function SubmitButton({
     );
   }
 
-  // A product can be sellable overall while the chosen variant is not — the
+  // A product can be sellable overall while the chosen variant is not - the
   // previous version only checked the product and happily added a sold-out
   // variant, which Shopify then rejected.
   if (!selectedVariant.availableForSale) {

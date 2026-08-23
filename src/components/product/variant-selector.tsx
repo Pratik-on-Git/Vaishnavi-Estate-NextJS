@@ -11,7 +11,7 @@ type Combination = {
 };
 
 /**
- * Variant picker (DESIGN.md §5). No chips, no boxes — a plain vertical list of
+ * Variant picker (DESIGN.md §5). No chips, no boxes - a plain vertical list of
  * radio glyphs and mono labels under a mono group heading. Unavailable
  * combinations are struck through as well as dimmed, so the state never relies
  * on colour alone.

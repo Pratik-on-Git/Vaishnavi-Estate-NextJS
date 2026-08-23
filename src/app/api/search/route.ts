@@ -41,7 +41,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
   const needle = q.toLocaleLowerCase();
 
-  // Products — already filtered by Shopify's search API
+  // Products - already filtered by Shopify's search API
   const products = rawProducts.slice(0, 6).map((p) => ({
     title: p.title,
     handle: p.handle,
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     altText: p.featuredImage?.altText ?? p.title,
   }));
 
-  // Collections — local filter on title + handle
+  // Collections - local filter on title + handle
   const collections = allCollections
     .filter(
       (c) =>
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     .slice(0, 4)
     .map((c) => ({ title: c.title, handle: c.handle }));
 
-  // Pages — local filter on title + handle
+  // Pages - local filter on title + handle
   const pages = allPages
     .filter(
       (p) =>

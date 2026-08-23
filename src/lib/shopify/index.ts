@@ -453,7 +453,7 @@ export class CartMutationError extends Error {
   }
 }
 
-/** Raised when the cart id no longer resolves — checked out, or expired. */
+/** Raised when the cart id no longer resolves - checked out, or expired. */
 export class CartNotFoundError extends Error {
   constructor() {
     super("Cart no longer exists");
@@ -462,7 +462,7 @@ export class CartNotFoundError extends Error {
 }
 
 function reshapeCart(cart: ShopifyCart): Cart {
-  // `cost` and `totalTaxAmount` are both nullable on the Storefront API — a
+  // `cost` and `totalTaxAmount` are both nullable on the Storefront API - a
   // brand-new cart has no tax until an address is attached. Rebuild the object
   // instead of mutating the response in place.
   const currencyCode =
@@ -707,8 +707,8 @@ function summarize(content: string, limit = 180): string | null {
 
 /**
  * Shopify serves articles at `/blogs/<blog>/<article>`; the storefront mirrors
- * that path exactly so links copied out of the admin — or already indexed by
- * search engines — resolve without a redirect.
+ * that path exactly so links copied out of the admin - or already indexed by
+ * search engines - resolve without a redirect.
  */
 function reshapeArticle(
   article: ShopifyArticle,

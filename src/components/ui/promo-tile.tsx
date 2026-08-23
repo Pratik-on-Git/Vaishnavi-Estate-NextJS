@@ -4,7 +4,7 @@ import clsx from "clsx";
 
 /**
  * Dark promo panel (DESIGN.md §5). A near-black photographic tile with the
- * label set in the display serif near the top — the one place in the system
+ * label set in the display serif near the top - the one place in the system
  * where flame type sits on a dark ground rather than white.
  *
  * `src` is optional: without estate photography the tile renders a coal panel

@@ -7,7 +7,7 @@ import { Headline } from "../ui/section";
 
 /**
  * Buy panel. Order follows how the decision is actually made: what it is, what
- * it costs, which size and grind, then the commitment — with the specification
+ * it costs, which size and grind, then the commitment - with the specification
  * table underneath so the detail never pushes the button below the fold.
  */
 

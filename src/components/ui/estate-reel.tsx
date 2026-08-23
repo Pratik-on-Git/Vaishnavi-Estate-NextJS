@@ -13,7 +13,7 @@ export type ReelItem = {
 };
 
 /**
- * The estate reel — four plates of estate footage read as one horizontal
+ * The estate reel - four plates of estate footage read as one horizontal
  * band, half stills and half silent loops.
  *
  * The stagger is height, not offset: tops align on the hairline grid and the
@@ -52,7 +52,7 @@ export default function EstateReel({
   }, []);
 
   // Autoplay can be refused outright (low power mode, data saver). That is not
-  // an error worth surfacing — the poster frame simply stays put.
+  // an error worth surfacing - the poster frame simply stays put.
   const safePlay = (video: HTMLVideoElement) => {
     video.play().catch(() => {});
   };

@@ -15,7 +15,7 @@ import { contact } from "@/lib/site";
  *
  * A server action rather than a route handler: the Admin token stays on the
  * server either way, but an action has no publicly documented URL to point a
- * script at, and it gives progressive enhancement for free — the form posts and
+ * script at, and it gives progressive enhancement for free - the form posts and
  * works with JavaScript disabled.
  */
 
@@ -59,7 +59,7 @@ const ContactSchema = z.object({
  * Naive per-instance throttle: five submissions per address per ten minutes.
  *
  * On serverless this is per-container, so it is a speed bump rather than a
- * guarantee — it stops a single browser hammering submit, not a distributed
+ * guarantee - it stops a single browser hammering submit, not a distributed
  * flood. Shopify's own rate limits and the honeypot below cover the rest; move
  * this to a shared store (KV/Redis) if enquiry spam ever becomes real.
  */
@@ -108,13 +108,13 @@ export async function submitContactMessage(
   // Answer with the success state rather than an error: an error teaches the
   // script what to avoid next time.
   if ((formData.get("company") as string)?.trim()) {
-    return { ok: true, message: "Thank you — we'll be in touch shortly." };
+    return { ok: true, message: "Thank you - we'll be in touch shortly." };
   }
 
   if (rateLimited(await clientKey())) {
     return {
       ok: false,
-      message: `That's a few messages in a row — give it a few minutes, or email us at ${contact.email}.`,
+      message: `That's a few messages in a row - give it a few minutes, or email us at ${contact.email}.`,
     };
   }
 
@@ -129,7 +129,7 @@ export async function submitContactMessage(
     const fieldErrors: Partial<Record<ContactFieldName, string>> = {};
     for (const issue of parsed.error.issues) {
       const field = issue.path[0] as ContactFieldName;
-      // First issue per field only — a stack of messages under one input is
+      // First issue per field only - a stack of messages under one input is
       // noise, and the first is always the one to fix.
       if (field && !fieldErrors[field]) fieldErrors[field] = issue.message;
     }
@@ -179,13 +179,13 @@ export async function submitContactMessage(
     } else {
       console.error("Contact form submission failed", error);
     }
-    // Never report success for a message that was not stored — the whole point
+    // Never report success for a message that was not stored - the whole point
     // of the form is that someone will read it.
     return { ok: false, message: GENERIC_FAILURE };
   }
 
   return {
     ok: true,
-    message: "Thank you — your message is with us. We usually reply within one business day.",
+    message: "Thank you - your message is with us. We usually reply within one business day.",
   };
 }

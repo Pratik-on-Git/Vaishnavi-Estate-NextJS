@@ -1,7 +1,7 @@
 import clsx from "clsx";
 
 /**
- * Formatted money. Renders a `<span>`, not a `<p>` — prices sit inline beside
+ * Formatted money. Renders a `<span>`, not a `<p>` - prices sit inline beside
  * titles, inside table cells and inside other inline runs throughout this
  * design, and a block-level `<p>` there is invalid nesting.
  *
@@ -32,7 +32,7 @@ const Price = ({
             currencyDisplay: "narrowSymbol",
             maximumFractionDigits: 2,
           }).format(value)
-        : "—"}
+        : "-"}
       {showCurrencyCode ? (
         <span className={clsx("ml-1 inline", currencyCodeClassName)}>
           {currencyCode}

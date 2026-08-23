@@ -37,7 +37,7 @@ export function Eyebrow({
 
 /**
  * Display heading. `count` renders as the superscript numeral that marks how
- * many products sit in the section below — a signature of this system.
+ * many products sit in the section below - a signature of this system.
  */
 export function Headline({
   children,

@@ -11,7 +11,7 @@ import { announcement, primaryNav, site } from "@/lib/site";
 import Link from "next/link";
 
 /**
- * Header (DESIGN.md §5): a scrolling announcement strip over a three-part nav —
+ * Header (DESIGN.md §5): a scrolling announcement strip over a three-part nav -
  * menu left, logo optically centred, utilities right. Hairline bottom, sticky
  * as one unit so `--header-h` stays the single offset for sticky children.
  */
@@ -30,7 +30,7 @@ export async function Navbar() {
 
   return (
     <header className="sticky top-0 z-[999] bg-paper">
-      {/* Inverted from the rest of the header: oxblood fill, paper text — the
+      {/* Inverted from the rest of the header: oxblood fill, paper text - the
           announcement strip is meant to read as a banner, not body copy. */}
       <div className="on-dark border-b border-ink/30 bg-ink py-2">
         <Marquee

@@ -9,7 +9,7 @@ import type {
 
 /**
  * Pure cart arithmetic and the optimistic reducer. Kept out of the React file
- * so the money handling can be reasoned about — and tested — on its own.
+ * so the money handling can be reasoned about - and tested - on its own.
  */
 
 export type UpdateType = "plus" | "minus" | "delete";
@@ -66,7 +66,7 @@ export function unitPriceMinor(item: CartItem): number {
 
 /**
  * The lines win over the cart envelope. On the very first add there is no
- * server cart, so the envelope is the placeholder from `createEmptyCart` — and
+ * server cart, so the envelope is the placeholder from `createEmptyCart` - and
  * reading its currency rendered the total in the placeholder currency while the
  * line prices used the store's real one.
  */
@@ -110,7 +110,7 @@ export function applyUpdate(
   );
 
   if (newQuantity === 0) return null;
-  // Already at the ceiling — hand back the same object so React can bail out.
+  // Already at the ceiling - hand back the same object so React can bail out.
   if (newQuantity === item.quantity) return item;
 
   const unit = unitPriceMinor(item);
@@ -214,7 +214,7 @@ export function cartReducer(
         )
         .filter((item): item is CartItem => item !== null);
 
-      // No `lines.length === 0` special case any more — recalculateCart zeroes
+      // No `lines.length === 0` special case any more - recalculateCart zeroes
       // subtotal, total AND tax. The old early return left subtotal and tax at
       // their pre-emptying values.
       return recalculateCart(currentCart, updatedLines);

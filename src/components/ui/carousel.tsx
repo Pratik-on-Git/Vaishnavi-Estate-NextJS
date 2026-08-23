@@ -9,7 +9,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * scrollable without any overlay chrome. Dots sit bottom-left, arrows
  * bottom-right.
  *
- * Native scrolling does the work — no transform tracking — so touch, trackpad,
+ * Native scrolling does the work - no transform tracking - so touch, trackpad,
  * keyboard and scrollbar all behave correctly for free.
  */
 export default function Carousel({

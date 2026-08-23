@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 /**
- * The hairline trail that opens a standalone editorial page — `HOME — ABOUT US`
+ * The hairline trail that opens a standalone editorial page - `HOME - ABOUT US`
  * centred in a full-bleed band, ruled top and bottom.
  *
  * It carries the same weight as an announcement strip rather than a nav: the

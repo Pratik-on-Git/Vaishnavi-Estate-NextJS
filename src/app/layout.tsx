@@ -33,8 +33,8 @@ const organizationJsonLd = {
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: `${site.name} — ${site.tagline}`,
-    template: `%s — ${site.name}`,
+    default: `${site.name} - ${site.tagline}`,
+    template: `%s - ${site.name}`,
   },
   description: site.description,
   icons: {
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: site.name,
-    title: `${site.name} — ${site.tagline}`,
+    title: `${site.name} - ${site.tagline}`,
     description: site.description,
   },
   twitter: {
@@ -64,7 +64,7 @@ export default async function RootLayout({
   const cartId = (await cookies()).get("cartId")?.value;
   // The promise is handed to a client component that unwraps it with `use()`,
   // so a rejection surfaces at the root and blanks the whole site. Degrade to
-  // an empty cart instead — every other page still works without one.
+  // an empty cart instead - every other page still works without one.
   const cart = getCart(cartId).catch((error) => {
     console.error("Failed to load cart", error);
     return undefined;

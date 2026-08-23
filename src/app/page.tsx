@@ -29,7 +29,7 @@ import {
 import Image from "next/image";
 
 export const metadata = {
-  title: `${site.name} — ${site.tagline}`,
+  title: `${site.name} - ${site.tagline}`,
   description: site.description,
   openGraph: { type: "website" },
 };
@@ -95,7 +95,7 @@ async function productsFrom(
     const fromCollection = await getCollectionProducts({ collection });
     if (fromCollection.length) return fromCollection;
   } catch {
-    // Collection does not exist on this store — fall through.
+    // Collection does not exist on this store - fall through.
   }
 
   try {
@@ -113,7 +113,7 @@ function Hero() {
       {/* `bg-coal` overrides the plate's light tint: the amber statement sits
           on this panel before the video paints, and amber needs a dark ground. */}
       <div className="plate relative aspect-[4/5] w-full overflow-hidden bg-coal sm:aspect-[16/10] lg:aspect-[16/8]">
-        {/* Leading slash matters on every clip — a bare filename resolves
+        {/* Leading slash matters on every clip - a bare filename resolves
             against the current route, so it would 404 on any page but "/".
             Coffee.mp4 opens the loop; each clip crossfades into the next,
             then the final clip crossfades back to Coffee.mp4. */}
@@ -133,7 +133,7 @@ function Hero() {
           aria-hidden
           className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-coal/70 to-transparent"
         />
-        {/* The statement rides across the lower third of the frame, in amber —
+        {/* The statement rides across the lower third of the frame, in amber -
             the palette's on-dark accent. Lifted off the very edge (rather than
             a bottom-0/percentage offset) so descenders never brush the plate's
             own clipping boundary, and pulled down from the previous offsets so
@@ -144,7 +144,7 @@ function Hero() {
             phrases={heroPhrases}
             size="hero"
             separator=""
-            // Slow, legible crawl — three short statements rather than one
+            // Slow, legible crawl - three short statements rather than one
             // long one repeated, so each gets a moment to actually be read.
             duration={50}
             className="text-amber"
@@ -152,7 +152,7 @@ function Hero() {
         </div>
       </div>
       <h1 className="sr-only">
-        {site.name} — {site.tagline}
+        {site.name} - {site.tagline}
       </h1>
     </section>
   );
@@ -245,7 +245,7 @@ function PromoPair() {
  * states the position and the plates below are the evidence for it, so a
  * hairline between them would read as a change of subject.
  *
- * The head is deliberately not `SectionHead` — every product rail on this
+ * The head is deliberately not `SectionHead` - every product rail on this
  * page opens centred, and holding this one to a left-hung asymmetric column
  * is what marks it as the page's editorial pause rather than another rail.
  */

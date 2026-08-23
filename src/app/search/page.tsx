@@ -48,7 +48,7 @@ export default async function SearchPage({
           <p className="serif text-display-md">Nothing on this shelf yet</p>
           <p className="body-mono mx-auto mt-4 max-w-measure">
             {searchValue
-              ? "Try a broader term — a roast level, a brew method, or simply “Robusta”."
+              ? "Try a broader term - a roast level, a brew method, or simply “Robusta”."
               : "The current harvest is being listed. Check back shortly."}
           </p>
           <Link href="/search" className="btn-outline mt-8">

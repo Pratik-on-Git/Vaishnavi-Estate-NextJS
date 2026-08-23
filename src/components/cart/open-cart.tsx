@@ -1,7 +1,7 @@
 import clsx from "clsx";
 
 /**
- * Cart affordance. Word plus count rather than an icon badge — it matches the
+ * Cart affordance. Word plus count rather than an icon badge - it matches the
  * "CART (3)" treatment in the reference navigation and reads without decoding.
  */
 export default function OpenCart({

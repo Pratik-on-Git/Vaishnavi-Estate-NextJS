@@ -55,7 +55,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
 
   if (!article) return notFound();
 
-  // Siblings from the same blog, minus this post — the "keep reading" rail.
+  // Siblings from the same blog, minus this post - the "keep reading" rail.
   const blog = await getBlog(article.blogHandle, 8).catch(() => undefined);
   const related =
     blog?.articles.filter((item) => item.id !== article.id).slice(0, 3) ?? [];

@@ -6,9 +6,9 @@ import clsx from "clsx";
  * from assistive tech.
  *
  * Three sizes carry three jobs in the system (DESIGN.md §5):
- *   `ui`      — the announcement strip and the shipping band, mono.
- *   `display` — the "Brew of the Month" bands, serif at heading scale.
- *   `hero`    — the giant statement over the hero image and in the footer.
+ *   `ui`      - the announcement strip and the shipping band, mono.
+ *   `display` - the "Brew of the Month" bands, serif at heading scale.
+ *   `hero`    - the giant statement over the hero image and in the footer.
  */
 export default function Marquee({
   phrases,
@@ -31,8 +31,8 @@ export default function Marquee({
     ui: "font-mono text-ui uppercase tracking-ui",
     display: "font-display text-display-md",
     // `leading-none` (line-height: 1) sets the line box tighter than
-    // Instrument Serif's actual descent, so glyphs with descenders — the "g"
-    // in "Coorg", the "y" in "Every" — render below the box and get clipped
+    // Instrument Serif's actual descent, so glyphs with descenders - the "g"
+    // in "Coorg", the "y" in "Every" - render below the box and get clipped
     // by this wrapper's own `overflow-hidden` (needed to hide the duplicated
     // track). A touch of headroom fixes it without loosening the set visibly.
     hero: "font-display text-display-hero leading-[1.15]",

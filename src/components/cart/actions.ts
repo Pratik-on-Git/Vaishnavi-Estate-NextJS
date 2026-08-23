@@ -22,7 +22,7 @@ const CART_COOKIE = "cartId";
 
 // One year. Shopify carts themselves expire after ~10 days of inactivity; the
 // cookie outliving the cart is fine because every action recovers from a dead
-// cart id, but a *session* cookie is not — it drops the cart when the browser
+// cart id, but a *session* cookie is not - it drops the cart when the browser
 // closes, which is the common "my cart vanished" report.
 const CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
@@ -81,7 +81,7 @@ function clampQuantity(quantity: number): number {
 
 /**
  * Quantity 0 legitimately means "remove this line", so a malformed quantity
- * must be rejected outright rather than clamped — clamping NaN to 0 would turn
+ * must be rejected outright rather than clamped - clamping NaN to 0 would turn
  * a corrupt payload into a silent deletion.
  */
 function isUsableQuantity(quantity: unknown): quantity is number {
@@ -112,7 +112,7 @@ function describeWarnings(warnings: CartWarning[]): string {
     (warning) => warning.code === "MERCHANDISE_NOT_ENOUGH_STOCK"
   );
   return stockWarning
-    ? "Limited stock — your cart was set to the quantity still available."
+    ? "Limited stock - your cart was set to the quantity still available."
     : "";
 }
 
@@ -213,7 +213,7 @@ export async function updateItemQuantity(
     const { cartId, cart } = await resolveCart();
 
     if (!cartId || !cart) {
-      // Nothing to update against, and nothing was lost — the cart is already
+      // Nothing to update against, and nothing was lost - the cart is already
       // empty from the customer's point of view.
       updateTag(TAGS.cart);
       return quantity === 0
@@ -288,6 +288,6 @@ export async function removeItem(
 // `createCartAndSetCookie` used to live here and was called from an effect in
 // the cart modal. It is gone deliberately: `addItem` now creates the cart
 // inside the same action that adds the line, so pre-creation bought nothing
-// while minting a Shopify cart for every visitor — and every exported Server
+// while minting a Shopify cart for every visitor - and every exported Server
 // Action is a publicly callable endpoint, so an unused one is a free way for
 // anyone to create carts in bulk.

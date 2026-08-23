@@ -50,7 +50,7 @@ function useSearchSubmit(onDone?: () => void) {
 }
 
 // ---------------------------------------------------------------------------
-// SearchBar — inline bar used in the mobile sidebar.
+// SearchBar - inline bar used in the mobile sidebar.
 // Results render inline (no floating box) so they flow inside the drawer.
 // ---------------------------------------------------------------------------
 export function SearchBar({
@@ -103,7 +103,7 @@ export function SearchBar({
         />
       </form>
 
-      {/* Inline results — flows naturally inside the drawer, no box-in-box */}
+      {/* Inline results - flows naturally inside the drawer, no box-in-box */}
       {showResults && (
         <SearchResults
           query={query}
@@ -118,7 +118,7 @@ export function SearchBar({
 }
 
 // ---------------------------------------------------------------------------
-// SearchTrigger — navbar affordance; opens the full-width overlay
+// SearchTrigger - navbar affordance; opens the full-width overlay
 // ---------------------------------------------------------------------------
 export default function SearchTrigger() {
   const [isOpen, setIsOpen] = useState(false);
@@ -186,7 +186,7 @@ export default function SearchTrigger() {
                   <SearchOverlayForm onDone={() => setIsOpen(false)} />
                 </div>
 
-                {/* Browse by brew pills — only shown when there is no query */}
+                {/* Browse by brew pills - only shown when there is no query */}
               </div>
             </DialogPanel>
           </TransitionChild>
@@ -197,7 +197,7 @@ export default function SearchTrigger() {
 }
 
 // ---------------------------------------------------------------------------
-// SearchOverlayForm — large controlled input inside the overlay dialog.
+// SearchOverlayForm - large controlled input inside the overlay dialog.
 // Results are rendered inline below the input (NO floating card).
 // The "Browse by brew" pills are shown only when the input is empty.
 // ---------------------------------------------------------------------------
@@ -252,7 +252,7 @@ function SearchOverlayForm({ onDone }: { onDone: () => void }) {
         />
       </form>
 
-      {/* Inline results — no card, no shadow, part of the overlay content */}
+      {/* Inline results - no card, no shadow, part of the overlay content */}
       {showResults && (
         <SearchResults
           query={query}
@@ -263,7 +263,7 @@ function SearchOverlayForm({ onDone }: { onDone: () => void }) {
         />
       )}
 
-      {/* Browse-by-brew pills — visible only when input is empty */}
+      {/* Browse-by-brew pills - visible only when input is empty */}
       {showBrowse && (
         <div className="mt-10">
           <p className="eyebrow mb-4">Browse by brew</p>
@@ -287,7 +287,7 @@ function SearchOverlayForm({ onDone }: { onDone: () => void }) {
 }
 
 // ---------------------------------------------------------------------------
-// SearchSkeleton — used in Suspense fallbacks
+// SearchSkeleton - used in Suspense fallbacks
 // ---------------------------------------------------------------------------
 export function SearchSkeleton() {
   return (

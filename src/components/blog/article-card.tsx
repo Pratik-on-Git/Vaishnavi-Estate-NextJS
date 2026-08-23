@@ -3,7 +3,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import { Article } from "@/lib/shopify/types";
 
-/** Shopify articles carry no image until one is uploaded — fall back to the
+/** Shopify articles carry no image until one is uploaded - fall back to the
  *  house plate art rather than collapsing the card's aspect ratio. */
 const FALLBACK_IMAGES = [
   "/sales-collection.png",

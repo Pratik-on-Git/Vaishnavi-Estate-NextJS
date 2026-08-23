@@ -4,7 +4,7 @@
  * Every piece of editorial copy on the marketing surfaces lives here rather
  * than being inlined in JSX, so the voice can be revised in one pass without
  * touching layout. Commerce data (products, collections, prices) still comes
- * from Shopify — this file only covers the storytelling around it.
+ * from Shopify - this file only covers the storytelling around it.
  */
 
 export const site = {
@@ -23,7 +23,7 @@ export const site = {
 
 /**
  * Rotating hero-marquee statements. Kept as short, distinct lines rather than
- * one long sentence — at hero scale a single run-on phrase reads as a blur by
+ * one long sentence - at hero scale a single run-on phrase reads as a blur by
  * the time it's midway across the frame, where three short ones each get a
  * moment to actually be read.
  */
@@ -115,7 +115,7 @@ export const promoTiles = [
 
 /** Centred statement set in the display serif above the about rail. */
 export const aboutStatement =
-  "Vaishnavi Estate started with a simple idea: great mornings begin with great coffee. We believe coffee should be fresh, honest, and something you actually look forward to drinking — every single day.";
+  "Vaishnavi Estate started with a simple idea: great mornings begin with great coffee. We believe coffee should be fresh, honest, and something you actually look forward to drinking - every single day.";
 
 /** Alternating text cells in the about carousel. */
 export const aboutCards = [
@@ -124,7 +124,7 @@ export const aboutCards = [
   "Every cherry is picked by hand at peak ripeness, pulped the same evening, and dried on raised beds where air reaches it from every side. Nothing touches tarmac.",
 ] as const;
 
-/** Guides teaser — image right, copy left. */
+/** Guides teaser - image right, copy left. */
 export const guidesFeature = {
   eyebrow: "Guides",
   title: "Pouring the perfect cup",
@@ -155,13 +155,13 @@ export const journalPosts = [
     slug: "morning-coffee-routine",
     title: "Morning Coffee: Make It Part of Your Routine",
     excerpt:
-      "For many of us, mornings are a blur of alarms, emails and scrambling out the door. But what if your coffee wasn't just fuel — it was a moment to pau...",
+      "For many of us, mornings are a blur of alarms, emails and scrambling out the door. But what if your coffee wasn't just fuel - it was a moment to pau...",
   },
   {
     slug: "upgrade-your-home-coffee",
     title: "5 Easy Ways to Upgrade Your Home Coffee Game",
     excerpt:
-      "You don't need a café setup — or a counter full of fancy gear — to make great coffee at home. A few small tweaks can make a big difference in flavour, f...",
+      "You don't need a café setup - or a counter full of fancy gear - to make great coffee at home. A few small tweaks can make a big difference in flavour, f...",
   },
 ] as const;
 
@@ -217,7 +217,7 @@ export const faqs = [
   {
     question: "Which roast level should I start with?",
     answer:
-      "Medium is the honest introduction to the estate — it carries the cocoa and dried-fruit notes without the smoke. Choose dark if you drink with milk or brew South Indian filter, and light if you want the fruit acidity forward in a pourover.",
+      "Medium is the honest introduction to the estate - it carries the cocoa and dried-fruit notes without the smoke. Choose dark if you drink with milk or brew South Indian filter, and light if you want the fruit acidity forward in a pourover.",
   },
   {
     question: "Do you ship outside India?",
@@ -269,7 +269,7 @@ export const socialLinks = [
  * the contact page so the footer, the JSON-LD in `layout.tsx` and any future
  * order-confirmation copy can all read the same source.
  *
- * `phoneHref` is the E.164 form for `tel:` — the display string keeps the
+ * `phoneHref` is the E.164 form for `tel:` - the display string keeps the
  * spacing a person would read aloud.
  */
 export const contact = {
@@ -305,7 +305,7 @@ export const contact = {
 /* ----------------------------------------------------------------- heritage */
 
 /**
- * Photography for `/about-us`, served from the store's own Shopify CDN — the same
+ * Photography for `/about-us`, served from the store's own Shopify CDN - the same
  * host `estateReel` uses and already allowed in `next.config.js`.
  *
  * All three are product and lifestyle frames rather than estate landscapes or
@@ -315,23 +315,23 @@ export const contact = {
  * the four people who worked it. Those stay type-led until real archive and
  * portrait frames exist.
  *
- * `aspect` is the native ratio of the source file — placements crop from it
+ * `aspect` is the native ratio of the source file - placements crop from it
  * rather than the other way round, so nothing important sits outside the frame.
  */
 export const aboutImages = {
-  /** Square. Tray, press and a cup outdoors — the closest thing here to place. */
+  /** Square. Tray, press and a cup outdoors - the closest thing here to place. */
   morning: {
     src: "https://vaishnaviestate.com/cdn/shop/files/genericwithblackcoffee.jpg?v=1781080798&width=1200",
     alt: "A Vaishnavi Estate Robusta pouch on a wooden tray beside a French press and a green cup of black coffee, set outdoors among flowering shrubs.",
     aspect: "1/1",
   },
-  /** Square. Ground Robusta in a brass bowl — the bean the section argues for. */
+  /** Square. Ground Robusta in a brass bowl - the bean the section argues for. */
   grounds: {
     src: "https://vaishnaviestate.com/cdn/shop/files/vc_mobile-homebanner_two.jpg?v=1740020233&width=1200",
     alt: "A Dark Roast Robusta pouch beside a brass bowl heaped with freshly ground coffee and loose beans on a wooden board.",
     aspect: "1/1",
   },
-  /** Portrait 2:3. The pouch as hero — the shop hand-off at the foot of the page. */
+  /** Portrait 2:3. The pouch as hero - the shop hand-off at the foot of the page. */
   pouch: {
     src: "https://vaishnaviestate.com/cdn/shop/files/E.jpg?v=1778501317&width=1600",
     alt: "A Vaishnavi Estate Green Coffee pouch of single-origin Robusta standing on a wooden stool, framed by houseplants in warm daylight.",
@@ -343,14 +343,14 @@ export const aboutImages = {
  * The About page, section by section. Each block below is one band on
  * `/about-us`; the page itself only decides layout.
  *
- * The timeline is the spine of the page — five dates, each one a decision
+ * The timeline is the spine of the page - five dates, each one a decision
  * that still shows up in the cup. Kept as data so a sixth entry is a one-line
  * change rather than a layout edit.
  */
 export const heritage = {
   eyebrow: "Heritage",
   title: "Four generations. One hillside.",
-  body: "From a bullock cart in 1909 to your kitchen today — the same family, the same land, refined over a hundred years.",
+  body: "From a bullock cart in 1909 to your kitchen today - the same family, the same land, refined over a hundred years.",
   timeline: [
     {
       year: "1909",
@@ -360,17 +360,17 @@ export const heritage = {
     {
       year: "1928",
       title: "Purchased a 200-acre estate",
-      body: "After two decades of trading, Kunhikannan buys a 200-acre estate in Perumbubetta, Pollibetta — the land that still grows our coffee today.",
+      body: "After two decades of trading, Kunhikannan buys a 200-acre estate in Perumbubetta, Pollibetta - the land that still grows our coffee today.",
     },
     {
       year: "1956",
       title: "Built Coorg's first cinema",
-      body: "Shanta Picture Palace opens in Virajpet — the first permanent movie theatre in the district. Coffee, community, cinema.",
+      body: "Shanta Picture Palace opens in Virajpet - the first permanent movie theatre in the district. Coffee, community, cinema.",
     },
     {
       year: "1985",
       title: "Vaishnavi Estate is formed",
-      body: "C.P. Prakash, the youngest of six sons, formally establishes Vaishnavi Estate as we know it today — a working plantation rooted in family.",
+      body: "C.P. Prakash, the youngest of six sons, formally establishes Vaishnavi Estate as we know it today - a working plantation rooted in family.",
     },
     {
       year: "2020",
@@ -382,13 +382,13 @@ export const heritage = {
 
 /**
  * The Robusta argument. Four figures, then the head-to-head table that backs
- * them — the numbers are the whole point of the section, so they are set at
+ * them - the numbers are the whole point of the section, so they are set at
  * display scale rather than buried in a paragraph.
  */
 export const whyRobusta = {
   eyebrow: "Why Robusta",
   title: "Why should Robusta play second fiddle?",
-  body: "Two-thirds of India's coffee is Robusta — and yet the world keeps calling it the lesser bean. We've spent four generations proving otherwise.",
+  body: "Two-thirds of India's coffee is Robusta - and yet the world keeps calling it the lesser bean. We've spent four generations proving otherwise.",
   stats: [
     {
       value: "2.7x",
@@ -408,7 +408,7 @@ export const whyRobusta = {
     {
       value: "0L",
       label: "Water used in processing",
-      note: "Natural dry process — every bean",
+      note: "Natural dry process - every bean",
     },
   ],
   comparison: [
@@ -427,7 +427,7 @@ export const farmToCup = {
   steps: [
     {
       title: "Shade Grown",
-      body: "Our coffee grows under silver oak and native canopy — slower ripening, deeper flavour, healthier soil.",
+      body: "Our coffee grows under silver oak and native canopy - slower ripening, deeper flavour, healthier soil.",
     },
     {
       title: "Hand Harvested",
@@ -435,15 +435,15 @@ export const farmToCup = {
     },
     {
       title: "Natural, Water-Free",
-      body: "We dry our cherries under the Coorg sun — zero water in processing, even during the rains.",
+      body: "We dry our cherries under the Coorg sun - zero water in processing, even during the rains.",
     },
     {
       title: "German Roasted",
-      body: "Roasted on world-leading Probat machines, profile by profile, batch by batch — never compromised.",
+      body: "Roasted on world-leading Probat machines, profile by profile, batch by batch - never compromised.",
     },
     {
       title: "Ground After You Order",
-      body: "Whole beans rest until your order arrives — only then do we grind, pack and ship. Fresh, every time.",
+      body: "Whole beans rest until your order arrives - only then do we grind, pack and ship. Fresh, every time.",
     },
   ],
 } as const;
@@ -451,11 +451,11 @@ export const farmToCup = {
 export const sustainability = {
   eyebrow: "Sustainability",
   title: ["We farm like the land has to last", "another hundred years."],
-  body: "Because it does. Our great-grandfather planted on this hillside in 1928 — and our grandchildren will pick from the same trees.",
+  body: "Because it does. Our great-grandfather planted on this hillside in 1928 - and our grandchildren will pick from the same trees.",
   pillars: [
     {
       title: "Less pesticide",
-      body: "Robusta is naturally hardy — we use a fraction of what other varieties demand.",
+      body: "Robusta is naturally hardy - we use a fraction of what other varieties demand.",
     },
     {
       title: "Water conservation",
@@ -467,7 +467,7 @@ export const sustainability = {
     },
     {
       title: "Local employment",
-      body: "Hired, trained and supported from villages around the estate — for generations.",
+      body: "Hired, trained and supported from villages around the estate - for generations.",
     },
   ],
 } as const;
@@ -492,7 +492,7 @@ export const family = {
       name: "C.P. Prakash",
       generation: "2nd Generation",
       credential: "BA, LLB",
-      body: "Lawyer, builder, and the one who gave Vaishnavi Estate its name — in 1985.",
+      body: "Lawyer, builder, and the one who gave Vaishnavi Estate its name - in 1985.",
     },
     {
       name: "Mridhul Prakash",
@@ -503,7 +503,7 @@ export const family = {
     {
       name: "Neel M Prakash",
       generation: "4th Generation",
-      credential: "BS (Business) — Miami U (Oxford)",
+      credential: "BS (Business) - Miami U (Oxford)",
       body: "Growing up with the plantation. Already in the cherry rows. Helping build the future one cup at a time.",
     },
   ],
@@ -514,14 +514,14 @@ export const familyNote = {
   eyebrow: "A note from the family",
   title: "We've literally lived and breathed coffee.",
   body: [
-    "We've drunk our own beans for as long as we can remember. And we wanted to share what we love, directly with you — no middlemen, no shortcuts.",
-    "Hope you enjoy our coffee. If you do, please tell a friend and come back for more. If for any reason you don't — we'll make it right.",
+    "We've drunk our own beans for as long as we can remember. And we wanted to share what we love, directly with you - no middlemen, no shortcuts.",
+    "Hope you enjoy our coffee. If you do, please tell a friend and come back for more. If for any reason you don't - we'll make it right.",
   ],
   signature: "Mridhul Prakash",
   signatureRole: "Designated Partner · Vaishnavi Coffees LLP",
 } as const;
 
-/** Closing band on `/about-us` — the one place the story hands off to the shop. */
+/** Closing band on `/about-us` - the one place the story hands off to the shop. */
 export const aboutCta = {
   eyebrow: "Single Origin · Robusta",
   title: ["Taste coffee with", "real roots."],
@@ -531,7 +531,7 @@ export const aboutCta = {
 } as const;
 
 /**
- * Estate philosophy band — the brand's own statement of intent, set as an
+ * Estate philosophy band - the brand's own statement of intent, set as an
  * asymmetric two-column block rather than the centred `SectionHead` the
  * product rails use. `title` is split into lines deliberately: at
  * `display-xl` the break lands where the sentence breathes, which balance
@@ -542,7 +542,7 @@ export const estatePhilosophy = {
   title: ["We believe coffee", " is an art form"],
   /**
    * Three paragraphs rather than one: the opening states the position, and
-   * the two that follow are what earn it — the practice, then the people.
+   * the two that follow are what earn it - the practice, then the people.
    * Kept as an array so the section can space them without `<br />`.
    */
   body: [
@@ -558,7 +558,7 @@ export const estatePhilosophy = {
  * and an italic serif line.
  *
  * `kind: "video"` cells autoplay muted and carry the LIVE badge; they are
- * decorative, so they take no alt text. Stills do — they carry information
+ * decorative, so they take no alt text. Stills do - they carry information
  * the captions only allude to.
  */
 export const estateReel = [

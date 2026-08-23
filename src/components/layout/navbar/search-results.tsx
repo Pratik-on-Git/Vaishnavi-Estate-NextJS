@@ -13,9 +13,9 @@ type Props = {
   isLoading: boolean;
   onSelect: (href: string) => void;
   /**
-   * "inline"  — results flow as part of the document (inside modals/drawers).
+   * "inline"  - results flow as part of the document (inside modals/drawers).
    *             No floating box, no shadow, no absolute positioning.
-   * "dropdown" — floating card anchored below the input (future use for an
+   * "dropdown" - floating card anchored below the input (future use for an
    *              always-visible page-level search bar).
    */
   variant?: "inline" | "dropdown";

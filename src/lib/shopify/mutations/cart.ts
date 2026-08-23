@@ -3,7 +3,7 @@ import cartFragment from "../fragments/cart";
 /**
  * Every cart mutation selects `userErrors` and `warnings`. Shopify answers a
  * rejected mutation with HTTP 200, no top-level `errors`, `cart: null` and the
- * reason in `userErrors` — without selecting it the failure is invisible and
+ * reason in `userErrors` - without selecting it the failure is invisible and
  * the reshape step blows up on the null cart.
  */
 const cartMutationResultFragment = /* GraphQL */ `

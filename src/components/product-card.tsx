@@ -8,7 +8,7 @@ import { Product } from "@/lib/shopify/types";
 /**
  * Product cell (DESIGN.md §5). A packshot on the mist tile with a status badge
  * inset top-left, then a single mono row: title left, price right. Cards carry
- * no border of their own — they sit flush inside the hairline grid, which owns
+ * no border of their own - they sit flush inside the hairline grid, which owns
  * the dividing rules.
  */
 
@@ -68,7 +68,7 @@ export default function ProductCard({
           </div>
         )}
 
-        {/* Availability outranks a marketing tag — never flag a sold-out bag
+        {/* Availability outranks a marketing tag - never flag a sold-out bag
             as "New!". */}
         {!product.availableForSale || badge ? (
           <span className="absolute left-4 top-4">

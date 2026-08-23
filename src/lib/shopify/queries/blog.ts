@@ -4,7 +4,7 @@ import seoFragment from "../fragments/seo";
 /**
  * Article shape used by every blog surface. `content` is the plain-text body,
  * used to synthesise an excerpt when the merchant left the excerpt field empty
- * — Shopify returns "" rather than null there. Rendered HTML (`contentHtml`)
+ * - Shopify returns "" rather than null there. Rendered HTML (`contentHtml`)
  * is pulled only on the detail query.
  */
 const articleFragment = /* GraphQL */ `

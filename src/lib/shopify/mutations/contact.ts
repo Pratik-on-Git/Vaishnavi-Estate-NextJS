@@ -9,7 +9,7 @@
  *     question, which would pollute segments and marketing lists;
  *   - it is queryable and exportable later, where an email is not.
  *
- * The definition must exist in the store before this mutation succeeds — see
+ * The definition must exist in the store before this mutation succeeds - see
  * the setup notes in README/DESIGN for the field keys it expects.
  */
 export const createContactMessageMutation = /* GraphQL */ `
