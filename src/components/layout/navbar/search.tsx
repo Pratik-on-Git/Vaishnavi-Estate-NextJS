@@ -18,6 +18,8 @@ import {
 } from "react";
 import clsx from "clsx";
 import { brewFormats } from "@/lib/site";
+import { shopCategories } from "@/lib/menu";
+import type { Menu } from "@/lib/shopify/types";
 import { useInstantSearch } from "@/hooks/use-instant-search";
 import SearchResults from "./search-results";
 
@@ -120,7 +122,7 @@ export function SearchBar({
 // ---------------------------------------------------------------------------
 // SearchTrigger - navbar affordance; opens the full-width overlay
 // ---------------------------------------------------------------------------
-export default function SearchTrigger() {
+export default function SearchTrigger({ menu = [] }: { menu?: Menu[] }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -183,7 +185,10 @@ export default function SearchTrigger() {
 
                 {/* Overlay search form + inline results */}
                 <div className="mt-6">
-                  <SearchOverlayForm onDone={() => setIsOpen(false)} />
+                  <SearchOverlayForm
+                    menu={menu}
+                    onDone={() => setIsOpen(false)}
+                  />
                 </div>
 
                 {/* Browse by brew pills - only shown when there is no query */}
@@ -201,7 +206,13 @@ export default function SearchTrigger() {
 // Results are rendered inline below the input (NO floating card).
 // The "Browse by brew" pills are shown only when the input is empty.
 // ---------------------------------------------------------------------------
-function SearchOverlayForm({ onDone }: { onDone: () => void }) {
+function SearchOverlayForm({
+  menu,
+  onDone,
+}: {
+  menu: Menu[];
+  onDone: () => void;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const onSubmit = useSearchSubmit(onDone);
@@ -209,7 +220,17 @@ function SearchOverlayForm({ onDone }: { onDone: () => void }) {
   const [query, setQuery] = useState(searchParams?.get("q") || "");
   const { results, hasResults, isLoading } = useInstantSearch(query);
   const showResults = !!query.trim() && (hasResults || isLoading);
-  const showBrowse = !query.trim();
+  // The Shopify menu's own shopping categories, so the pills track what the
+  // merchant actually publishes. `brewFormats` remains the fallback for a
+  // store whose menu has no nested collection list yet.
+  const categories = shopCategories(menu);
+  const browse = categories.length
+    ? categories.map((item) => ({ title: item.title, href: item.path }))
+    : brewFormats.map((format) => ({
+        title: format.title,
+        href: `/search/${format.handle}`,
+      }));
+  const showBrowse = !query.trim() && browse.length > 0;
 
   function handleSelect(href: string) {
     setQuery("");
@@ -266,16 +287,16 @@ function SearchOverlayForm({ onDone }: { onDone: () => void }) {
       {/* Browse-by-brew pills - visible only when input is empty */}
       {showBrowse && (
         <div className="mt-10">
-          <p className="eyebrow mb-4">Browse by brew</p>
+          <p className="eyebrow mb-4">Browse by collection</p>
           <ul className="flex flex-wrap gap-2">
-            {brewFormats.map((format) => (
-              <li key={format.handle}>
+            {browse.map((item) => (
+              <li key={item.href}>
                 <a
-                  href={`/search/${format.handle}`}
+                  href={item.href}
                   onClick={() => onDone()}
                   className="pill text-display-sm"
                 >
-                  {format.title}
+                  {item.title}
                 </a>
               </li>
             ))}

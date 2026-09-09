@@ -6,6 +6,7 @@ import SearchTrigger from "./search";
 import LogoSquare from "@/components/logo-square";
 import CartModal from "@/components/cart/modal";
 import Marquee from "@/components/ui/marquee";
+import HeaderHeight from "./header-height";
 import { getCustomerSession } from "@/lib/customer-account";
 import { announcement, primaryNav, site } from "@/lib/site";
 import Link from "next/link";
@@ -16,20 +17,27 @@ import Link from "next/link";
  * as one unit so `--header-h` stays the single offset for sticky children.
  */
 export async function Navbar() {
-  const shopifyMenu = await getMenu("vaishnavi-estate-nextjs-menu").catch(
-    (error) => {
+  // Read straight from this store's own menu handle. Resolving across a list
+  // of candidate handles was tried and reverted: Shopify's default
+  // "main-menu" exists on most stores and would shadow the one this site is
+  // actually built against.
+  const [shopifyMenu, customerSession] = await Promise.all([
+    getMenu("vaishnavi-estate-nextjs-menu").catch((error) => {
       console.error("Failed to load the Shopify navigation", error);
       return [] as Menu[];
-    }
-  );
-  const customerSession = await getCustomerSession();
+    }),
+    getCustomerSession(),
+  ]);
 
   // Shopify owns the menu when it is configured; the site config is the
   // fallback so the nav is never empty on a fresh store.
   const menu: Menu[] = shopifyMenu.length ? shopifyMenu : primaryNav;
 
   return (
-    <header className="sticky top-0 z-[999] bg-paper">
+    <header data-site-header className="sticky top-0 z-[999] bg-paper">
+      {/* Measures the header and republishes `--header-h`, which the sticky
+          shop bar and sidebar offset themselves by. */}
+      <HeaderHeight />
       {/* Inverted from the rest of the header: oxblood fill, paper text - the
           announcement strip is meant to read as a banner, not body copy. */}
       <div className="on-dark border-b border-ink/30 bg-ink py-2">
@@ -64,7 +72,7 @@ export async function Navbar() {
 
           {/* Right rail */}
           <div className="flex items-center gap-6">
-            <SearchTrigger />
+            <SearchTrigger menu={menu} />
             <Link
               href={
                 customerSession.isAuthenticated

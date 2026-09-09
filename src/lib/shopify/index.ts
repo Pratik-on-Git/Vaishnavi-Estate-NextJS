@@ -19,6 +19,11 @@ import {
 } from "./queries/collection";
 import { getMenuQuery } from "./queries/menu";
 import {
+  getCatalogQuery,
+  getCollectionOrderQuery,
+  searchCatalogQuery,
+} from "./queries/catalog";
+import {
   getProductQuery,
   getProductRecommendationsQuery,
   getProductsQuery,
@@ -30,6 +35,7 @@ import {
   Cart,
   CartUserError,
   CartWarning,
+  CatalogProduct,
   Collection,
   Connection,
   Image,
@@ -44,8 +50,11 @@ import {
   ShopifyBlogOperation,
   ShopifyBlogsOperation,
   ShopifyCart,
+  ShopifyCatalogOperation,
+  ShopifyCatalogProduct,
   ShopifyCartOperation,
   ShopifyCollection,
+  ShopifyCollectionOrderOperation,
   ShopifyCollectionProductsOperation,
   ShopifyCollectionsOperation,
   ShopifyCreateCartOperation,
@@ -56,6 +65,7 @@ import {
   ShopifyProductOperation,
   ShopifyProductRecommendationsOperation,
   ShopifyProductsOperation,
+  ShopifySearchCatalogOperation,
   ShopifySearchProductsOperation,
   ShopifyRemoveFromCartOperation,
   ShopifyUpdateCartOperation,
@@ -75,6 +85,29 @@ const domain = process.env.SHOPIFY_STORE_DOMAIN
   : "";
 const endpoint = `${domain}${SHOPIFY_GRAPHQL_API_ENDPOINT}`;
 const key = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
+
+/**
+ * Next and React signal control flow by throwing: the dynamic-rendering
+ * bailout, `notFound()`, `redirect()`. Those errors carry a `digest` and MUST
+ * reach the framework untouched - a `catch` that swallows one can leave a
+ * route statically rendered with the data it was about to fetch missing, and
+ * the failure is silent.
+ *
+ * Every Shopify call in this app sits behind a `catch` that degrades to empty
+ * data, so the check belongs at the bottom of the stack.
+ */
+export function isFrameworkControlFlowError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) return false;
+  const digest = (error as { digest?: unknown }).digest;
+  if (typeof digest !== "string") return false;
+
+  return (
+    digest === "DYNAMIC_SERVER_USAGE" ||
+    digest === "NEXT_NOT_FOUND" ||
+    digest.startsWith("NEXT_REDIRECT") ||
+    digest.startsWith("BAILOUT_TO_CLIENT_SIDE_RENDERING")
+  );
+}
 type ExtractVariables<T> = T extends { variables: object }
   ? T["variables"]
   : never;
@@ -126,6 +159,10 @@ export async function shopifyFetch<T>({
       body,
     };
   } catch (error) {
+    // Control-flow throws pass straight through: wrapping one turns a
+    // framework signal into an ordinary object that callers then swallow.
+    if (isFrameworkControlFlowError(error)) throw error;
+
     if (isShopifyError(error)) {
       throw {
         cause: error.cause?.toString() || "unknown",
@@ -192,6 +229,68 @@ function reshapeProducts(products: ShopifyProduct[]) {
 
   return reshapedProducts;
 }
+/**
+ * Rewrites a Shopify menu URL into a route this app actually serves.
+ *
+ * Parsed with `URL` rather than by stripping the configured domain: menu items
+ * come back on whichever domain the storefront is published under, so a store
+ * with a primary custom domain returns links that never match
+ * `SHOPIFY_STORE_DOMAIN` and would otherwise stay absolute.
+ */
+function normalizeMenuPath(url: string): string {
+  let pathname: string;
+
+  try {
+    pathname = new URL(url).pathname;
+  } catch {
+    // Already relative, or not a URL at all.
+    pathname = url.split("?")[0] || "/";
+  }
+
+  // Trailing slashes would defeat the prefix checks below and the active-state
+  // comparison in the nav.
+  if (pathname.length > 1) pathname = pathname.replace(/\/+$/, "");
+
+  if (pathname === "" || pathname === "/") return "/";
+
+  // Shopify pluralises where this app does not.
+  if (pathname.startsWith("/products/")) {
+    return pathname.replace("/products/", "/product/");
+  }
+
+  // `/collections`, `/collections/all` and `/collections/<handle>`.
+  if (pathname === "/collections") return "/search";
+  if (pathname.startsWith("/collections/")) {
+    const handle = pathname.split("/")[2];
+    return !handle || handle === "all" ? "/search" : `/search/${handle}`;
+  }
+
+  // Shopify pages are served at the app root: /pages/about-us -> /about-us.
+  if (pathname.startsWith("/pages/")) return pathname.replace("/pages", "");
+
+  // /blogs/... and everything else already matches a route.
+  return pathname;
+}
+
+type ShopifyMenuItemShape = {
+  title: string;
+  url: string;
+  items?: ShopifyMenuItemShape[];
+};
+
+function reshapeMenuItem(item: ShopifyMenuItemShape): Menu {
+  return {
+    title: item.title,
+    path: normalizeMenuPath(item.url),
+    ...(item.items?.length ? { items: item.items.map(reshapeMenuItem) } : {}),
+  };
+}
+
+/**
+ * One Shopify menu by handle. Returns `[]` when the handle does not exist -
+ * Shopify answers with a null menu rather than an error, so a caller checking
+ * whether a menu resolved must test the length, not catch.
+ */
 export async function getMenu(handle: string): Promise<Menu[]> {
   const res = await shopifyFetch<ShopifyMenuOperation>({
     query: getMenuQuery,
@@ -202,38 +301,6 @@ export async function getMenu(handle: string): Promise<Menu[]> {
     variables: {
       handle,
     },
-  });
-
-  const normalizeMenuPath = (url: string) => {
-    const path = url.replace(domain, "");
-    const [pathname] = path.split("?");
-
-    if (pathname === "/collections") {
-      return "/search";
-    }
-
-    if (pathname.startsWith("/collections/")) {
-      const [, , collectionHandle] = pathname.split("/");
-      return collectionHandle ? `/search/${collectionHandle}` : "/search";
-    }
-
-    if (pathname.startsWith("/pages/")) {
-      return pathname.replace("/pages", "");
-    }
-
-    return pathname || path;
-  };
-
-  const reshapeMenuItem = (item: {
-    title: string;
-    url: string;
-    items?: typeof item[];
-  }): Menu => ({
-    title: item.title,
-    path: normalizeMenuPath(item.url),
-    ...(item.items?.length
-      ? { items: item.items.map(reshapeMenuItem) }
-      : {}),
   });
 
   return res.body?.data?.menu?.items.map(reshapeMenuItem) || [];
@@ -819,4 +886,148 @@ export async function getArticles(first = 24): Promise<Article[]> {
   });
 
   return reshapeArticles(removeEdgesAndNodes(res.body.data.articles));
+}
+
+/* ------------------------------------------------------------------ catalog
+
+   The shop page reads the catalogue once and does the rest - facets, filtering,
+   sorting, paging - over that one array. Shopify's own storefront filters were
+   the obvious alternative and were rejected after checking what a store like
+   this returns: `filters` on a collection comes back with Availability and
+   Price only until the merchant configures Search & Discovery, there is no
+   `collection(handle: "all")` to hang them off for the unfiltered shop page,
+   and facet counts across a set the API will not describe cannot be made exact.
+
+   Reading the whole catalogue is only affordable because `productCardFragment`
+   is small; see the note there. */
+
+/** Shopify caps a connection at 250 nodes per page. */
+const CATALOG_PAGE_SIZE = 250;
+
+/**
+ * Hard ceiling on the catalogue walk. A store past this size wants Shopify's
+ * own filtered pagination rather than an in-memory pass, and stopping is far
+ * better than a request that walks forever: the shop page degrades to the first
+ * `CATALOG_LIMIT` products with a warning in the log, rather than timing out.
+ */
+export const CATALOG_LIMIT = 2000;
+
+function reshapeCatalogProduct(
+  product: ShopifyCatalogProduct
+): CatalogProduct | undefined {
+  if (!product || product.tags?.includes(HIDDEN_PRODUCT_TAG)) return undefined;
+
+  const { collections, images, variants, ...rest } = product;
+
+  return {
+    ...rest,
+    tags: product.tags ?? [],
+    options: product.options ?? [],
+    collections: collections ? removeEdgesAndNodes(collections) : [],
+    // Both connections are optional in practice: a cached catalogue entry
+    // written before the fragment carried them deserialises without either.
+    images: images ? reshapeImages(images, product.title) : [],
+    variants: variants ? removeEdgesAndNodes(variants) : [],
+  };
+}
+
+/**
+ * Every published product, in Shopify's best-selling order.
+ *
+ * That order is the catalogue's canonical one: it is what an unsorted shop page
+ * shows, and it is the ranking "Trending" sorts by from any starting point.
+ */
+export async function getCatalog(): Promise<CatalogProduct[]> {
+  const products: CatalogProduct[] = [];
+  let after: string | null = null;
+
+  while (products.length < CATALOG_LIMIT) {
+    const res: { body: ShopifyCatalogOperation } =
+      await shopifyFetch<ShopifyCatalogOperation>({
+        query: getCatalogQuery,
+        tags: [TAGS.products, TAGS.collections],
+        variables: { first: CATALOG_PAGE_SIZE, after },
+      });
+
+    const connection = res.body?.data?.products;
+    if (!connection) break;
+
+    for (const edge of connection.edges ?? []) {
+      const product = reshapeCatalogProduct(edge?.node);
+      if (product) products.push(product);
+    }
+
+    if (!connection.pageInfo?.hasNextPage || !connection.pageInfo.endCursor) {
+      return products;
+    }
+
+    after = connection.pageInfo.endCursor;
+  }
+
+  console.warn(
+    `Catalogue walk stopped at ${CATALOG_LIMIT} products; the shop page is showing a truncated catalogue.`
+  );
+
+  return products;
+}
+
+/**
+ * The product ids of one collection in the merchant's own order, or `null` when
+ * Shopify has no such collection.
+ *
+ * Used only as an ordering index over `getCatalog()`, so a collection page's
+ * default sort matches what the merchant arranged in Admin.
+ */
+export async function getCollectionProductOrder(
+  handle: string
+): Promise<string[] | null> {
+  const ids: string[] = [];
+  let after: string | null = null;
+
+  while (ids.length < CATALOG_LIMIT) {
+    const res: { body: ShopifyCollectionOrderOperation } =
+      await shopifyFetch<ShopifyCollectionOrderOperation>({
+        query: getCollectionOrderQuery,
+        tags: [TAGS.collections, TAGS.products],
+        variables: { handle, first: CATALOG_PAGE_SIZE, after },
+      });
+
+    const collection = res.body?.data?.collection;
+    if (!collection) return null;
+
+    for (const edge of collection.products?.edges ?? []) {
+      if (edge?.node?.id) ids.push(edge.node.id);
+    }
+
+    const pageInfo = collection.products?.pageInfo;
+    if (!pageInfo?.hasNextPage || !pageInfo.endCursor) break;
+
+    after = pageInfo.endCursor;
+  }
+
+  return ids;
+}
+
+/**
+ * Product ids matching a search term, in Shopify's relevance order.
+ *
+ * The shop page intersects these with the catalogue, so search keeps Shopify's
+ * matching and ranking while the facets, counts and paging stay one code path.
+ */
+export async function searchCatalogIds(query: string): Promise<string[]> {
+  const normalized = query.trim().replace(/\s+/g, " ");
+  if (!normalized) return [];
+
+  const res = await shopifyFetch<ShopifySearchCatalogOperation>({
+    query: searchCatalogQuery,
+    tags: [TAGS.products],
+    variables: { query: normalized, first: CATALOG_PAGE_SIZE },
+  });
+
+  const ids: string[] = [];
+  for (const edge of res.body?.data?.search?.edges ?? []) {
+    if (edge?.node?.id) ids.push(edge.node.id);
+  }
+
+  return ids;
 }

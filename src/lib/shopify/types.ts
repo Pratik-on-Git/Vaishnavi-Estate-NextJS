@@ -107,6 +107,93 @@ export type ShopifySearchProductsOperation = {
   };
 };
 
+/* ------------------------------------------------------------------ catalog
+
+   The listing shape. Everything the shop grid renders and everything the facet
+   engine derives filters from - see `fragments/product-card.ts` for why this is
+   separate from the full `Product`. */
+
+export type CatalogProductOption = {
+  name: string;
+  values: string[];
+};
+
+export type ShopifyCatalogProduct = {
+  id: string;
+  handle: string;
+  title: string;
+  availableForSale: boolean;
+  tags: string[];
+  productType: string;
+  vendor: string;
+  options: CatalogProductOption[];
+  priceRange: {
+    minVariantPrice: Money;
+    maxVariantPrice: Money;
+  };
+  /** `amount` is "0.0" when the merchant set no compare-at price. */
+  compareAtPriceRange: {
+    maxVariantPrice: Money;
+  };
+  featuredImage: Image | null;
+  /** Capped at 5 by the fragment - the card's gallery, not the full set. */
+  images: Connection<Image>;
+  /** Capped at 2: enough to tell "sellable here" from "has choices to make". */
+  variants: Connection<ProductVariant>;
+  collections: Connection<{ handle: string; title: string }>;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CatalogProduct = Omit<
+  ShopifyCatalogProduct,
+  "collections" | "images" | "variants"
+> & {
+  collections: { handle: string; title: string }[];
+  images: Image[];
+  variants: ProductVariant[];
+};
+
+export type ShopifyCatalogOperation = {
+  data: {
+    products: {
+      pageInfo: { hasNextPage: boolean; endCursor: string | null };
+      edges: Array<Edge<ShopifyCatalogProduct>>;
+    };
+  };
+  variables: {
+    first: number;
+    after?: string | null;
+  };
+};
+
+export type ShopifyCollectionOrderOperation = {
+  data: {
+    collection: {
+      handle: string;
+      products: {
+        pageInfo: { hasNextPage: boolean; endCursor: string | null };
+        edges: Array<Edge<{ id: string }>>;
+      };
+    } | null;
+  };
+  variables: {
+    handle: string;
+    first: number;
+    after?: string | null;
+  };
+};
+
+export type ShopifySearchCatalogOperation = {
+  data: {
+    search: Connection<{ id?: string }>;
+  };
+  variables: {
+    query: string;
+    first: number;
+  };
+};
+
 export type ShopifyCollection = {
   handle: string;
   title: string;

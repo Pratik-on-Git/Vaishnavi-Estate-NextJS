@@ -3,7 +3,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import Price from "./price";
 import { Badge } from "./ui/section";
-import { Product } from "@/lib/shopify/types";
+import type { Image as ShopifyImage, Money } from "@/lib/shopify/types";
 
 /**
  * Product cell (DESIGN.md §5). A packshot on the mist tile with a status badge
@@ -11,6 +11,27 @@ import { Product } from "@/lib/shopify/types";
  * no border of their own - they sit flush inside the hairline grid, which owns
  * the dividing rules.
  */
+
+/**
+ * What a card renders, and nothing more.
+ *
+ * Structural rather than `Product`, so the shop grid can build cards from the
+ * listing shape it already holds - see `lib/shopify/fragments/product-card.ts`
+ * for why the catalogue is read through a smaller fragment than the detail
+ * page uses. The full `Product` satisfies this, so every existing caller keeps
+ * working untouched.
+ */
+export type ProductCardProduct = {
+  handle: string;
+  title: string;
+  availableForSale: boolean;
+  tags: string[];
+  featuredImage?: ShopifyImage | null;
+  priceRange: {
+    minVariantPrice: Money;
+    maxVariantPrice: Money;
+  };
+};
 
 /** Shopify tags drive the flag; the first match wins. */
 const BADGE_TAGS: Record<string, string> = {
@@ -21,7 +42,7 @@ const BADGE_TAGS: Record<string, string> = {
   bestseller: "Bestseller",
 };
 
-function badgeFor(product: Product): string | null {
+function badgeFor(product: ProductCardProduct): string | null {
   for (const tag of product.tags ?? []) {
     const label = BADGE_TAGS[tag.toLowerCase()];
     if (label) return label;
@@ -35,7 +56,7 @@ export default function ProductCard({
   sizes = "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw",
   className,
 }: {
-  product: Product;
+  product: ProductCardProduct;
   priority?: boolean;
   sizes?: string;
   className?: string;

@@ -1,9 +1,21 @@
-import Grid from "@/components/grid";
-import ProductGridItems from "@/components/layout/product-grid-items";
-import { defaultSort, sorting } from "@/lib/constants";
-import { getCollections, getCollectionProducts } from "@/lib/shopify";
 import { Metadata } from "next";
-import Link from "next/link";
+import { notFound } from "next/navigation";
+import ShopView from "@/components/shop/shop-view";
+import { getCollections } from "@/lib/shopify";
+import type { Collection } from "@/lib/shopify/types";
+import { site } from "@/lib/site";
+
+/**
+ * `getCollections` is cached and is read by the view as well, so looking the
+ * collection up here costs nothing beyond the first call in a request.
+ */
+async function findCollection(handle: string): Promise<Collection | undefined> {
+  const collections = await getCollections();
+
+  return collections.find(
+    (collection) => collection.handle && collection.handle === handle
+  );
+}
 
 export async function generateMetadata({
   params,
@@ -11,10 +23,7 @@ export async function generateMetadata({
   params: Promise<{ collection: string }>;
 }): Promise<Metadata> {
   const { collection: handle } = await params;
-  // The storefront client exposes the collection list rather than a
-  // single-collection lookup, so match on the handle within its path.
-  const collections = await getCollections();
-  const collection = collections.find((item) => item.path === `/search/${handle}`);
+  const collection = await findCollection(handle);
 
   if (!collection) return { title: "Collection" };
 
@@ -23,7 +32,7 @@ export async function generateMetadata({
     description:
       collection.seo?.description ||
       collection.description ||
-      `${collection.title} from Vaishnavi Estate.`,
+      `${collection.title} from ${site.name}.`,
   };
 }
 
@@ -36,34 +45,22 @@ export default async function CategoryPage({
     [key: string]: string | string[] | undefined;
   }>;
 }) {
-  const { collection } = await params;
-  const { sort } = (await searchParams) || {};
-  const { sortKey, reverse } =
-    sorting.find((item) => item.slug === sort) || defaultSort;
-  const products = await getCollectionProducts({
-    collection,
-    sortKey,
-    reverse,
-  });
+  const { collection: handle } = await params;
+  const collection = await findCollection(handle);
+
+  // A handle Shopify does not publish is a 404, not an empty grid. Rendering
+  // "this collection is empty" for a typo tells a shopper the store is bare
+  // when the address is simply wrong, and tells search engines the same.
+  if (!collection) notFound();
 
   return (
-    <section>
-      {products.length === 0 ? (
-        <div className="rounded-plate border border-rule px-8 py-20 text-center">
-          <p className="serif text-display-md">This collection is empty</p>
-          <p className="body-mono mx-auto mt-4 max-w-measure">
-            Nothing from this lot is in stock right now. The rest of the harvest
-            is still on the shelf.
-          </p>
-          <Link href="/search" className="btn-outline mt-8">
-            View all coffee
-          </Link>
-        </div>
-      ) : (
-        <Grid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <ProductGridItems products={products} />
-        </Grid>
-      )}
-    </section>
+    <ShopView
+      basePath={collection.path}
+      collectionHandle={collection.handle}
+      eyebrow="Collection"
+      title={collection.title}
+      description={collection.description || undefined}
+      searchParams={(await searchParams) ?? {}}
+    />
   );
 }
