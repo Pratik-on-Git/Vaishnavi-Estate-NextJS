@@ -267,7 +267,7 @@ function Philosophy() {
             heading needs the extra width to avoid a ragged four-line stack.
             The opening paragraph is set a step up from the two beneath it, so
             the eye has somewhere to land before the detail. */}
-        <div className="mt-6 max-w-4xl space-y-5">
+        <div className="mt-6 max-w-6xl space-y-5">
           {estatePhilosophy.body.map((paragraph, index) => (
             <p
               key={paragraph}
