@@ -2,8 +2,8 @@ import { MAX_LINE_QUANTITY } from "@/lib/constants";
 import type {
   Cart,
   CartItem,
+  Image,
   Money,
-  Product,
   ProductVariant,
 } from "@/lib/shopify/types";
 
@@ -14,6 +14,20 @@ import type {
 
 export type UpdateType = "plus" | "minus" | "delete";
 
+/**
+ * What a cart line needs to know about the product behind it.
+ *
+ * Structural rather than `Product`, because that is genuinely all this file
+ * reads - and it lets a listing card, which never loads the full product,
+ * raise an optimistic line of its own.
+ */
+export type CartLineProduct = {
+  id: string;
+  handle: string;
+  title: string;
+  featuredImage?: Image | null;
+};
+
 export type CartAction =
   | {
       type: "UPDATE_ITEM";
@@ -21,7 +35,12 @@ export type CartAction =
     }
   | {
       type: "ADD_ITEM";
-      payload: { variant: ProductVariant; product: Product };
+      payload: {
+        variant: ProductVariant;
+        product: CartLineProduct;
+        /** Units to add. Defaults to one. */
+        quantity?: number;
+      };
     };
 
 export const DEFAULT_CURRENCY = "INR";
@@ -157,9 +176,10 @@ export function recalculateCart(cart: Cart, lines: CartItem[]): Cart {
 export function createOrUpdateCartItem(
   existingItem: CartItem | undefined,
   variant: ProductVariant,
-  product: Product
+  product: CartLineProduct,
+  units = 1
 ): CartItem {
-  const quantity = clampQuantity((existingItem?.quantity ?? 0) + 1);
+  const quantity = clampQuantity((existingItem?.quantity ?? 0) + units);
   const currencyCode =
     existingItem?.cost.totalAmount.currencyCode ??
     variant.price.currencyCode ??
@@ -191,7 +211,14 @@ export function createOrUpdateCartItem(
         id: product.id,
         handle: product.handle,
         title: product.title,
-        featuredImage: product.featuredImage,
+        // A listing card may not carry a photograph at all; the cart row wants
+        // a shape it can render rather than an undefined it has to guard.
+        featuredImage: product.featuredImage ?? {
+          url: "",
+          altText: product.title,
+          width: 0,
+          height: 0,
+        },
       },
     },
   };
@@ -220,7 +247,7 @@ export function cartReducer(
       return recalculateCart(currentCart, updatedLines);
     }
     case "ADD_ITEM": {
-      const { variant, product } = action.payload;
+      const { variant, product, quantity: units } = action.payload;
       const existingItem = currentCart.lines.find(
         (item) => item.merchandise.id === variant.id
       );
@@ -231,7 +258,12 @@ export function cartReducer(
         return currentCart;
       }
 
-      const updatedItem = createOrUpdateCartItem(existingItem, variant, product);
+      const updatedItem = createOrUpdateCartItem(
+        existingItem,
+        variant,
+        product,
+        units
+      );
       const updatedLines = existingItem
         ? currentCart.lines.map((item) =>
             item.merchandise.id === variant.id ? updatedItem : item

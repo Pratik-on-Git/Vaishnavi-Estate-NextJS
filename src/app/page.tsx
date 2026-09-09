@@ -171,6 +171,10 @@ function CollectionFilters() {
 /* --------------------------------------------------------------- rails */
 
 async function Bestsellers() {
+  // Four cells VISIBLE (see `perView` below), but twelve loaded behind them.
+  // The rail is the one section on the page you browse rather than glance at,
+  // and its arrows and dots only render when there is somewhere to scroll to -
+  // load exactly four and the carousel correctly hides its own chrome.
   const products = (
     await productsFrom("popular", { sortKey: "BEST_SELLING" })
   ).slice(0, 12);
@@ -186,7 +190,7 @@ async function Bestsellers() {
         action="View all"
         actionHref="/search"
       />
-      <Carousel label="Bestselling coffee">
+      <Carousel label="Bestselling coffee" perView={4}>
         {products.map((product, index) => (
           <ProductCard
             key={product.handle}
@@ -204,8 +208,8 @@ function RailFallback() {
   return (
     <div className="py-16">
       <div className="shell mx-auto h-10 w-64 animate-pulse rounded-full bg-wash" />
-      <div className="rule-y mt-12 grid grid-cols-1 divide-x divide-rule sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 3 }).map((_, i) => (
+      <div className="rule-y mt-12 grid grid-cols-1 divide-x divide-rule sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="p-4">
             <div className="plate aspect-square w-full animate-pulse" />
             <div className="mt-4 h-4 w-2/3 animate-pulse rounded-full bg-wash" />
@@ -293,10 +297,9 @@ function Philosophy() {
 }
 
 async function LatestBlends() {
-  const products = (await productsFrom("blend", { sortKey: "CREATED_AT", reverse: true })).slice(
-    0,
-    9
-  );
+  const products = (
+    await productsFrom("blend", { sortKey: "CREATED_AT", reverse: true })
+  ).slice(0, 4);
 
   if (!products.length) return null;
 
@@ -309,8 +312,8 @@ async function LatestBlends() {
         action="View all"
         actionHref="/search"
       />
-      <ul className="rule-y grid grid-cols-1 divide-y divide-rule sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-3">
-        {products.slice(0, 3).map((product) => (
+      <ul className="rule-y grid grid-cols-1 divide-y divide-rule sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
+        {products.map((product) => (
           <li key={product.handle}>
             <ProductCard product={product} />
           </li>
@@ -363,7 +366,7 @@ function About() {
 async function SingleOrigin() {
   const products = (
     await productsFrom("single-origin", { sortKey: "RELEVANCE" })
-  ).slice(0, 16);
+  ).slice(0, 4);
 
   if (!products.length) return null;
 
@@ -461,7 +464,7 @@ async function BrewOfTheMonth() {
 /* ---------------------------------------------------------------- merch */
 
 async function Merch() {
-  const products = (await productsFrom("merch")).slice(0, 3);
+  const products = (await productsFrom("merch")).slice(0, 4);
   if (!products.length) return null;
 
   return (
@@ -471,7 +474,7 @@ async function Merch() {
         title={<span id="merch">Fits for Drips</span>}
         count={products.length}
       />
-      <ul className="rule-y grid grid-cols-1 divide-y divide-rule sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-3">
+      <ul className="rule-y grid grid-cols-1 divide-y divide-rule sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
         {products.map((product) => (
           <li key={product.handle}>
             <ProductCard product={product} />

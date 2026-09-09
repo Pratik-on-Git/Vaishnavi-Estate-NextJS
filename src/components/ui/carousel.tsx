@@ -21,7 +21,7 @@ export default function Carousel({
 }: {
   children: React.ReactNode[];
   label: string;
-  perView?: 2 | 3;
+  perView?: 2 | 3 | 4;
   className?: string;
 }) {
   const railRef = useRef<HTMLUListElement>(null);
@@ -74,10 +74,13 @@ export default function Carousel({
     });
   };
 
-  const cellWidth =
-    perView === 2
-      ? "w-[85%] sm:w-1/2 lg:w-1/2"
-      : "w-[85%] sm:w-1/2 lg:w-1/3";
+  // Written out rather than interpolated: Tailwind scans source text, so a
+  // computed `lg:w-1/${n}` would never be generated.
+  const cellWidth = {
+    2: "w-[85%] sm:w-1/2 lg:w-1/2",
+    3: "w-[85%] sm:w-1/2 lg:w-1/3",
+    4: "w-[85%] sm:w-1/2 md:w-1/3 lg:w-1/4",
+  }[perView];
 
   return (
     <div className={className}>
