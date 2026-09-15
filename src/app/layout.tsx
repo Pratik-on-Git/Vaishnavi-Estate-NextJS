@@ -84,10 +84,15 @@ export default async function RootLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
-        {/* Two families, no exceptions: Instrument Serif for display, Space
-            Mono for everything else. See DESIGN.md §2. */}
+        <link rel="preconnect" href="https://api.fontshare.com" />
+        {/* Two families, no exceptions: Instrument Serif for display, General
+            Sans for everything else. See DESIGN.md §2. */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap"
           rel="stylesheet"
         />
       </head>

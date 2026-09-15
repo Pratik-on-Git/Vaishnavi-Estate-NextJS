@@ -30,7 +30,7 @@
   color-scheme: light;
 
   --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
-  --font-mono: "Space Mono", ui-monospace, "SFMono-Regular", monospace;
+  --font-mono: "General Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --paper: #ffffff;
   --ink: #341706;

@@ -31,10 +31,10 @@ module.exports = {
       },
       fontFamily: {
         display: ["var(--font-display)", "Georgia", "serif"],
-        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+        mono: ["var(--font-mono)", "ui-sans-serif", "system-ui", "sans-serif"],
         // Nothing in this system is set in a sans — alias it to the mono so a
         // stray `font-sans` cannot silently introduce a third typeface.
-        sans: ["var(--font-mono)", "ui-monospace", "monospace"],
+        sans: ["var(--font-mono)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       fontSize: {
         "display-hero": [
